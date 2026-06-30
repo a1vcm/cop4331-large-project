@@ -129,3 +129,4 @@ vite.config.ts.timestamp-*
 .vite/
 .dynamodb/
 .firebase/
+.env
