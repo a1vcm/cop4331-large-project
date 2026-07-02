@@ -3,6 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
+require("./collections/Course");
+require("./collections/Instructor");
+require("./collections/Review");
+require("./collections/User");
+require("./collections/Vote");
+
 const app = express();
 app.use(express.json());
 app.use(cors());
