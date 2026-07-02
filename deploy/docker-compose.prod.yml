@@ -1,0 +1,53 @@
+# Production stack for the DigitalOcean droplet. Lives at /opt/poost/ alongside
+# a .env file (see .env.example). Deployed automatically by GitHub Actions:
+#   docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d
+#
+# SECURITY: mongo intentionally has no `ports:` mapping. Docker-published ports
+# bypass UFW, so publishing 27017 would expose the database to the internet.
+
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    image: ghcr.io/a1vcm/cop4331-large-project-backend:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/poost
+    depends_on:
+      - mongo
+
+  frontend:
+    image: ghcr.io/a1vcm/cop4331-large-project-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - backend
+    # 1) run the image's envsubst script by hand (the entrypoint skips it for
+    #    non-nginx commands) so ${DOMAIN} is filled into the config,
+    # 2) reload nginx every 6h so renewed Let's Encrypt certs get picked up.
+    command: /bin/sh -c "/docker-entrypoint.d/20-envsubst-on-templates.sh && (while :; do sleep 6h; nginx -s reload; done &) && exec nginx -g 'daemon off;'"
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done"
+
+volumes:
+  mongo_data:
+  certbot_certs:
+  certbot_www:

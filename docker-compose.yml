@@ -1,0 +1,47 @@
+# Local development stack: `docker compose up --build`
+#   Frontend (Vite + HMR)  -> http://localhost:5173
+#   Backend  (nodemon)     -> http://localhost:5001  (also proxied at /api via the frontend)
+#   MongoDB                -> mongodb://localhost:27017 (published for host-side `npm test` / seed.js)
+#
+# Hot reload troubleshooting: if edits don't trigger reloads under Docker Desktop,
+# set CHOKIDAR_USEPOLLING=true (Vite) or change the backend dev script to `nodemon -L`.
+
+services:
+  mongo:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_dev:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      target: dev
+    ports:
+      - "5001:5001"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/poost
+      PORT: 5001
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_PROXY_TARGET: http://backend:5001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data_dev:

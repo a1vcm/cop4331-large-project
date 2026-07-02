@@ -5,14 +5,11 @@
 //
 // Run with:  node seed.js
 
-require("dotenv").config(); // loads .env so process.env.MONGO_URI is available
-const { MongoClient, ObjectId } = require("mongodb");
+require("dotenv").config(); // loads .env so process.env.MONGODB_URI is available
+const { MongoClient } = require("mongodb");
 
-// --- Paste your Atlas connection string here ---
-// (or set MONGO_URI in your environment and this will pick it up)
-const url =
-  process.env.MONGO_URI ||
-  "mongodb+srv://<user>:<password>@<cluster>.mongodb.net/coursedb";
+// Set MONGODB_URI in your environment / .env (defaults to the local dev container)
+const url = process.env.MONGODB_URI || "mongodb://localhost:27017/coursedb";
 
 const client = new MongoClient(url);
 const COLLECTIONS = ["Users", "Courses", "Instructors", "Reviews", "Votes"];
