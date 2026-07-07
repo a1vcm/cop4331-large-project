@@ -1,6 +1,6 @@
 #!/bin/bash
 # First-time Let's Encrypt certificate bootstrap (idempotent).
-# Run from /opt/poost AFTER: .env is filled in, DNS points at this droplet,
+# Run from /var/www/cop4331-large-project/deploy AFTER: .env is filled in, DNS points at this droplet,
 # and docker-compose.prod.yml is present.
 #
 # Solves the chicken-and-egg problem: nginx won't start without cert files,

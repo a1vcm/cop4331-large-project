@@ -1,5 +1,5 @@
 # Production nginx config. ${DOMAIN} is filled in at container start by the
-# nginx image's envsubst entrypoint (set DOMAIN in /opt/poost/.env on the server).
+# nginx image's envsubst entrypoint (set DOMAIN in /var/www/cop4331-large-project/deploy/.env on the server).
 
 server {
     listen 80;

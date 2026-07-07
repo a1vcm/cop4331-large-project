@@ -2,12 +2,12 @@
 # One-time (idempotent) bootstrap for the DigitalOcean droplet.
 # Run as root (or with sudo):  bash setup-server.sh
 #
-# Installs Docker, configures the firewall, creates /opt/poost with a .env
+# Installs Docker, configures the firewall, creates /var/www/cop4331-large-project/deploy with a .env
 # template, and logs in to GHCR so the droplet can pull the private images.
 
 set -euo pipefail
 
-APP_DIR=/opt/poost
+APP_DIR=/var/www/cop4331-large-project/deploy
 
 echo "==> 1/4 Docker"
 if ! command -v docker >/dev/null 2>&1; then
@@ -55,11 +55,11 @@ fi
 cat <<'EOF'
 
 Done. Remaining manual steps:
-  1. Edit /opt/poost/.env  (DOMAIN, JWT_SECRET)
+  1. Edit /var/www/cop4331-large-project/deploy/.env  (DOMAIN, JWT_SECRET)
   2. Point your domain's DNS A record at this droplet's public IP
      (verify with: dig +short YOUR_DOMAIN)
   3. Add the GitHub Actions secrets (DO_HOST, DO_USER, DO_SSH_KEY) to the repo,
      then push to main so the first deploy copies the compose file here — or
-     copy deploy/docker-compose.prod.yml + deploy/init-letsencrypt.sh to /opt/poost yourself.
-  4. Run:  cd /opt/poost && bash init-letsencrypt.sh   (first-time TLS certificate)
+     copy deploy/docker-compose.prod.yml + deploy/init-letsencrypt.sh to /var/www/cop4331-large-project/deploy yourself.
+  4. Run:  cd /var/www/cop4331-large-project/deploy && bash init-letsencrypt.sh   (first-time TLS certificate)
 EOF

@@ -65,7 +65,7 @@ summary job always runs — set it as the *only* required status check in branch
 1. Builds the production Docker images and pushes them to GHCR
    (`ghcr.io/a1vcm/cop4331-large-project-backend` / `-frontend`).
 2. SSHes into the DigitalOcean droplet, copies [`deploy/docker-compose.prod.yml`](deploy/docker-compose.prod.yml)
-   to `/opt/poost/`, pulls the new images, and restarts the containers.
+   to `/var/www/cop4331-large-project/deploy/`, pulls the new images, and restarts the containers.
 
 Production runs four containers on the droplet: nginx (serves the React build, terminates
 HTTPS, proxies `/api` to the backend), the Express backend, MongoDB (data in the `mongo_data`
@@ -74,12 +74,12 @@ volume, **not** exposed to the internet), and certbot (auto-renews the Let's Enc
 ### One-time droplet setup
 
 1. `scp deploy/setup-server.sh root@DROPLET_IP:` and run `bash setup-server.sh` on the droplet
-   (installs Docker, configures UFW, creates `/opt/poost/.env`, logs in to GHCR).
-2. Edit `/opt/poost/.env` — set `DOMAIN` and a strong `JWT_SECRET`.
+   (installs Docker, configures UFW, creates `/var/www/cop4331-large-project/deploy/.env`, logs in to GHCR).
+2. Edit `/var/www/cop4331-large-project/deploy/.env` — set `DOMAIN` and a strong `JWT_SECRET`.
 3. Point the domain's DNS **A record** at the droplet IP (`dig +short YOUR_DOMAIN` to verify).
 4. Add the GitHub Actions secrets below, then push to `main` (or copy
-   `deploy/docker-compose.prod.yml` + `deploy/init-letsencrypt.sh` to `/opt/poost` manually).
-5. On the droplet: `cd /opt/poost && bash init-letsencrypt.sh` — bootstraps the first
+   `deploy/docker-compose.prod.yml` + `deploy/init-letsencrypt.sh` to `/var/www/cop4331-large-project/deploy` manually).
+5. On the droplet: `cd /var/www/cop4331-large-project/deploy && bash init-letsencrypt.sh` — bootstraps the first
    Let's Encrypt certificate. After this, renewals are automatic.
 
 ### GitHub Actions secrets (repo → Settings → Secrets and variables → Actions)
@@ -91,7 +91,7 @@ volume, **not** exposed to the internet), and certbot (auto-renews the Let's Enc
 | `DO_SSH_KEY` | Private SSH key whose public half is in the droplet's `~/.ssh/authorized_keys` |
 | `DO_SSH_PORT` | Only if SSH isn't on port 22 |
 
-Runtime secrets (`DOMAIN`, `JWT_SECRET`) live only in `/opt/poost/.env` on the droplet —
+Runtime secrets (`DOMAIN`, `JWT_SECRET`) live only in `/var/www/cop4331-large-project/deploy/.env` on the droplet —
 deploys never overwrite that file.
 
 > **GHCR note:** the first image push creates the packages as *private*. Either keep them

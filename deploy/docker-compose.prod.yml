@@ -1,4 +1,4 @@
-# Production stack for the DigitalOcean droplet. Lives at /opt/poost/ alongside
+# Production stack for the DigitalOcean droplet. Lives at /var/www/cop4331-large-project/deploy/ alongside
 # a .env file (see .env.example). Deployed automatically by GitHub Actions:
 #   docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d
 #
