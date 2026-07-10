@@ -1,0 +1,198 @@
+.course-search-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #EDEFF1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reserves the same 64px as the fixed TopBar, since it's pulled out of flow */
+.course-search-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.course-search-content {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Search bar */
+.course-search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 12px 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.course-search-bar input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1A1A1A;
+}
+
+.course-search-bar input::placeholder {
+  color: #BBBBBB;
+}
+
+.course-search-bar button {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #1A1A1A;
+  cursor: pointer;
+  padding: 0;
+}
+
+.course-search-bar button svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Filter / Sort controls */
+.course-search-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.control-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 8px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  color: #555555;
+}
+
+.control-dropdown svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.control-dropdown select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  color: #1A1A1A;
+  cursor: pointer;
+}
+
+.results-count {
+  font-size: 13px;
+  color: #888888;
+  margin: 4px 0 0;
+}
+
+/* Class list */
+.class-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.class-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+}
+
+.class-info {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.class-name {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.class-meta {
+  font-size: 13px;
+  color: #888888;
+  margin: 0;
+}
+
+.class-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.difficulty-badge {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #1A1A1A;
+  padding: 6px 14px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+.reviews-btn {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.reviews-btn:hover {
+  background: #333333;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .course-search-content {
+    padding: 24px 16px 40px;
+  }
+
+  .class-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .class-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

@@ -6,11 +6,11 @@ export const C =
   white: "#FFFFFF",
 };
 
-//Font
+//Font — swapped from licensed Gotham/Knockout to Montserrat (matches Flutter's google_fonts choice)
 export const F = 
 {
-  display: '"Knockout", "Helvetica Neue", Arial, sans-serif',
-  heading: '"Gotham", "Helvetica Neue", Arial, sans-serif',
+  display: '"Montserrat", "Helvetica Neue", Arial, sans-serif',
+  heading: '"Montserrat", "Helvetica Neue", Arial, sans-serif',
   body: '"Helvetica Neue", Arial, sans-serif', 
 };
 
