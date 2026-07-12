@@ -1,0 +1,83 @@
+/* Shared top bar — single source of truth for height, padding, icon sizing,
+   and hover colors across every page. Change it here and every page using
+   <TopBar /> picks it up automatically. */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1A1A1A;
+  padding: 0 32px;
+  width: 100%;
+  height: 64px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Homepage uses this variant: pinned to the viewport, semi-transparent so
+   the hero image shows through underneath it. */
+.top-bar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.top-bar-transparent {
+  background: rgba(26, 26, 26, 0.6);
+}
+
+.top-bar-spacer {
+  width: 26px;
+  height: 26px;
+}
+
+.back-btn {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+.back-btn:hover {
+  color: #F2C417;
+}
+
+.top-bar-icons {
+  display: flex;
+  gap: 16px;
+}
+
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-btn:hover {
+  color: #F2C417;
+}

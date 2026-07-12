@@ -1,0 +1,285 @@
+.homepage {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #FFFFFF;
+
+  --panel-expanded-height: min(55vh, 480px);
+  --panel-collapsed-height: 64px;
+  --top-bar-height: 64px;
+}
+
+/* Hero — fills the entire first screen. padding-top clears the fixed top bar;
+   padding-bottom reserves space for the panel and grows when expanded. Since
+   the hero centers its content via flexbox, the visible content (title +
+   search bar) is always naturally centered in whatever space is left. */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-top: var(--top-bar-height);
+  padding-bottom: var(--panel-collapsed-height);
+  transition: padding-bottom 0.35s ease;
+}
+
+.hero.expanded-state {
+  padding-bottom: var(--panel-expanded-height);
+  transition: padding-bottom 0.35s ease 0.25s;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.hero-overlay {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.hero-title {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(26px, 4.5vw, 44px);
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+  max-height: 200px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+}
+
+.hero.expanded-state .hero-title {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+}
+
+.hero:not(.expanded-state) .hero-title {
+  transition: max-height 0.25s ease 0.35s, opacity 0.2s ease 0.4s, margin 0.25s ease 0.35s;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 24px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1A1A1A;
+}
+
+.search-bar input::placeholder {
+  color: #BBBBBB;
+  font-style: italic;
+}
+
+.search-bar button {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #1A1A1A;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-bar button svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Expandable panel — slides up from the bottom over the hero */
+.expandable-panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  background: #FFFFFF;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  height: var(--panel-collapsed-height);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: height 0.35s ease;
+}
+
+.expandable-panel.expanded {
+  height: var(--panel-expanded-height);
+  transition: height 0.35s ease 0.25s;
+}
+
+/* Pull handle — always visible at the panel's top edge, in both states */
+.pull-handle {
+  flex-shrink: 0;
+  width: 100%;
+  height: var(--panel-collapsed-height);
+  border: none;
+  background: transparent;
+  color: #1A1A1A;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pull-handle svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.4s ease;
+}
+
+.expandable-panel.expanded .pull-handle svg {
+  transform: rotate(180deg);
+}
+
+.pull-handle:hover svg {
+  color: #F2C417;
+}
+
+/* Scrollable content area inside the panel */
+.panel-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+
+/* Intro section */
+.intro {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 32px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.intro-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.intro-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  max-width: 700px;
+}
+
+.intro-heading {
+  height: 6px;
+  width: 60%;
+  background: #1A1A1A;
+}
+
+.intro-line {
+  width: 100%;
+  height: 4px;
+  background: #888888;
+}
+
+.intro-line.short {
+  width: 40%;
+}
+
+.line {
+  display: block;
+  border-radius: 2px;
+}
+
+/* Popular Classes heading */
+.popular-classes-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #1A1A1A;
+  padding: 0 32px;
+  margin: 8px 0 16px;
+}
+
+/* Cards row */
+.cards-row {
+  display: flex;
+  gap: 16px;
+  padding: 0 32px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.card {
+  flex: 1 1 calc(25% - 16px);
+  min-width: 100px;
+  height: 70px;
+  background: #CCCCCC;
+  border-radius: 8px;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+  .homepage {
+    --panel-expanded-height: min(60vh, 420px);
+  }
+
+  .hero-title {
+    font-size: clamp(22px, 6.5vw, 34px);
+  }
+
+  .intro,
+  .popular-classes-heading,
+  .cards-row {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .intro-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .card {
+    flex: 1 1 calc(50% - 16px);
+    height: 60px;
+  }
+}

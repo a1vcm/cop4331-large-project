@@ -1,0 +1,269 @@
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: #EDEFF1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Since TopBar is now position: fixed on this page too, it's pulled out of
+   normal document flow — this spacer reserves the same 64px so the auth
+   card doesn't render underneath it. */
+.auth-page-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+/* Centered content area */
+.auth-page-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* Auth card */
+.auth-card {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 380px;
+  padding: 8px 32px 32px;
+  box-sizing: border-box;
+}
+
+/* Tab switcher */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid #EAEAEA;
+  margin: 0 -32px 24px;
+  padding: 0 16px;
+}
+
+.auth-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 16px 8px;
+  cursor: pointer;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #888888;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.auth-tab svg {
+  width: 18px;
+  height: 18px;
+}
+
+.auth-tab:hover {
+  color: #1A1A1A;
+}
+
+.auth-tab.active {
+  color: #1A1A1A;
+  border-bottom-color: #F2C417;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: #1A1A1A;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #F5F5F5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.input-field svg {
+  width: 18px;
+  height: 18px;
+  color: #888888;
+  flex-shrink: 0;
+}
+
+.input-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #1A1A1A;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.input-field input::placeholder {
+  color: #AAAAAA;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #555555;
+  cursor: pointer;
+}
+
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+  accent-color: #F2C417;
+  cursor: pointer;
+}
+
+.auth-submit {
+  background: #1A1A1A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 24px;
+  padding: 14px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s ease;
+}
+
+.auth-submit:hover {
+  background: #333333;
+}
+
+.auth-link {
+  text-align: center;
+  font-size: 13px;
+  color: #888888;
+  text-decoration: underline;
+}
+
+.auth-link:hover {
+  color: #1A1A1A;
+}
+
+/* Email verification overlay */
+.verification-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.5);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.verification-card {
+  background: #1A1A1A;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 280px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+}
+
+.verification-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.verification-subtext {
+  font-size: 13px;
+  color: #BBBBBB;
+  margin: 0;
+}
+
+.verification-input {
+  width: 100%;
+  text-align: center;
+  letter-spacing: 4px;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+}
+
+.verification-submit {
+  width: 100%;
+  background: #F2C417;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 20px;
+  padding: 12px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.verification-submit:hover {
+  background: #BD9A36;
+}
+
+.verification-resend {
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.verification-resend:hover {
+  color: #F2C417;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 8px 20px 24px;
+    border-radius: 16px;
+  }
+
+  .auth-tabs {
+    margin: 0 -20px 20px;
+  }
+}

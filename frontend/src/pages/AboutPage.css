@@ -1,0 +1,149 @@
+.about-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reserves the same 64px as the fixed TopBar, since it's pulled out of flow */
+.about-page-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+/* Hero — now takes up a large portion of the initial viewport, similar to
+   Homepage's full hero treatment, so "Meet the Team!" and the background
+   photo are clearly the first thing seen. */
+.about-hero {
+  position: relative;
+  width: 100%;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.about-hero-title {
+  position: relative;
+  z-index: 1;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 56px);
+  color: #FFFFFF;
+  margin: 0;
+  text-align: center;
+}
+
+/* Team list */
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 48px 32px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Alternates photo/text sides on every other row */
+.team-row.reversed {
+  flex-direction: row-reverse;
+}
+
+.team-photo-placeholder {
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  background: #EAEAEA;
+  color: #BBBBBB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-photo-placeholder svg {
+  width: 48px;
+  height: 48px;
+}
+
+.team-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.team-row.reversed .team-info {
+  text-align: right;
+}
+
+.team-name {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.team-role {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #F2C417;
+  margin: 0;
+}
+
+.team-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555555;
+  margin: 4px 0 0;
+}
+
+/* Responsive: stack photo above text on narrow screens, no alternating */
+@media (max-width: 600px) {
+  .team-row,
+  .team-row.reversed {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .team-row.reversed .team-info {
+    text-align: center;
+  }
+
+  .team-photo-placeholder {
+    width: 120px;
+    height: 120px;
+  }
+
+  .team-list {
+    padding: 32px 20px;
+    gap: 40px;
+  }
+
+  .about-hero {
+    min-height: 40vh;
+  }
+}
