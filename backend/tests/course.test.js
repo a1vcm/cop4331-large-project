@@ -52,6 +52,20 @@ describe('Course endpoints', () => {
     expect(res.body.some((c) => c.course_code === testCode)).toBe(true);
   });
 
+  it('finds a course by a partial course_code substring', async () => {
+    const res = await request(app).get('/api/courses').query({ q: '1010' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.some((c) => c.course_code === testCode)).toBe(true);
+  });
+
+  it('does not treat the query as a regex (special characters are literal)', async () => {
+    const res = await request(app).get('/api/courses').query({ q: '(unmatched' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
+
   it('fetches a course by id', async () => {
     const created = await Course.findOne({ course_code: testCode });
     const res = await request(app).get(`/api/courses/${created._id}`);
