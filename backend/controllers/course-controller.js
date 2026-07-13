@@ -1,10 +1,25 @@
 const Course = require('../collections/Course');
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // GET /api/courses?q=search+term
+// Uses a case-insensitive substring match (not the $text index) so partial
+// course numbers like "4331" match "COP4331", which $text can't do since it
+// only matches whole tokens. The query is regex-escaped since it's raw user
+// input going straight into $regex.
 async function getCourses(req, res) {
   try {
     const { q } = req.query;
-    const filter = q ? { $text: { $search: q } } : {};
+    const filter = q
+      ? {
+          $or: [
+            { course_code: { $regex: escapeRegExp(q), $options: 'i' } },
+            { title: { $regex: escapeRegExp(q), $options: 'i' } },
+          ],
+        }
+      : {};
     const courses = await Course.find(filter).limit(100);
     res.json(courses);
   } catch (err) {

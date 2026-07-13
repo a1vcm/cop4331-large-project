@@ -160,14 +160,32 @@
 }
 
 .auth-link {
+  background: none;
+  border: none;
   text-align: center;
   font-size: 13px;
   color: #888888;
   text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .auth-link:hover {
   color: #1A1A1A;
+}
+
+.auth-message {
+  text-align: center;
+  font-size: 13px;
+  margin: -8px 0 0;
+}
+
+.auth-message.error {
+  color: #E57373;
+}
+
+.auth-message.success {
+  color: #3FA34D;
 }
 
 /* Email verification overlay */

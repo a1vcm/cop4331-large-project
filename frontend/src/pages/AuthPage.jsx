@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import { setAuthToken, getErrorMessage } from '../api/client.js';
+import { register, verifyEmail, resendVerification, login, forgotPassword, resetPassword } from '../api/auth.js';
 import './AuthPage.css';
 
 function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
   const [mode, setMode] = useState('login');
   const [showVerification, setShowVerification] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
+  const [verificationMessage, setVerificationMessage] = useState(null);
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [authMessage, setAuthMessage] = useState(null);
 
   const [regEmail, setRegEmail] = useState('');
   const [regUsername, setRegUsername] = useState('');
@@ -16,32 +20,111 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handleLogin = (e) => {
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState('request'); // 'request' | 'reset'
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
+  const [forgotMessage, setForgotMessage] = useState(null);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Logging in with:', loginEmail);
+    setAuthMessage(null);
+    try {
+      const data = await login({ email: loginEmail, password: loginPassword });
+      setAuthToken(data.token);
+      if (onBack) onBack();
+    } catch (err) {
+      if (err?.response?.data?.unverified) {
+        setRegEmail(loginEmail);
+        setVerificationMessage({ type: 'error', text: 'Please verify your email to continue.' });
+        setShowVerification(true);
+      } else {
+        setAuthMessage({ type: 'error', text: getErrorMessage(err) });
+      }
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setAuthMessage(null);
     if (regPassword !== regConfirmPassword) {
-      console.log('Passwords do not match');
+      setAuthMessage({ type: 'error', text: 'Passwords do not match' });
       return;
     }
     if (!agreedToTerms) {
-      console.log('Must agree to terms');
+      setAuthMessage({ type: 'error', text: 'You must agree to the Terms of Service' });
       return;
     }
-    console.log('Registering:', regEmail, regUsername);
-    setShowVerification(true);
+
+    try {
+      await register({ username: regUsername, email: regEmail, password: regPassword });
+      setVerificationMessage(null);
+      setShowVerification(true);
+    } catch (err) {
+      setAuthMessage({ type: 'error', text: getErrorMessage(err) });
+    }
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
-    console.log('Verifying code:', verificationCode);
+    try {
+      const data = await verifyEmail({ email: regEmail, code: verificationCode });
+      setAuthToken(data.token);
+      setShowVerification(false);
+      if (onBack) onBack();
+    } catch (err) {
+      setVerificationMessage({ type: 'error', text: getErrorMessage(err) });
+    }
   };
 
-  const handleResend = () => {
-    console.log('Resending verification code to', regEmail);
+  const handleResend = async () => {
+    try {
+      await resendVerification({ email: regEmail });
+      setVerificationMessage({ type: 'success', text: 'Code resent — check your email.' });
+    } catch (err) {
+      setVerificationMessage({ type: 'error', text: getErrorMessage(err) });
+    }
+  };
+
+  const openForgotPassword = () => {
+    setForgotEmail(loginEmail);
+    setForgotStep('request');
+    setForgotMessage(null);
+    setResetCode('');
+    setNewPassword('');
+    setNewPasswordConfirm('');
+    setShowForgotPassword(true);
+  };
+
+  const handleForgotRequest = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await forgotPassword({ email: forgotEmail });
+      setForgotStep('reset');
+      setForgotMessage({ type: 'success', text: data.message });
+    } catch (err) {
+      setForgotMessage({ type: 'error', text: getErrorMessage(err) });
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword !== newPasswordConfirm) {
+      setForgotMessage({ type: 'error', text: 'Passwords do not match' });
+      return;
+    }
+    try {
+      await resetPassword({ email: forgotEmail, code: resetCode, newPassword });
+      setShowForgotPassword(false);
+      setMode('login');
+      setLoginEmail(forgotEmail);
+      setLoginPassword('');
+      setAuthMessage({ type: 'success', text: 'Password reset — log in with your new password.' });
+    } catch (err) {
+      setForgotMessage({ type: 'error', text: getErrorMessage(err) });
+    }
   };
 
   return (
@@ -118,9 +201,13 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                 />
               </label>
 
+              {authMessage && <p className={`auth-message ${authMessage.type}`}>{authMessage.text}</p>}
+
               <button type="submit" className="auth-submit">Log In</button>
 
-              <a href="#forgot" className="auth-link">Forgot password?</a>
+              <button type="button" className="auth-link" onClick={openForgotPassword}>
+                Forgot password?
+              </button>
             </form>
           )}
 
@@ -193,6 +280,8 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                 <span>I agree to the Terms of Service</span>
               </label>
 
+              {authMessage && <p className={`auth-message ${authMessage.type}`}>{authMessage.text}</p>}
+
               <button type="submit" className="auth-submit">Create Account</button>
             </form>
           )}
@@ -215,6 +304,10 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                   required
                 />
 
+                {verificationMessage && (
+                  <p className={`auth-message ${verificationMessage.type}`}>{verificationMessage.text}</p>
+                )}
+
                 <button type="submit" className="verification-submit">Verify</button>
 
                 <button
@@ -225,6 +318,91 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                   Resend code
                 </button>
               </form>
+            </div>
+          )}
+
+          {showForgotPassword && (
+            <div className="verification-overlay">
+              {forgotStep === 'request' ? (
+                <form className="verification-card" onSubmit={handleForgotRequest}>
+                  <h2 className="verification-heading">Reset Password</h2>
+                  <p className="verification-subtext">
+                    Enter your account email and we'll send a reset code.
+                  </p>
+
+                  <input
+                    type="email"
+                    className="verification-input"
+                    placeholder="Email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+
+                  {forgotMessage && (
+                    <p className={`auth-message ${forgotMessage.type}`}>{forgotMessage.text}</p>
+                  )}
+
+                  <button type="submit" className="verification-submit">Send Code</button>
+
+                  <button
+                    type="button"
+                    className="verification-resend"
+                    onClick={() => setShowForgotPassword(false)}
+                  >
+                    Back to Log In
+                  </button>
+                </form>
+              ) : (
+                <form className="verification-card" onSubmit={handleResetPassword}>
+                  <h2 className="verification-heading">Enter Reset Code</h2>
+                  <p className="verification-subtext">
+                    We sent a code to {forgotEmail || 'your email'}
+                  </p>
+
+                  <input
+                    type="text"
+                    className="verification-input"
+                    placeholder="Reset code"
+                    value={resetCode}
+                    onChange={(e) => setResetCode(e.target.value)}
+                    maxLength={6}
+                    required
+                  />
+
+                  <input
+                    type="password"
+                    className="verification-input"
+                    placeholder="New password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+
+                  <input
+                    type="password"
+                    className="verification-input"
+                    placeholder="Confirm new password"
+                    value={newPasswordConfirm}
+                    onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                    required
+                  />
+
+                  {forgotMessage && (
+                    <p className={`auth-message ${forgotMessage.type}`}>{forgotMessage.text}</p>
+                  )}
+
+                  <button type="submit" className="verification-submit">Reset Password</button>
+
+                  <button
+                    type="button"
+                    className="verification-resend"
+                    onClick={handleForgotRequest}
+                  >
+                    Resend code
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </div>

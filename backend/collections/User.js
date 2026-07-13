@@ -11,6 +11,11 @@ const userSchema = new Schema(
       trim: true,
     },
     passwordHash: { type: String, required: true },
+    isVerified: { type: Boolean, default: false },
+    verificationCode: String,
+    verificationCodeExpires: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
   },
   { timestamps: true }
 );

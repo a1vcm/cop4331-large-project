@@ -1,77 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import { getCourses } from '../api/courses.js';
+import { getErrorMessage } from '../api/client.js';
 import './CourseSearchPage.css';
 
 const DIFFICULTY = {
   easy: { label: 'Easy', color: '#7FCB8F' },
   medium: { label: 'Medium', color: '#F2D14A' },
   hard: { label: 'Hard', color: '#E57373' },
+  unrated: { label: 'Not yet rated', color: '#D9D9D9' },
 };
 
-const CLASSES = [
-  {
-    id: 1,
-    name: 'Introduction to Programming',
-    credits: 3,
-    subject: 'COP',
-    number: '3502',
-    difficulty: 'easy',
-  },
-  {
-    id: 2,
-    name: 'Data Structures and Algorithms',
-    credits: 3,
-    subject: 'COP',
-    number: '3530',
-    difficulty: 'easy',
-  },
-  {
-    id: 3,
-    name: 'Discrete Structures',
-    credits: 3,
-    subject: 'COT',
-    number: '3100',
-    difficulty: 'hard',
-  },
-  {
-    id: 4,
-    name: 'Computer Organization',
-    credits: 3,
-    subject: 'CDA',
-    number: '3103',
-    difficulty: 'medium',
-  },
-  {
-    id: 5,
-    name: 'Software Engineering',
-    credits: 3,
-    subject: 'COP',
-    number: '4331',
-    difficulty: 'medium',
-  },
-  {
-    id: 6,
-    name: 'Operating Systems',
-    credits: 3,
-    subject: 'COP',
-    number: '4600',
-    difficulty: 'medium',
-  },
-];
+function getDifficultyKey(course) {
+  if (!course.numRatings) return 'unrated';
+  if (course.avgDifficulty <= 2) return 'easy';
+  if (course.avgDifficulty <= 3.5) return 'medium';
+  return 'hard';
+}
 
 function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, onShowReviews }) {
   const [query, setQuery] = useState('');
   const [filterBy, setFilterBy] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadCourses = async (q) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getCourses(q);
+      setCourses(data);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to load courses.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
+    loadCourses();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching for:', query);
+    loadCourses(query);
   };
 
-  const handleShowReviews = (classItem) => {
-    console.log('Show reviews for:', classItem.subject, classItem.number);
-    if (onShowReviews) onShowReviews(classItem);
+  const handleShowReviews = (course) => {
+    if (onShowReviews) onShowReviews(course);
   };
 
   return (
@@ -126,17 +105,21 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
           </label>
         </div>
 
-        <p className="results-count">{CLASSES.length} results</p>
+        {loading && <p className="results-count">Loading courses...</p>}
+        {error && <p className="results-count">{error}</p>}
+        {!loading && !error && <p className="results-count">{courses.length} results</p>}
 
         <div className="class-list">
-          {CLASSES.map((classItem) => {
-            const diff = DIFFICULTY[classItem.difficulty];
+          {!loading && !error && courses.map((course) => {
+            const diffKey = getDifficultyKey(course);
+            const diff = DIFFICULTY[diffKey];
             return (
-              <div key={classItem.id} className="class-card">
+              <div key={course._id} className="class-card">
                 <div className="class-info">
-                  <h3 className="class-name">{classItem.name}</h3>
+                  <h3 className="class-name">{course.title}</h3>
                   <p className="class-meta">
-                    {classItem.credits} credits &nbsp;•&nbsp; {classItem.subject} {classItem.number}
+                    {course.credits ?? '—'} credits &nbsp;•&nbsp; {course.course_code}
+                    {course.department ? ` • ${course.department}` : ''}
                   </p>
                 </div>
 
@@ -149,7 +132,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
                   </span>
                   <button
                     className="reviews-btn"
-                    onClick={() => handleShowReviews(classItem)}
+                    onClick={() => handleShowReviews(course)}
                   >
                     Show Reviews
                   </button>
