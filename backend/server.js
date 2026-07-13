@@ -1,14 +1,15 @@
-require('dotenv').config(); // MUST BE LINE 1
-console.log("DEBUG MONGO_URI FROM SERVER:", process.env.MONGO_URI); // <-- ADD THIS
-const express = require('express');
-
-
-const { app } = require('./app');
-const connectDB = require('./db'); // Import the database connection logic
-
-connectDB(); // force connection
-
+// server.js
+const { app } = require('./app'); // Only import the configured app instance
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Start listening for network requests
+const server = app.listen(PORT, () => {
+    console.log(`Server running in production mode on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections (e.g., if database falls over mid-runtime)
+process.on('unhandledRejection', (err, promise) => {
+    console.error(`Critical Error: ${err.message}`);
+    // Close server & exit process
+    server.close(() => process.exit(1));
 });
