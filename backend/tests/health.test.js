@@ -1,8 +1,14 @@
 const request = require('supertest');
-const { app, client } = require('../app');
+const mongoose = require('mongoose');
+const { app, client, dbReady } = require('../app');
+
+beforeAll(async () => {
+  await dbReady;
+});
 
 afterAll(async () => {
   await client.close();
+  await mongoose.connection.close();
 });
 
 describe('GET /api/health', () => {

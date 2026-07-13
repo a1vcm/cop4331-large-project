@@ -54,7 +54,7 @@ class PlaceholderBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.grayLighter.withOpacity(0.4),
+        color: AppColors.grayLighter.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Icon(icon, color: AppColors.grayLight),

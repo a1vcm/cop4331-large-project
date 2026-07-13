@@ -4,16 +4,16 @@ import userEvent from '@testing-library/user-event'
 import App from './App'
 
 describe('App', () => {
-  it('renders the landing heading', () => {
+  it('renders the homepage', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: /get started/i })).toBeInTheDocument()
+    expect(screen.getByText(/welcome to knightrate/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/search for a class/i)).toBeInTheDocument()
   })
 
-  it('increments the counter on click', async () => {
+  it('navigates to the FAQ page via the Help nav icon', async () => {
     const user = userEvent.setup()
     render(<App />)
-    const button = screen.getByRole('button', { name: /count is 0/i })
-    await user.click(button)
-    expect(button).toHaveTextContent(/count is 1/i)
+    await user.click(screen.getByRole('button', { name: /help/i }))
+    expect(screen.getByRole('heading', { name: /getting started/i })).toBeInTheDocument()
   })
 })

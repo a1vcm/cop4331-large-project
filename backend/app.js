@@ -2,12 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const { connectDB } = require('./db');
 
 require("./collections/Course");
 require("./collections/Instructor");
 require("./collections/Review");
 require("./collections/User");
 require("./collections/Vote");
+
+const dbReady = connectDB();
 
 const app = express();
 app.use(express.json());
@@ -27,4 +30,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-module.exports = { app, client };
+app.use('/api/auth', require('./routes/auth-routes'));
+app.use('/api/courses', require('./routes/course-routes'));
+
+module.exports = { app, client, dbReady };
