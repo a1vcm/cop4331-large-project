@@ -51,7 +51,11 @@ STAGING_ARG=""
 $COMPOSE run --rm --entrypoint sh certbot -c "\
   rm -rf '/etc/letsencrypt/live/$DOMAIN' '/etc/letsencrypt/archive/$DOMAIN' '/etc/letsencrypt/renewal/$DOMAIN.conf'"
 
-$COMPOSE run --rm certbot certonly --webroot -w /var/www/certbot \
+# --entrypoint certbot is required here: the certbot service's default
+# entrypoint (see docker-compose.prod.yml) is a perpetual renew-loop shell
+# script that ignores any command passed via `compose run`, so without this
+# override `certonly` never actually runs.
+$COMPOSE run --rm --entrypoint certbot certbot certonly --webroot -w /var/www/certbot \
   $STAGING_ARG $EMAIL_ARG --agree-tos -d "$DOMAIN" -d "www.$DOMAIN" \
   || { echo "Certificate request FAILED (is DNS pointing here? port 80 open, and does www.$DOMAIN also resolve here?)"; exit 1; }
 
