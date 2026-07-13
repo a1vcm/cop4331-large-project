@@ -20,9 +20,13 @@ STAGING="${STAGING:-0}"          # STAGING=1 bash init-letsencrypt.sh -> use LE 
 
 LIVE_PATH="/etc/letsencrypt/live/$DOMAIN"
 
-# A renewal config only exists after a real (non-dummy) certbot issuance
-if $COMPOSE run --rm --entrypoint sh certbot -c "[ -f '/etc/letsencrypt/renewal/$DOMAIN.conf' ]"; then
-  echo "A Let's Encrypt certificate for $DOMAIN already exists. Nothing to do."
+# A renewal config only exists after a real (non-dummy) certbot issuance.
+# Also re-issue (rather than no-op) if that cert doesn't cover www.$DOMAIN yet,
+# so re-running this script safely upgrades an older apex-only cert.
+if $COMPOSE run --rm --entrypoint sh certbot -c "\
+  [ -f '/etc/letsencrypt/renewal/$DOMAIN.conf' ] && \
+  grep -q 'www\.$DOMAIN' '/etc/letsencrypt/renewal/$DOMAIN.conf'"; then
+  echo "A Let's Encrypt certificate for $DOMAIN and www.$DOMAIN already exists. Nothing to do."
   exit 0
 fi
 
@@ -43,13 +47,13 @@ EMAIL_ARG="--register-unsafely-without-email"
 STAGING_ARG=""
 [ "$STAGING" = "1" ] && STAGING_ARG="--staging"
 
-# Delete the dummy cert so certbot can claim the live path
+# Delete the dummy (or older apex-only) cert so certbot can claim the live path
 $COMPOSE run --rm --entrypoint sh certbot -c "\
   rm -rf '/etc/letsencrypt/live/$DOMAIN' '/etc/letsencrypt/archive/$DOMAIN' '/etc/letsencrypt/renewal/$DOMAIN.conf'"
 
 $COMPOSE run --rm certbot certonly --webroot -w /var/www/certbot \
-  $STAGING_ARG $EMAIL_ARG --agree-tos -d "$DOMAIN" \
-  || { echo "Certificate request FAILED (is DNS pointing here? port 80 open?)"; exit 1; }
+  $STAGING_ARG $EMAIL_ARG --agree-tos -d "$DOMAIN" -d "www.$DOMAIN" \
+  || { echo "Certificate request FAILED (is DNS pointing here? port 80 open, and does www.$DOMAIN also resolve here?)"; exit 1; }
 
 echo "==> Reloading nginx with the real certificate"
 $COMPOSE exec frontend nginx -s reload
