@@ -1,37 +1,36 @@
-// require('dotenv').config(); // same line in server.js
-
-require('dotenv').config(); // 1. ALWAYS FIRST
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose'); // Import mongoose directly for health checking
-const connectDB = require('./db'); // Clean import
+const { MongoClient } = require('mongodb');
+const { connectDB } = require('./db');
 
-// Load Schemas
 require("./collections/Course");
 require("./collections/Instructor");
 require("./collections/Review");
 require("./collections/User");
 require("./collections/Vote");
 
+const dbReady = connectDB();
+
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Establish Mongoose Connection
-connectDB(); 
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/poost';
+const client = new MongoClient(url);
 
-// Cleaned Health Endpoint using Mongoose status states
-app.get('/api/health', (req, res) => {
-    // mongoose.connection.readyState returns 1 if fully connected
-    if (mongoose.connection.readyState === 1) {
-        return res.status(200).json({ status: 'ok', message: 'Connected to MongoDB via Mongoose' });
-    } else {
-        return res.status(500).json({ status: 'error', message: 'Database disconnected' });
-    }
+// Test endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    await client.connect();
+    await client.db().command({ ping: 1 });
+    res.status(200).json({ status: 'ok', message: 'Connected to MongoDB' });
+  } catch (e) {
+    res.status(500).json({ status: 'error', message: e.toString() });
+  }
 });
 
-// Routes
 app.use('/api/auth', require('./routes/auth-routes'));
 app.use('/api/courses', require('./routes/course-routes'));
 
-module.exports = { app };
+module.exports = { app, client, dbReady };

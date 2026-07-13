@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 async function connectDB()
 {
   try {
-    //await mongoose.connect(process.env.MONGODB_URI);
-    const uri = process.env.MONGO_URI; 
+    //await mongoose.connect(process.env.MONGODB_URI); // old code dont use, fix is below
+    const uri = process.env.MONGODB_URI; 
         
     const conn = await mongoose.connect(uri);
     console.log("[db] MongoDB connected");
@@ -15,4 +15,4 @@ async function connectDB()
 }
 
 // module.exports = { connectDB }; // old code
-module.exports = connectDB; // new cleaner export
+module.exports = { connectDB }; // new cleaner export
