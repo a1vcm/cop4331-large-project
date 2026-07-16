@@ -1,13 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import '../services/auth_state.dart';
 import '../theme/app_theme.dart';
-
-/// The app's three primary destinations, shown as a persistent bottom tab
-/// bar (standard iOS UITabBar pattern) rather than a hamburger menu.
-enum AppTab { home, search, account }
 
 /// A frosted, translucent surface approximating iOS's "Liquid Glass"
 /// material. Flutter has no access to Apple's native glass renderer (that's
@@ -91,12 +85,13 @@ class AppTopBar extends StatelessWidget {
 }
 
 /// Bottom tab bar: Home / Search / Account, the standard 3-destination
-/// iOS UITabBar shape. Account routes straight to login when signed out;
-/// logout itself lives only on the account/dashboard screen, not in a menu.
+/// iOS UITabBar shape. Purely presentational — MainShell owns the actual
+/// branch-switching logic (see widgets/main_shell.dart).
 class AppBottomTabBar extends StatelessWidget {
-  final AppTab current;
+  final int currentIndex;
+  final ValueChanged<int> onTap;
 
-  const AppBottomTabBar({super.key, required this.current});
+  const AppBottomTabBar({super.key, required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -106,35 +101,30 @@ class AppBottomTabBar extends StatelessWidget {
         top: false,
         child: SizedBox(
           height: 52,
-          child: ListenableBuilder(
-            listenable: AuthState.instance,
-            builder: (context, _) {
-              return Row(
-                children: [
-                  _TabButton(
-                    icon: Icons.home_outlined,
-                    activeIcon: Icons.home,
-                    label: 'Home',
-                    selected: current == AppTab.home,
-                    onTap: () => context.go('/'),
-                  ),
-                  _TabButton(
-                    icon: Icons.search_outlined,
-                    activeIcon: Icons.search,
-                    label: 'Search',
-                    selected: current == AppTab.search,
-                    onTap: () => context.go('/courses'),
-                  ),
-                  _TabButton(
-                    icon: Icons.person_outline,
-                    activeIcon: Icons.person,
-                    label: 'Account',
-                    selected: current == AppTab.account,
-                    onTap: () => context.go(AuthState.instance.isLoggedIn ? '/dashboard' : '/login'),
-                  ),
-                ],
-              );
-            },
+          child: Row(
+            children: [
+              _TabButton(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: 'Home',
+                selected: currentIndex == 0,
+                onTap: () => onTap(0),
+              ),
+              _TabButton(
+                icon: Icons.search_outlined,
+                activeIcon: Icons.search,
+                label: 'Search',
+                selected: currentIndex == 1,
+                onTap: () => onTap(1),
+              ),
+              _TabButton(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                label: 'Account',
+                selected: currentIndex == 2,
+                onTap: () => onTap(2),
+              ),
+            ],
           ),
         ),
       ),
@@ -177,18 +167,16 @@ class _TabButton extends StatelessWidget {
 }
 
 /// Wraps a screen body with the standard top bar so screens only need to
-/// supply their middle content (and optionally a title/back action). Pass
-/// [currentTab] on the three tab-root screens (Home/Search/Account) to show
-/// the bottom tab bar; leave it null for pushed detail screens or full-screen
-/// flows (auth) that shouldn't show it — except CourseDetailScreen, which
-/// passes AppTab.search anyway to keep the tab bar visible on drill-down,
-/// matching standard iOS behavior of pushed screens staying inside their tab.
+/// supply their middle content (and optionally a title/back action). The
+/// bottom tab bar is no longer part of this — it's owned by MainShell and
+/// automatically stays visible for every screen inside the tab shell
+/// (including pushed detail screens), and automatically absent for
+/// full-screen flows like auth that live outside the shell entirely.
 class AppScaffold extends StatelessWidget {
   final Widget body;
   final bool showBack;
   final VoidCallback? onBack;
   final String? title;
-  final AppTab? currentTab;
 
   const AppScaffold({
     super.key,
@@ -196,7 +184,6 @@ class AppScaffold extends StatelessWidget {
     this.showBack = false,
     this.onBack,
     this.title,
-    this.currentTab,
   });
 
   @override
@@ -210,7 +197,6 @@ class AppScaffold extends StatelessWidget {
             Expanded(child: body),
           ],
         ),
-        bottomNavigationBar: currentTab != null ? AppBottomTabBar(current: currentTab!) : null,
       ),
     );
   }
