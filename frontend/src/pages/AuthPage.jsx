@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import TopBar from './components/TopBar.jsx';
-import { setAuthToken, getErrorMessage } from '../api/client.js';
+import { setAuthToken, setAuthUser, getErrorMessage } from '../api/client.js';
 import { register, verifyEmail, resendVerification, login, forgotPassword, resetPassword } from '../api/auth.js';
 import './AuthPage.css';
 
@@ -34,6 +34,7 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
     try {
       const data = await login({ email: loginEmail, password: loginPassword });
       setAuthToken(data.token);
+      setAuthUser({ id: data.id, username: data.username, email: data.email });
       if (onBack) onBack();
     } catch (err) {
       if (err?.response?.data?.unverified) {
@@ -72,6 +73,7 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
     try {
       const data = await verifyEmail({ email: regEmail, code: verificationCode });
       setAuthToken(data.token);
+      setAuthUser({ id: data.id, username: data.username, email: data.email });
       setShowVerification(false);
       if (onBack) onBack();
     } catch (err) {

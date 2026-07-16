@@ -33,7 +33,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 20px;
-  color: #1A1A1A;
+  color: #242021;
   margin: 0 0 12px;
   text-align: center;
 }
@@ -68,7 +68,7 @@
 .faq-question-label {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
-  color: #1A1A1A;
+  color: #242021;
   display: flex;
   gap: 6px;
 }
@@ -86,7 +86,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: #242021;
   color: #FFFFFF;
   display: flex;
   align-items: center;
@@ -102,7 +102,7 @@
 .faq-toggle-icon.open {
   transform: rotate(45deg);
   background: #F2C417;
-  color: #1A1A1A;
+  color: #242021;
 }
 
 /* Smooth expand/collapse using grid-template-rows trick, since height: auto
