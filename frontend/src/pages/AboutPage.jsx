@@ -29,7 +29,7 @@ const TEAM_MEMBERS = [
     name: 'Jaden Harris',
     role: 'Frontend, Database',
     description:
-      'Fill in...',
+      'Focused on designing the database and granting the team access, and acted as the floater for the frontend.',
   },
   {
     id: 5,

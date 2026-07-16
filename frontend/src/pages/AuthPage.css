@@ -2,20 +2,16 @@
   position: relative;
   min-height: 100vh;
   width: 100%;
-  background: #EDEFF1;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
 }
 
-/* Since TopBar is now position: fixed on this page too, it's pulled out of
-   normal document flow — this spacer reserves the same 64px so the auth
-   card doesn't render underneath it. */
 .auth-page-top-spacer {
   height: 64px;
   flex-shrink: 0;
 }
 
-/* Centered content area */
 .auth-page-content {
   flex: 1;
   display: flex;
@@ -25,10 +21,9 @@
   box-sizing: border-box;
 }
 
-/* Auth card */
 .auth-card {
   position: relative;
-  background: #FFFFFF;
+  background: var(--color-surface);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
@@ -37,10 +32,9 @@
   box-sizing: border-box;
 }
 
-/* Tab switcher */
 .auth-tabs {
   display: flex;
-  border-bottom: 1px solid #EAEAEA;
+  border-bottom: 1px solid var(--color-border);
   margin: 0 -32px 24px;
   padding: 0 16px;
 }
@@ -58,7 +52,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #888888;
+  color: var(--color-text-muted);
   border-bottom: 3px solid transparent;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
@@ -69,15 +63,14 @@
 }
 
 .auth-tab:hover {
-  color: #1A1A1A;
+  color: var(--color-text);
 }
 
 .auth-tab.active {
-  color: #1A1A1A;
-  border-bottom-color: #F2C417;
+  color: var(--color-text);
+  border-bottom-color: var(--color-primary);
 }
 
-/* Form */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -88,7 +81,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 22px;
-  color: #1A1A1A;
+  color: var(--color-text);
   margin: 0 0 8px;
   text-align: center;
 }
@@ -97,7 +90,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #F5F5F5;
+  background: var(--color-bg); /* recessed against the white card */
   border-radius: 12px;
   padding: 12px 16px;
   box-sizing: border-box;
@@ -106,7 +99,7 @@
 .input-field svg {
   width: 18px;
   height: 18px;
-  color: #888888;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
@@ -117,12 +110,12 @@
   outline: none;
   background: transparent;
   font-size: 14px;
-  color: #1A1A1A;
+  color: var(--color-text);
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
 .input-field input::placeholder {
-  color: #AAAAAA;
+  color: var(--color-text-muted);
 }
 
 .checkbox-field {
@@ -130,20 +123,20 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: #555555;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
 .checkbox-field input {
   width: 16px;
   height: 16px;
-  accent-color: #F2C417;
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
 .auth-submit {
-  background: #1A1A1A;
-  color: #FFFFFF;
+  background: var(--color-emphasis);
+  color: var(--color-on-emphasis);
   border: none;
   border-radius: 24px;
   padding: 14px;
@@ -156,7 +149,7 @@
 }
 
 .auth-submit:hover {
-  background: #333333;
+  background: var(--color-emphasis-hover);
 }
 
 .auth-link {
@@ -164,14 +157,14 @@
   border: none;
   text-align: center;
   font-size: 13px;
-  color: #888888;
+  color: var(--color-text-muted);
   text-decoration: underline;
   cursor: pointer;
   font-family: inherit;
 }
 
 .auth-link:hover {
-  color: #1A1A1A;
+  color: var(--color-text);
 }
 
 .auth-message {
@@ -181,18 +174,17 @@
 }
 
 .auth-message.error {
-  color: #E57373;
+  color: var(--color-error);
 }
 
 .auth-message.success {
-  color: #3FA34D;
+  color: var(--color-success);
 }
 
-/* Email verification overlay */
 .verification-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(26, 26, 26, 0.5);
+  background: rgba(26, 26, 26, 0.5); /* dimming scrim */
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -202,7 +194,7 @@
 }
 
 .verification-card {
-  background: #1A1A1A;
+  background: var(--color-surface);
   border-radius: 16px;
   padding: 28px 24px;
   width: 100%;
@@ -219,13 +211,13 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 18px;
-  color: #FFFFFF;
+  color: var(--color-text);
   margin: 0;
 }
 
 .verification-subtext {
   font-size: 13px;
-  color: #BBBBBB;
+  color: var(--color-text-muted);
   margin: 0;
 }
 
@@ -236,16 +228,18 @@
   font-size: 18px;
   padding: 12px;
   border-radius: 10px;
-  border: none;
+  border: 1px solid var(--color-border);
   outline: none;
   box-sizing: border-box;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
 }
 
 .verification-submit {
   width: 100%;
-  background: #F2C417;
-  color: #1A1A1A;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   border: none;
   border-radius: 20px;
   padding: 12px;
@@ -257,13 +251,13 @@
 }
 
 .verification-submit:hover {
-  background: #BD9A36;
+  background: var(--color-primary-hover);
 }
 
 .verification-resend {
   background: transparent;
   border: none;
-  color: #FFFFFF;
+  color: var(--color-text-muted);
   font-size: 12px;
   text-decoration: underline;
   cursor: pointer;
@@ -271,10 +265,9 @@
 }
 
 .verification-resend:hover {
-  color: #F2C417;
+  color: var(--color-primary);
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .auth-card {
     padding: 8px 20px 24px;

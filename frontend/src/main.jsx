@@ -5,6 +5,7 @@ import '@fontsource/montserrat/500.css'
 import '@fontsource/montserrat/700.css'
 import './index.css'
 import App from './App.jsx'
+import "./theme.css";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

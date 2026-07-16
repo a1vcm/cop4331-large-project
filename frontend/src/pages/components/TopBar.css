@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #1A1A1A;
+  background: var(--black);
   padding: 0 32px;
   width: 100%;
   height: 64px;
@@ -25,7 +25,7 @@
 }
 
 .top-bar-transparent {
-  background: rgba(26, 26, 26, 0.6);
+  background: color-mix(in srgb, var(--black) 60%, transparent);
 }
 
 .top-bar-spacer {
@@ -38,7 +38,7 @@
   height: 26px;
   border: none;
   background: transparent;
-  color: #FFFFFF;
+  color: var(--white);
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -52,7 +52,7 @@
 }
 
 .back-btn:hover {
-  color: #F2C417;
+  color: var(--color-primary);
 }
 
 .top-bar-icons {
@@ -65,7 +65,7 @@
   height: 24px;
   border: none;
   background: transparent;
-  color: #FFFFFF;
+  color: var(--white);
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -79,5 +79,5 @@
 }
 
 .icon-btn:hover {
-  color: #F2C417;
+  color: var(--color-primary);
 }

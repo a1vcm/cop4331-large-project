@@ -1,20 +1,16 @@
 .about-page {
   min-height: 100vh;
   width: 100%;
-  background: #FFFFFF;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
 }
 
-/* Reserves the same 64px as the fixed TopBar, since it's pulled out of flow */
 .about-page-top-spacer {
   height: 64px;
   flex-shrink: 0;
 }
 
-/* Hero — now takes up a large portion of the initial viewport, similar to
-   Homepage's full hero treatment, so "Meet the Team!" and the background
-   photo are clearly the first thing seen. */
 .about-hero {
   position: relative;
   width: 100%;
@@ -32,7 +28,7 @@
 .about-hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.45); /* scrim over hero image */
 }
 
 .about-hero-title {
@@ -41,12 +37,11 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: clamp(32px, 6vw, 56px);
-  color: #FFFFFF;
+  color: var(--white); /* over dark scrim — stays white in both skins */
   margin: 0;
   text-align: center;
 }
 
-/* Team list */
 .team-list {
   display: flex;
   flex-direction: column;
@@ -64,7 +59,6 @@
   gap: 32px;
 }
 
-/* Alternates photo/text sides on every other row */
 .team-row.reversed {
   flex-direction: row-reverse;
 }
@@ -74,8 +68,8 @@
   width: 140px;
   height: 140px;
   border-radius: 12px;
-  background: #EAEAEA;
-  color: #BBBBBB;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +95,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 20px;
-  color: #1A1A1A;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -109,18 +103,17 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 500;
   font-size: 14px;
-  color: #F2C417;
+  color: var(--color-primary);
   margin: 0;
 }
 
 .team-description {
   font-size: 14px;
   line-height: 1.5;
-  color: #555555;
+  color: var(--color-text-muted);
   margin: 4px 0 0;
 }
 
-/* Responsive: stack photo above text on narrow screens, no alternating */
 @media (max-width: 600px) {
   .team-row,
   .team-row.reversed {

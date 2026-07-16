@@ -1,0 +1,78 @@
+/* --- Raw palette: fixed values, referenced by the themes below --- */
+:root {
+  /* gold (light accent) */
+  --gold-dark: #C89A0F;
+  --gold-base: #F2C417;
+  --gold-light: #F7D75A;
+
+  /* space-night (dark accent) */
+  --blue-base: #2E6BE6;
+  --blue-light: #5B8DEF;
+  --space-black: #0A0E1A;
+  --space-surface: #16203B;
+  --space-border: #2A3350;
+  --space-muted: #9AA3B8;
+
+  /* neutrals */
+  --black: #1A1A1A;
+  --black-rgb: 26, 26, 26;
+  --gray-900: #333333;
+  --gray-500: #888888;
+  --gray-300: #BBBBBB;
+  --page-gray: #EDEFF1;
+  --white: #FFFFFF;
+
+  /* status */
+  --status-error: #E57373;
+  --status-success: #3FA34D;
+}
+
+/* LIGHT mode (default) */
+:root {
+  --color-bg: var(--page-gray);
+  --color-surface: var(--white);
+  --color-text: var(--black);
+  --color-text-muted: var(--gray-500);
+  --color-border: var(--gray-300);
+
+  --color-primary: var(--gold-base);
+  --color-primary-hover: var(--gold-dark);
+  --color-on-primary: var(--black);
+
+  --color-emphasis: var(--black);
+  --color-emphasis-hover: var(--gray-900);
+  --color-on-emphasis: var(--white);
+
+  --color-error: var(--status-error);
+  --color-success: var(--status-success);
+}
+
+/* DARK mode: UCF space-night (black, blue, white) */
+[data-theme="dark"] {
+  --color-bg: var(--space-black);
+  --color-surface: var(--space-surface);
+  --color-text: var(--white);
+  --color-text-muted: var(--space-muted);
+  --color-border: var(--space-border);
+
+  --color-primary: var(--blue-base);
+  --color-primary-hover: var(--blue-light);
+  --color-on-primary: var(--white);
+
+  --color-emphasis: var(--blue-base);
+  --color-emphasis-hover: var(--blue-light);
+  --color-on-emphasis: var(--white);
+
+  --color-error: var(--status-error);
+  --color-success: var(--status-success);
+}
+
+/* Transparency helper (can't wrap a var in rgba directly): 
+    gba(var(--black-rgb), 0.6) --> color-mix(in srgb, var(--black) 60%, transparent)
+*/
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
