@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/api_client.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
 import '../widgets/app_form_field.dart';
@@ -15,31 +17,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _agreedToTerms = false;
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
     _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRegister() async {
+    setState(() => _errorMessage = null);
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() => _errorMessage = 'Passwords do not match');
+      return;
+    }
+    if (!_agreedToTerms) {
+      setState(() => _errorMessage = 'You must agree to the Terms of Service');
+      return;
+    }
+
     setState(() => _isLoading = true);
+    final email = _emailController.text.trim();
 
-    // TODO: call your teammates' register endpoint here, e.g.
-    // await AuthService.register(
-    //   email: _emailController.text.trim(),
-    //   username: _usernameController.text.trim(),
-    //   password: _passwordController.text,
-    // );
-
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    context.go('/email-auth');
+    try {
+      await AuthService.register(
+        email: email,
+        username: _usernameController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      context.go('/email-auth', extra: email);
+    } on ApiException catch (e) {
+      setState(() => _errorMessage = e.message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -80,6 +99,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   icon: Icons.lock_outline,
                   obscure: true,
                 ),
+                const SizedBox(height: 12),
+                AppTextField(
+                  controller: _confirmPasswordController,
+                  hint: 'Confirm password',
+                  icon: Icons.lock_outline,
+                  obscure: true,
+                ),
+                const SizedBox(height: 12),
+                CheckboxListTile(
+                  value: _agreedToTerms,
+                  onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Text('I agree to the Terms of Service', style: AppTextStyles.muted),
+                ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorMessage!,
+                    style: AppTextStyles.muted.copyWith(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleRegister,

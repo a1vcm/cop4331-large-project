@@ -1,89 +1,141 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../models/review.dart';
+import '../services/api_client.dart';
+import '../services/auth_service.dart';
+import '../services/auth_state.dart';
+import '../services/review_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
-import '../widgets/app_form_field.dart';
 
-class ProfileDashboardScreen extends StatelessWidget {
+class ProfileDashboardScreen extends StatefulWidget {
   const ProfileDashboardScreen({super.key});
 
   @override
+  State<ProfileDashboardScreen> createState() => _ProfileDashboardScreenState();
+}
+
+class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
+  List<Review>? _reviews;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!AuthState.instance.isLoggedIn) {
+        context.go('/login');
+        return;
+      }
+      _load();
+    });
+  }
+
+  Future<void> _load() async {
+    try {
+      final reviews = await ReviewService.getMyReviews();
+      if (!mounted) return;
+      setState(() => _reviews = reviews);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _error = e.message);
+    }
+  }
+
+  Future<void> _logout() async {
+    await AuthService.logout();
+    if (!mounted) return;
+    context.go('/');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!AuthState.instance.isLoggedIn) {
+      return const AppScaffold(body: SizedBox.shrink());
+    }
+
     return AppScaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Avatar + name/bio row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    const CircleAvatar(
-                      radius: 32,
-                      backgroundColor: AppColors.grayLighter,
-                      child: Icon(Icons.image_outlined, color: AppColors.grayLight),
+      body: RefreshIndicator(
+        onRefresh: _load,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const CircleAvatar(
+                    radius: 32,
+                    backgroundColor: AppColors.grayLighter,
+                    child: Icon(Icons.person, color: AppColors.white, size: 32),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(AuthState.instance.username ?? '', style: AppTextStyles.heading),
+                        Text(AuthState.instance.email ?? '', style: AppTextStyles.muted),
+                      ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: CircleAvatar(
-                        radius: 10,
-                        backgroundColor: AppColors.grayDark,
-                        child: const Icon(Icons.edit, size: 12, color: AppColors.white),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.logout, color: AppColors.grayMedium),
+                    onPressed: _logout,
+                    tooltip: 'Log out',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text('My Reviews', style: AppTextStyles.subheading),
+              const SizedBox(height: 12),
+              if (_error != null)
+                Text(_error!, style: AppTextStyles.muted.copyWith(color: Colors.red))
+              else if (_reviews == null)
+                const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+              else if (_reviews!.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    "You haven't written any reviews yet.",
+                    style: AppTextStyles.muted,
+                  ),
+                )
+              else
+                for (final review in _reviews!)
+                  GestureDetector(
+                    onTap: () => context.push('/courses/${review.courseId}'),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardFill,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  review.courseCode ?? review.courseTitle ?? 'Course',
+                                  style: AppTextStyles.subheading,
+                                ),
+                                if (review.courseTitle != null)
+                                  Text(review.courseTitle!, style: AppTextStyles.muted),
+                              ],
+                            ),
+                          ),
+                          Text('${review.quality}/5 ★', style: AppTextStyles.body),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const PlaceholderBox(height: 14, width: 140),
-                      const SizedBox(height: 8),
-                      const PlaceholderBox(height: 60),
-                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left rail — nav / stats placeholder, matches the vertical
-                // gray bar in the wireframe.
-                Container(
-                  width: 6,
-                  height: 220,
-                  color: AppColors.grayLighter,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('My Reviews', style: AppTextStyles.subheading),
-                      const SizedBox(height: 12),
-                      GridView.count(
-                        crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 1.2,
-                        children: List.generate(4, (i) {
-                          return const PlaceholderBox(icon: Icons.rate_review_outlined);
-                        }),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
