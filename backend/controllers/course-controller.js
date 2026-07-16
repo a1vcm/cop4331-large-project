@@ -58,4 +58,41 @@ async function createCourse(req, res) {
   }
 }
 
-module.exports = { getCourses, getCourseById, createCourse };
+// PUT /api/courses/:id
+async function updateCourse(req, res) {
+  try {
+    const { course_code, title, department, credits } = req.body;
+    const updatedCourse = await Course.findByIdAndUpdate(
+      req.params.id,
+      { course_code, title, department, credits },
+      { returnDocument: 'after', runValidators: true }
+    );
+
+    if (!updatedCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    res.json(updatedCourse);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ message: 'A course with that course_code already exists' });
+    }
+    res.status(400).json({ message: 'Failed to update course', error: err.message });
+  }
+}
+
+// DELETE /api/courses/:id
+async function deleteCourse(req, res) {
+  try {
+    const deletedCourse = await Course.findByIdAndDelete(req.params.id);
+    if (!deletedCourse) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    res.json({ message: 'Course successfully deleted', deletedCourse });
+  } catch (err) {
+    res.status(400).json({ message: 'Failed to delete course', error: err.message });
+  }
+}
+
+module.exports = { getCourses, getCourseById, createCourse, updateCourse, deleteCourse };
