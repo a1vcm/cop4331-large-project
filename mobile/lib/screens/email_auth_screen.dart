@@ -71,6 +71,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: 'Verify Email',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),

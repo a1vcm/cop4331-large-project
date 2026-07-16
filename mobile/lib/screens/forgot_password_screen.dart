@@ -94,6 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: 'Reset Password',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),

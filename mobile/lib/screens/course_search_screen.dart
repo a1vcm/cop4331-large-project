@@ -98,6 +98,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: 'Search Courses',
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

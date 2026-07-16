@@ -105,6 +105,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: _course?.courseCode ?? 'Course Details',
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null

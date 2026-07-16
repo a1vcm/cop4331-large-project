@@ -55,6 +55,7 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
     }
 
     return AppScaffold(
+      title: 'My Dashboard',
       body: RefreshIndicator(
         onRefresh: _load,
         child: SingleChildScrollView(

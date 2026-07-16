@@ -66,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: 'Register',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -107,12 +108,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscure: true,
                 ),
                 const SizedBox(height: 12),
-                CheckboxListTile(
-                  value: _agreedToTerms,
-                  onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text('I agree to the Terms of Service', style: AppTextStyles.muted),
+                Material(
+                  type: MaterialType.transparency,
+                  child: CheckboxListTile(
+                    value: _agreedToTerms,
+                    onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text('I agree to the Terms of Service', style: AppTextStyles.muted),
+                  ),
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 8),
