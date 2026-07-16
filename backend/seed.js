@@ -1,121 +1,134 @@
 // seed.js
-// Populates the database with test data, then verifies everything works:
-// connection, inserts, reads, aggregates, relationships, and the
-// one-vote-per-user rule. Safe to run multiple times (it clears old data first).
+// Loads the UCF Computer Science Department's course catalog (CS and IT
+// Required and Electives List, AY2025-2026) into the real `courses`
+// collection via the app's own Mongoose model/connection, so search and
+// reviews have real data to work against instead of manually-created test
+// entries. Idempotent — upserts by course_code, safe to re-run.
+//
+// Source: https://www.cs.ucf.edu/wp-content/uploads/2026/03/CSIT-Elective-List-AY2025-2026-Updated-on-3-11-26-added-EEL4872-1.pdf
 //
 // Run with:  node seed.js
 
-require("dotenv").config(); // loads .env so process.env.MONGODB_URI is available
-const { MongoClient } = require("mongodb");
+require('dotenv').config();
+const { connectDB } = require('./db');
+const Course = require('./collections/Course');
 
-// Set MONGODB_URI in your environment / .env (defaults to the local dev container)
-const url = process.env.MONGODB_URI || "mongodb://localhost:27017/coursedb";
-
-const client = new MongoClient(url);
-const COLLECTIONS = ["Users", "Courses", "Instructors", "Reviews", "Votes"];
+const COURSES = [
+  { course_code: 'CAP4053', title: 'AI for Game Programming', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4102', title: 'IT Design and User Experience', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4145', title: 'Introduction to Malware Analysis', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4314', title: 'Social Network Analysis', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4453', title: 'Robot Vision', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4543', title: 'Introduction to Bioinformatics Algorithms', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4611', title: 'Algorithms for Machine Learning', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4630', title: 'Artificial Intelligence', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4641', title: 'Natural Language Processing', department: 'CAP', credits: 3 },
+  { course_code: 'CAP4720', title: 'Computer Graphics', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5115', title: 'Virtual Reality Engineering', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5150', title: 'Foundations of Computer Security and Privacy', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5415', title: 'Computer Vision', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5510', title: 'Bioinformatics', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5512', title: 'Evolutionary Computation', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5610', title: 'Machine Learning', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5636', title: 'Advanced Artificial Intelligence', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5725', title: 'Computer Graphics I', department: 'CAP', credits: 3 },
+  { course_code: 'CAP5738', title: 'Visualization Techniques for Data Analysis', department: 'CAP', credits: 3 },
+  { course_code: 'CDA3103C', title: 'Computer Logic and Organization', department: 'CDA', credits: 3 },
+  { course_code: 'CDA5106', title: 'Advanced Computer Architecture', department: 'CDA', credits: 3 },
+  { course_code: 'CDA5110', title: 'Parallel Architecture and Algorithms', department: 'CDA', credits: 3 },
+  { course_code: 'CEN4360', title: 'Mobile Device Software Development', department: 'CEN', credits: 3 },
+  { course_code: 'CEN5016', title: 'Software Engineering', department: 'CEN', credits: 3 },
+  { course_code: 'CGS2545C', title: 'Database Concepts', department: 'CGS', credits: 3 },
+  { course_code: 'CGS3269', title: 'Computer Architecture Concepts', department: 'CGS', credits: 3 },
+  { course_code: 'CGS3763', title: 'Operating System Concepts', department: 'CGS', credits: 3 },
+  { course_code: 'CIS3003', title: 'Fundamentals of Information Technology', department: 'CIS', credits: 3 },
+  { course_code: 'CIS3360', title: 'Security in Computing', department: 'CIS', credits: 3 },
+  { course_code: 'CIS3362', title: 'Cryptography and Information Security', department: 'CIS', credits: 3 },
+  { course_code: 'CIS3921', title: 'Careers in IT', department: 'CIS', credits: 1 },
+  { course_code: 'CIS3990', title: 'IT Career and Academic Advising I', department: 'CIS', credits: 0 },
+  { course_code: 'CIS4004', title: 'Web-Based Information Technology', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4203C', title: 'Digital Forensics', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4361', title: 'Secure Operating Systems and Administration', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4364', title: 'Cyber Defense Analysis', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4524', title: 'Managing IT Integration', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4615', title: 'Secure Software Development and Assurance', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4940C', title: 'Topics in Cybersecurity', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4941', title: 'Approved IT Internship Experience', department: 'CIS', credits: 3 },
+  { course_code: 'CIS4991', title: 'IT Career and Academic Advising II', department: 'CIS', credits: 0 },
+  { course_code: 'CNT3004', title: 'Computer Network Concepts', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4403', title: 'Network Security and Privacy', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4425', title: 'Cloud Computing Management', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4603', title: 'System Administration and Maintenance', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4703C', title: 'Design & Implementation of Comp Comm Network', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4704', title: 'Analysis of Computer Communication Networks', department: 'CNT', credits: 3 },
+  { course_code: 'CNT4714', title: 'Enterprise Computing', department: 'CNT', credits: 3 },
+  { course_code: 'CNT5008', title: 'Computer Communication Networks Architecture', department: 'CNT', credits: 3 },
+  { course_code: 'CNT5805', title: 'Network Science', department: 'CNT', credits: 3 },
+  { course_code: 'COP3223C', title: 'Introduction to Programming with C', department: 'COP', credits: 3 },
+  { course_code: 'COP3330', title: 'Object Oriented Programming', department: 'COP', credits: 3 },
+  { course_code: 'COP3402', title: 'Systems Software', department: 'COP', credits: 3 },
+  { course_code: 'COP3502C', title: 'Computer Science I', department: 'COP', credits: 3 },
+  { course_code: 'COP3503C', title: 'Computer Science II', department: 'COP', credits: 3 },
+  { course_code: 'COP4020', title: 'Programming Languages I', department: 'COP', credits: 3 },
+  { course_code: 'COP4283', title: 'Data Science Programming', department: 'COP', credits: 3 },
+  { course_code: 'COP4331C', title: 'Processes for Object-Oriented Software Development', department: 'COP', credits: 3 },
+  { course_code: 'COP4516C', title: 'Problem Solving Techniques and Team Dynamics', department: 'COP', credits: 3 },
+  { course_code: 'COP4520', title: 'Concepts of Parallel and Distributed Processing', department: 'COP', credits: 3 },
+  { course_code: 'COP4600', title: 'Operating Systems', department: 'COP', credits: 3 },
+  { course_code: 'COP4710', title: 'Database Systems', department: 'COP', credits: 3 },
+  { course_code: 'COP4910', title: 'Frontiers in Information Technology', department: 'COP', credits: 3 },
+  { course_code: 'COP4934', title: 'Senior Design I', department: 'COP', credits: 3 },
+  { course_code: 'COP4935', title: 'Senior Design II', department: 'COP', credits: 3 },
+  { course_code: 'COP4941', title: 'Approved CS Internship Experience', department: 'COP', credits: 3 },
+  { course_code: 'COP5021', title: 'Program Analysis', department: 'COP', credits: 3 },
+  { course_code: 'COP5537', title: 'Network Optimization', department: 'COP', credits: 3 },
+  { course_code: 'COP5611', title: 'Operating Systems Design Principles', department: 'COP', credits: 3 },
+  { course_code: 'COP5621', title: 'Compiler Construction', department: 'COP', credits: 3 },
+  { course_code: 'COP5711', title: 'Parallel and Distributed Database Systems', department: 'COP', credits: 3 },
+  { course_code: 'COT3100C', title: 'Introduction to Discrete Structures', department: 'COT', credits: 3 },
+  { course_code: 'COT3960', title: 'Passed CS Foundation Exam', department: 'COT', credits: 0 },
+  { course_code: 'COT4210', title: 'Discrete Structures II', department: 'COT', credits: 3 },
+  { course_code: 'COT4400', title: 'Tools for Algorithm Analysis', department: 'COT', credits: 3 },
+  { course_code: 'COT4500', title: 'Numerical Calculus', department: 'COT', credits: 3 },
+  { course_code: 'COT5405', title: 'Design and Analysis of Algorithms', department: 'COT', credits: 3 },
+  { course_code: 'COT5600', title: 'Quantum Computing', department: 'COT', credits: 3 },
+  { course_code: 'EEE4346C', title: 'Hardware Security and Trusted Circuit Design', department: 'EEE', credits: 3 },
+  { course_code: 'EEL4660', title: 'Robotic Systems', department: 'EEL', credits: 3 },
+  { course_code: 'EEL4768', title: 'Computer Architecture', department: 'EEL', credits: 3 },
+  { course_code: 'EEL4781', title: 'Computer Communication Networks', department: 'EEL', credits: 3 },
+  { course_code: 'EEL4872', title: 'Engineering Applications of Intelligent System', department: 'EEL', credits: 3 },
+  { course_code: 'EEL5780', title: 'Wireless Networks', department: 'EEL', credits: 3 },
+  { course_code: 'EEL5820', title: 'Image Processing', department: 'EEL', credits: 3 },
+  { course_code: 'EGN4060C', title: 'Introduction to Robotics', department: 'EGN', credits: 3 },
+  { course_code: 'EGN4630', title: 'Entrepreneurship for Defense', department: 'EGN', credits: 3 },
+  { course_code: 'EGN4641', title: 'Engineering Entrepreneurship', department: 'EGN', credits: 3 },
+  { course_code: 'EGN5640', title: 'Entrepreneurship for Defense', department: 'EGN', credits: 3 },
+  { course_code: 'MAP4384', title: 'Numerical Methods for Computational Sciences', department: 'MAP', credits: 3 },
+  { course_code: 'PHY3650', title: 'Quantum Information Processing', department: 'PHY', credits: 3 },
+];
 
 async function seed() {
-  try {
-    await client.connect();
-    const db = client.db("coursedb");
-    console.log("[seed] Connected to MongoDB\n");
+  await connectDB();
+  console.log(`[seed] Upserting ${COURSES.length} courses...`);
 
-    // 1. Clear previous test data so this script can be re-run safely
-    for (const name of COLLECTIONS) {
-      await db.collection(name).deleteMany({});
-    }
-    console.log("[seed] Cleared old test data");
-
-    // 2. Ensure the unique index that blocks double-voting exists
-    await db
-      .collection("Votes")
-      .createIndex({ reviewId: 1, userId: 1 }, { unique: true });
-    console.log("[seed] Ensured unique index on Votes(reviewId, userId)\n");
-
-    // 3. Users
-    const users = await db.collection("Users").insertMany([
-      { username: "knight_2026", email: "student1@knights.ucf.edu", passwordHash: "hash_placeholder", createdAt: new Date() },
-      { username: "pegasus_ry",  email: "student2@knights.ucf.edu", passwordHash: "hash_placeholder", createdAt: new Date() },
-    ]);
-    const userIds = Object.values(users.insertedIds);
-
-    // 4. Instructors
-    await db.collection("Instructors").insertMany([
-      { firstname: "Jane", lastname: "Doe", department: "Computer Science", createdAt: new Date(), updatedAt: new Date() },
-      { firstname: "Mark", lastname: "Lee", department: "Computer Science", createdAt: new Date(), updatedAt: new Date() },
-    ]);
-
-    // 5. Courses (aggregates start at 0, recomputed from reviews below)
-    const courses = await db.collection("Courses").insertMany([
-      { course_code: "COP3502", title: "Computer Science I", department: "Computer Science", credits: 3, avgRating: 0, avgDifficulty: 0, numRatings: 0, createdAt: new Date(), updatedAt: new Date() },
-      { course_code: "COP4331", title: "Processes for Object-Oriented Software Development", department: "Computer Science", credits: 3, avgRating: 0, avgDifficulty: 0, numRatings: 0, createdAt: new Date(), updatedAt: new Date() },
-    ]);
-    const courseIds = Object.values(courses.insertedIds);
-
-    // 6. Reviews (each linked to a course and a user)
-    const reviews = await db.collection("Reviews").insertMany([
-      { courseId: courseIds[0], userId: userIds[0], instructor: "Jane Doe", term: "Fall 2025",   quality: 5, difficulty: 3, grade: "A", comment: "Clear lectures, fair exams.",        voteScore: { helpful: 0, notHelpful: 0 }, createdAt: new Date(), updatedAt: new Date() },
-      { courseId: courseIds[0], userId: userIds[1], instructor: "Jane Doe", term: "Spring 2025", quality: 4, difficulty: 4, grade: "B", comment: "Heavy workload but you learn a lot.", voteScore: { helpful: 0, notHelpful: 0 }, createdAt: new Date(), updatedAt: new Date() },
-      { courseId: courseIds[1], userId: userIds[0], instructor: "Mark Lee", term: "Summer 2025", quality: 4, difficulty: 5, grade: "A", comment: "Group project is intense.",           voteScore: { helpful: 0, notHelpful: 0 }, createdAt: new Date(), updatedAt: new Date() },
-    ]);
-    const reviewIds = Object.values(reviews.insertedIds);
-
-    // 7. Recompute COP3502's aggregates from its two reviews
-    const stats = await db.collection("Reviews").aggregate([
-      { $match: { courseId: courseIds[0] } },
-      { $group: { _id: null, avgRating: { $avg: "$quality" }, avgDifficulty: { $avg: "$difficulty" }, numRatings: { $sum: 1 } } },
-    ]).toArray();
-    if (stats[0]) {
-      await db.collection("Courses").updateOne(
-        { _id: courseIds[0] },
-        { $set: { avgRating: stats[0].avgRating, avgDifficulty: stats[0].avgDifficulty, numRatings: stats[0].numRatings } }
-      );
-    }
-
-    // 8. Votes
-    await db.collection("Votes").insertMany([
-      { reviewId: reviewIds[0], userId: userIds[1], value: 1,  createdAt: new Date() },
-      { reviewId: reviewIds[1], userId: userIds[0], value: -1, createdAt: new Date() },
-    ]);
-    console.log("[seed] Inserted test data\n");
-
-    // ---------- VERIFICATION ----------
-    console.log("=== Document counts ===");
-    for (const name of COLLECTIONS) {
-      console.log(`  ${name}: ${await db.collection(name).countDocuments()}`);
-    }
-
-    console.log("\n=== Course with recomputed aggregates ===");
-    const course = await db.collection("Courses").findOne({ _id: courseIds[0] });
-    console.log(`  ${course.course_code} - ${course.title}`);
-    console.log(`  avgRating ${course.avgRating}, avgDifficulty ${course.avgDifficulty}, numRatings ${course.numRatings}`);
-
-    console.log("\n=== Relationship check (review -> course via $lookup) ===");
-    const joined = await db.collection("Reviews").aggregate([
-      { $match: { _id: reviewIds[0] } },
-      { $lookup: { from: "Courses", localField: "courseId", foreignField: "_id", as: "course" } },
-      { $unwind: "$course" },
-    ]).toArray();
-    console.log(`  Review "${joined[0].comment}" is linked to ${joined[0].course.course_code}`);
-
-    console.log("\n=== Constraint check (attempt a duplicate vote) ===");
-    try {
-      await db.collection("Votes").insertOne({ reviewId: reviewIds[0], userId: userIds[1], value: 1, createdAt: new Date() });
-      console.log("  WARNING: duplicate vote was allowed - the unique index is NOT working!");
-    } catch (err) {
-      if (err.code === 11000) {
-        console.log("  Duplicate vote correctly blocked (error 11000). Constraint works.");
-      } else {
-        throw err;
-      }
-    }
-
-    console.log("\n[seed] All checks passed - your database is working.");
-  } catch (err) {
-    console.error("[seed] Error:", err.message);
-  } finally {
-    await client.close();
+  let created = 0;
+  let updated = 0;
+  for (const course of COURSES) {
+    const res = await Course.updateOne(
+      { course_code: course.course_code },
+      { $setOnInsert: course },
+      { upsert: true }
+    );
+    if (res.upsertedCount > 0) created++;
+    else updated++;
   }
+
+  console.log(`[seed] Done. ${created} created, ${updated} already existed.`);
+  console.log(`[seed] Total courses in database: ${await Course.countDocuments()}`);
+  process.exit(0);
 }
 
-seed();
+seed().catch((err) => {
+  console.error('[seed] Error:', err.message);
+  process.exit(1);
+});

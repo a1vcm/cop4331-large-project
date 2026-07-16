@@ -96,7 +96,6 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
     final results = _visibleCourses;
 
     return AppScaffold(
-      currentTab: AppTab.search,
       title: 'Search Courses',
       body: SafeArea(
         child: Column(
