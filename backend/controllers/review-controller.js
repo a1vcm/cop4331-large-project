@@ -102,6 +102,20 @@ async function getCourseReviews(req, res) {
   }
 }
 
+// @desc    Get the logged-in user's own reviews
+// @route   GET /api/reviews/mine
+async function getMyReviews(req, res) {
+  try {
+    const reviews = await Review.find({ userId: req.user.id })
+      .populate('courseId', 'course_code title department')
+      .sort({ createdAt: -1 });
+
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch your reviews', error: err.message });
+  }
+}
+
 // @desc    Update an existing review
 // @route   PUT /api/reviews/:id
 async function updateReview(req, res) {
@@ -164,6 +178,7 @@ async function deleteReview(req, res) {
 module.exports = {
   createReview,
   getCourseReviews,
+  getMyReviews,
   updateReview,
   deleteReview,
 };
