@@ -79,4 +79,42 @@ describe('Course endpoints', () => {
 
     expect(res.status).toBe(404);
   });
+
+  it('updates a course', async () => {
+    const created = await Course.findOne({ course_code: testCode });
+    const res = await request(app).put(`/api/courses/${created._id}`).send({
+      course_code: testCode,
+      title: 'CI Test Course (updated)',
+      department: 'COP',
+      credits: 4,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body.title).toBe('CI Test Course (updated)');
+    expect(res.body.credits).toBe(4);
+  });
+
+  it('returns 404 updating a nonexistent course', async () => {
+    const res = await request(app)
+      .put('/api/courses/000000000000000000000000')
+      .send({ title: 'Nope' });
+
+    expect(res.status).toBe(404);
+  });
+
+  it('deletes a course', async () => {
+    const created = await Course.findOne({ course_code: testCode });
+    const res = await request(app).delete(`/api/courses/${created._id}`);
+
+    expect(res.status).toBe(200);
+
+    const gone = await Course.findById(created._id);
+    expect(gone).toBeNull();
+  });
+
+  it('returns 404 deleting a nonexistent course', async () => {
+    const res = await request(app).delete('/api/courses/000000000000000000000000');
+
+    expect(res.status).toBe(404);
+  });
 });
