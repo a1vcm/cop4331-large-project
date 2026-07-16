@@ -37,6 +37,8 @@ dependencies:
     
   go_router: ^14.2.0 # navigation between screens, works cleanly on web too
   google_fonts: ^6.2.1 # loads Montserrat at runtime, no font files needed
+  http: ^1.6.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/api_client.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
 import '../widgets/app_form_field.dart';
@@ -15,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -24,24 +27,37 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
 
-    // TODO: call your teammates' login endpoint here, e.g.
-    // final result = await AuthService.login(
-    //   email: _emailController.text.trim(),
-    //   password: _passwordController.text,
-    // );
+    final email = _emailController.text.trim();
 
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    context.go('/dashboard');
+    try {
+      await AuthService.login(email: email, password: _passwordController.text);
+      if (!mounted) return;
+      context.go('/dashboard');
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      // Mirrors AuthPage.jsx: an unverified login bounces to the
+      // verification screen instead of just showing an error.
+      if (e.statusCode == 403) {
+        context.go('/email-auth', extra: email);
+        return;
+      }
+      setState(() => _errorMessage = e.message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
+      showBack: true,
+      onBack: () => context.canPop() ? context.pop() : context.go('/'),
+      title: 'Log In',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -69,6 +85,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   icon: Icons.lock_outline,
                   obscure: true,
                 ),
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorMessage!,
+                    style: AppTextStyles.muted.copyWith(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _handleLogin,
@@ -84,6 +108,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       : const Text('Log In'),
                 ),
                 const SizedBox(height: 10),
+                Center(
+                  child: TextButton(
+                    onPressed: () => context.push('/forgot-password'),
+                    child: Text('Forgot password?', style: AppTextStyles.muted),
+                  ),
+                ),
                 Center(
                   child: TextButton(
                     onPressed: () => context.go('/register'),

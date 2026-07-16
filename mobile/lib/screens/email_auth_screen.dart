@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/api_client.dart';
+import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
 import '../widgets/app_form_field.dart';
 
 class EmailAuthScreen extends StatefulWidget {
-  const EmailAuthScreen({super.key});
+  final String email;
+
+  const EmailAuthScreen({super.key, required this.email});
 
   @override
   State<EmailAuthScreen> createState() => _EmailAuthScreenState();
@@ -14,6 +18,9 @@ class EmailAuthScreen extends StatefulWidget {
 class _EmailAuthScreenState extends State<EmailAuthScreen> {
   final _codeController = TextEditingController();
   bool _isVerifying = false;
+  bool _isResending = false;
+  String? _message;
+  bool _messageIsError = true;
 
   @override
   void dispose() {
@@ -22,16 +29,41 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
   }
 
   Future<void> _handleVerify() async {
-    setState(() => _isVerifying = true);
+    setState(() {
+      _isVerifying = true;
+      _message = null;
+    });
 
-    // TODO: call your teammates' verify-email endpoint, e.g.
-    // await AuthService.verifyEmail(code: _codeController.text.trim());
+    try {
+      await AuthService.verifyEmail(email: widget.email, code: _codeController.text.trim());
+      if (!mounted) return;
+      context.go('/dashboard');
+    } on ApiException catch (e) {
+      setState(() {
+        _message = e.message;
+        _messageIsError = true;
+      });
+    } finally {
+      if (mounted) setState(() => _isVerifying = false);
+    }
+  }
 
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-    setState(() => _isVerifying = false);
-    context.go('/login');
+  Future<void> _handleResend() async {
+    setState(() => _isResending = true);
+    try {
+      await AuthService.resendVerification(email: widget.email);
+      setState(() {
+        _message = 'Code resent — check your email.';
+        _messageIsError = false;
+      });
+    } on ApiException catch (e) {
+      setState(() {
+        _message = e.message;
+        _messageIsError = true;
+      });
+    } finally {
+      if (mounted) setState(() => _isResending = false);
+    }
   }
 
   @override
@@ -39,6 +71,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
+      title: 'Verify Email',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -68,7 +101,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  "We've sent a verification code to your email. Enter it below to continue.",
+                  "We've sent a verification code to ${widget.email}. Enter it below to continue.",
                   style: AppTextStyles.body,
                   textAlign: TextAlign.center,
                 ),
@@ -79,6 +112,16 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                   icon: Icons.pin_outlined,
                   keyboardType: TextInputType.number,
                 ),
+                if (_message != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _message!,
+                    style: AppTextStyles.muted.copyWith(
+                      color: _messageIsError ? Colors.red : Colors.green,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _isVerifying ? null : _handleVerify,
@@ -96,10 +139,11 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                 const SizedBox(height: 10),
                 Center(
                   child: TextButton(
-                    onPressed: () {
-                      // TODO: call resend-code endpoint
-                    },
-                    child: Text('Resend Code', style: AppTextStyles.muted),
+                    onPressed: _isResending ? null : _handleResend,
+                    child: Text(
+                      _isResending ? 'Resending...' : 'Resend Code',
+                      style: AppTextStyles.muted,
+                    ),
                   ),
                 ),
               ],

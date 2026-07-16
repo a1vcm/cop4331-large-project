@@ -133,6 +133,26 @@ describe('PUT /api/reviews/:id', () => {
   });
 });
 
+describe('GET /api/reviews/mine', () => {
+  it('rejects an unauthenticated request', async () => {
+    const res = await request(app).get('/api/reviews/mine');
+
+    expect(res.status).toBe(401);
+  });
+
+  it("returns only the caller's reviews with course info populated", async () => {
+    const res = await request(app).get('/api/reviews/mine').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.some((r) => r._id === reviewId)).toBe(true);
+    expect(res.body.every((r) => r.courseId?.course_code)).toBe(true);
+
+    const otherRes = await request(app).get('/api/reviews/mine').set('Authorization', `Bearer ${otherToken}`);
+    expect(otherRes.status).toBe(200);
+    expect(otherRes.body.some((r) => r._id === reviewId)).toBe(false);
+  });
+});
+
 describe('DELETE /api/reviews/:id', () => {
   it("rejects deleting another user's review", async () => {
     const res = await request(app)
