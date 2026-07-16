@@ -42,7 +42,7 @@
   outline: none;
   background: transparent;
   font-size: 15px;
-  color: #1A1A1A;
+  color: #242021;
 }
 
 .course-search-bar input::placeholder {
@@ -55,7 +55,7 @@
   flex-shrink: 0;
   border: none;
   background: transparent;
-  color: #1A1A1A;
+  color: #242021;
   cursor: pointer;
   padding: 0;
 }
@@ -94,7 +94,7 @@
   background: transparent;
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 13px;
-  color: #1A1A1A;
+  color: #242021;
   cursor: pointer;
 }
 
@@ -135,7 +135,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 15px;
-  color: #1A1A1A;
+  color: #242021;
   margin: 0;
 }
 
@@ -156,14 +156,14 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 12px;
-  color: #1A1A1A;
+  color: #242021;
   padding: 6px 14px;
   border-radius: 14px;
   white-space: nowrap;
 }
 
 .reviews-btn {
-  background: #1A1A1A;
+  background: #242021;
   color: #FFFFFF;
   border: none;
   border-radius: 8px;

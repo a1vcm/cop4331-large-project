@@ -69,11 +69,11 @@
 }
 
 .auth-tab:hover {
-  color: #1A1A1A;
+  color: #242021;
 }
 
 .auth-tab.active {
-  color: #1A1A1A;
+  color: #242021;
   border-bottom-color: #F2C417;
 }
 
@@ -88,7 +88,7 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 22px;
-  color: #1A1A1A;
+  color: #242021;
   margin: 0 0 8px;
   text-align: center;
 }
@@ -117,7 +117,7 @@
   outline: none;
   background: transparent;
   font-size: 14px;
-  color: #1A1A1A;
+  color: #242021;
   font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .auth-submit {
-  background: #1A1A1A;
+  background: #242021;
   color: #FFFFFF;
   border: none;
   border-radius: 24px;
@@ -171,7 +171,7 @@
 }
 
 .auth-link:hover {
-  color: #1A1A1A;
+  color: #242021;
 }
 
 .auth-message {
@@ -192,7 +192,7 @@
 .verification-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(26, 26, 26, 0.5);
+  background: rgba(36, 32, 33, 0.5);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -202,7 +202,7 @@
 }
 
 .verification-card {
-  background: #1A1A1A;
+  background: #242021;
   border-radius: 16px;
   padding: 28px 24px;
   width: 100%;
@@ -245,7 +245,7 @@
 .verification-submit {
   width: 100%;
   background: #F2C417;
-  color: #1A1A1A;
+  color: #242021;
   border: none;
   border-radius: 20px;
   padding: 12px;

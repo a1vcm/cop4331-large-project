@@ -2,7 +2,7 @@
 export const C = 
 {
   gold: "#F2C417", goldDark: "#BD9A36", goldLight: "#F5D77A", goldPale: "#FBEBBE",
-  black: "#1A1A1A", grayDark: "#333333", grayMedium: "#555555", grayLight: "#888888", grayLighter: "#BBBBBB", grayLightest: "#EAEAEA", 
+  black: "#242021", grayDark: "#333333", grayMedium: "#555555", grayLight: "#888888", grayLighter: "#BBBBBB", grayLightest: "#EAEAEA", 
   white: "#FFFFFF",
 };
 

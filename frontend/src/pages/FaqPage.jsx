@@ -9,19 +9,21 @@ const FAQ_SECTIONS = [
     questions: [
       {
         id: 'q1',
-        question: 'Placeholder question one?',
+        question: 'What is KnightRate?',
         answer:
-          'Placeholder answer text goes here. This will explain the answer to the first question in more detail once real content is written.',
+          "KnightRate is a course review platform built for UCF Computer Science and IT students. Search the course catalog, see difficulty and quality ratings from students who've taken a class, and share your own experience once you have.",
       },
       {
         id: 'q2',
-        question: 'Placeholder question two?',
-        answer: 'Placeholder answer text goes here for question two.',
+        question: 'How do I search for a class?',
+        answer:
+          'Use the search bar on the homepage or the Courses page and type a course code (like COP3502C) or a course name. You can filter by difficulty and sort by name, credits, or difficulty from the Courses page.',
       },
       {
         id: 'q3',
-        question: 'Placeholder question three?',
-        answer: 'Placeholder answer text goes here for question three.',
+        question: 'Do I need an account to browse courses?',
+        answer:
+          'No — anyone can search the catalog and read reviews without an account. You only need to register and log in to write your own review.',
       },
     ],
   },
@@ -31,18 +33,21 @@ const FAQ_SECTIONS = [
     questions: [
       {
         id: 'q4',
-        question: 'Placeholder question four?',
-        answer: 'Placeholder answer text goes here for question four.',
+        question: 'How do I create an account?',
+        answer:
+          "Click the account icon and choose Register. After signing up, we'll email you a verification code — enter it on the next screen to activate your account and log in automatically.",
       },
       {
         id: 'q5',
-        question: 'Placeholder question five?',
-        answer: 'Placeholder answer text goes here for question five.',
+        question: 'How do I write or edit a review?',
+        answer:
+          "Open a course's page and click Write a Review. You can rate quality and difficulty, add the instructor, term, and grade, and leave a comment. You can only submit one review per course, but you can edit or delete it any time from that course's page.",
       },
       {
         id: 'q6',
-        question: 'Placeholder question six?',
-        answer: 'Placeholder answer text goes here for question six.',
+        question: 'I forgot my password — what do I do?',
+        answer:
+          "On the Log In tab, click Forgot password?. We'll send a reset code to your email that you can use to set a new password.",
       },
     ],
   },

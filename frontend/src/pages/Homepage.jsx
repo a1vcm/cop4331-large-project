@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import ucfLogo from '../assets/ICON_UCF.png';
 import stockUcf from '../assets/STOCK_UCF.jpg';
+import { getCourses } from '../api/courses.js';
 import './Homepage.css';
 
 function Homepage({
@@ -11,13 +12,22 @@ function Homepage({
   onInfoClick,
   onHelpClick,
   onCoursesClick,
+  onSearch,
+  onCourseClick,
 }) {
   const [query, setQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [popularCourses, setPopularCourses] = useState([]);
+
+  useEffect(() => {
+    getCourses()
+      .then((courses) => setPopularCourses(courses.slice(0, 4)))
+      .catch(() => setPopularCourses([]));
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching for:', query);
+    if (onSearch) onSearch(query);
   };
 
   const toggleExpanded = () => {
@@ -78,20 +88,33 @@ function Homepage({
           <section className="intro">
             <img src={ucfLogo} alt="UCF Logo" className="intro-logo" />
             <div className="intro-text">
-              <span className="line intro-heading" />
-              <span className="line intro-line" />
-              <span className="line intro-line" />
-              <span className="line intro-line short" />
+              <h2 className="intro-heading">Find the right class, from students who've taken it</h2>
+              <p className="intro-line">
+                KnightRate is a course review platform built for UCF Computer Science and IT
+                students — search the catalog, read real ratings for difficulty and quality, and
+                share your own experience once you've taken a class.
+              </p>
             </div>
           </section>
 
-          <h2 className="popular-classes-heading">Popular Classes</h2>
+          <h2 className="popular-classes-heading">Browse Classes</h2>
 
           <section className="cards-row">
-            <div className="card" />
-            <div className="card" />
-            <div className="card" />
-            <div className="card" />
+            {popularCourses.length === 0 ? (
+              <p className="cards-row-empty">Loading classes…</p>
+            ) : (
+              popularCourses.map((course) => (
+                <button
+                  key={course._id}
+                  type="button"
+                  className="card"
+                  onClick={() => (onCourseClick ? onCourseClick(course) : onCoursesClick?.())}
+                >
+                  <span className="card-code">{course.course_code}</span>
+                  <span className="card-title">{course.title}</span>
+                </button>
+              ))
+            )}
           </section>
         </div>
       </div>
