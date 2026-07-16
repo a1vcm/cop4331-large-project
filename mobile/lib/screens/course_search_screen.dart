@@ -96,8 +96,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
     final results = _visibleCourses;
 
     return AppScaffold(
-      showBack: true,
-      onBack: () => context.pop(),
+      currentTab: AppTab.search,
       title: 'Search Courses',
       body: SafeArea(
         child: Column(
@@ -128,6 +127,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _filterBy,
+                      isExpanded: true,
                       decoration: const InputDecoration(isDense: true),
                       items: const [
                         DropdownMenuItem(value: 'all', child: Text('Filter By')),
@@ -142,6 +142,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _sortBy,
+                      isExpanded: true,
                       decoration: const InputDecoration(isDense: true),
                       items: const [
                         DropdownMenuItem(value: 'relevance', child: Text('Sort By')),

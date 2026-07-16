@@ -28,6 +28,7 @@ class _HomepageScreenState extends State<HomepageScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
+      currentTab: AppTab.home,
       body: ListenableBuilder(
         listenable: AuthState.instance,
         builder: (context, _) {

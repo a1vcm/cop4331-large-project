@@ -51,10 +51,11 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     if (!AuthState.instance.isLoggedIn) {
-      return const AppScaffold(body: SizedBox.shrink());
+      return const AppScaffold(currentTab: AppTab.account, body: SizedBox.shrink());
     }
 
     return AppScaffold(
+      currentTab: AppTab.account,
       title: 'My Dashboard',
       body: RefreshIndicator(
         onRefresh: _load,

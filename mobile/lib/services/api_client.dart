@@ -66,9 +66,20 @@ class ApiClient {
       throw ApiException('Could not reach the server. Check your connection and try again.', 0);
     }
 
-    final decoded = res.body.isNotEmpty ? jsonDecode(res.body) : null;
+    // A non-JSON body (e.g. Express's plain-text 404 page for a route that
+    // isn't deployed, or an nginx/proxy error page) must not let a raw
+    // FormatException escape here — every caller only catches ApiException.
+    dynamic decoded;
+    try {
+      decoded = res.body.isNotEmpty ? jsonDecode(res.body) : null;
+    } catch (_) {
+      decoded = null;
+    }
 
     if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (decoded == null && res.body.isNotEmpty) {
+        throw ApiException('Unexpected response from the server.', res.statusCode);
+      }
       return decoded;
     }
 
