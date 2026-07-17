@@ -18,8 +18,8 @@ function getDifficultyKey(course) {
   return 'hard';
 }
 
-function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, onShowReviews }) {
-  const [query, setQuery] = useState('');
+function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, onShowReviews, initialQuery = '' }) {
+  const [query, setQuery] = useState(initialQuery);
   const [filterBy, setFilterBy] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [courses, setCourses] = useState([]);
@@ -41,7 +41,8 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
-    loadCourses();
+    loadCourses(initialQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = (e) => {

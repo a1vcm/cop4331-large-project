@@ -22,13 +22,15 @@ class _HomepageScreenState extends State<HomepageScreen> {
   }
 
   void _search(String q) {
-    context.push(q.isEmpty ? '/courses' : '/courses?q=${Uri.encodeQueryComponent(q)}');
+    // go() (not push()) so switching to the Search tab correctly updates
+    // the bottom tab bar's selected state — Search is a sibling tab, not a
+    // screen pushed on top of Home.
+    context.go(q.isEmpty ? '/courses' : '/courses?q=${Uri.encodeQueryComponent(q)}');
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      currentTab: AppTab.home,
       body: ListenableBuilder(
         listenable: AuthState.instance,
         builder: (context, _) {
@@ -70,7 +72,10 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       ),
                       const SizedBox(height: 4),
                       ElevatedButton(
-                        onPressed: () => context.push(loggedIn ? '/dashboard' : '/login'),
+                        // Dashboard is a sibling tab (go switches branch +
+                        // updates the tab bar); login is a full-screen flow
+                        // outside the tabs (push so the back gesture works).
+                        onPressed: () => loggedIn ? context.go('/dashboard') : context.push('/login'),
                         child: Text(loggedIn ? 'My Dashboard' : 'Log In'),
                       ),
                     ],
@@ -80,7 +85,7 @@ class _HomepageScreenState extends State<HomepageScreen> {
                 Text('Browse', style: AppTextStyles.subheading),
                 const SizedBox(height: 12),
                 GestureDetector(
-                  onTap: () => context.push('/courses'),
+                  onTap: () => context.go('/courses'),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(4, (i) {
