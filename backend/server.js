@@ -1,4 +1,5 @@
 // server.js
+require('dotenv').config();
 const { app } = require('./app'); // Only import the configured app instance
 const PORT = process.env.PORT || 5001;
 

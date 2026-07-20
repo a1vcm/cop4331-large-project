@@ -18,7 +18,15 @@ async function sendEmail({ to, subject, text, html }) {
     return;
   }
 
-  await sgMail.send({ to, from: fromEmail, subject, text, html });
+  // error handling
+  try {
+    await sgMail.send({ to, from: fromEmail, subject, text, html });
+    console.log(`[mailer] Email successfully sent to ${to}`);
+  } catch (error) {
+    // SendGrid embeds the specific API error message inside error.response.body
+    console.error(`[mailer error] Failed to send email to ${to}:`, error.response?.body || error.message);
+    throw error; // Re-throw so your controller knows the email failed
+  }
 }
 
 module.exports = { sendEmail };
