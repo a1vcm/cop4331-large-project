@@ -37,10 +37,10 @@ class _GlassSurface extends StatelessWidget {
   }
 }
 
-/// Top bar: back button (or app/page title), extended up through the status
-/// bar / Dynamic Island so there's no color mismatch up there. AppScaffold
-/// pairs this with a light SystemUiOverlayStyle so the system's time/battery
-/// icons render in white and stay visible against the dark glass.
+/// Top bar: back button (or app/page title) + the light/dark theme toggle,
+/// extended up through the status bar / Dynamic Island so there's no color
+/// mismatch up there. Mirrors the web TopBar: fixed black in both skins,
+/// with ThemeToggle.jsx's moon/sun button on the trailing side.
 class AppTopBar extends StatelessWidget {
   final VoidCallback? onBack;
   final bool showBack;
@@ -76,10 +76,38 @@ class AppTopBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const _ThemeToggleButton(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Moon in light mode (tap to go dark), sun in dark mode (tap to go light) —
+/// exactly ThemeToggle.jsx's behavior.
+class _ThemeToggleButton extends StatelessWidget {
+  const _ThemeToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: ThemeController.instance,
+      builder: (context, _) {
+        final isDark = ThemeController.instance.isDark;
+        return IconButton(
+          tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+          icon: Icon(
+            isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
+            color: AppColors.white,
+            size: 20,
+          ),
+          onPressed: () => ThemeController.instance.toggle(),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        );
+      },
     );
   }
 }
@@ -149,7 +177,9 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.gold : Colors.white70;
+    // Accent follows the active skin: gold in light, blue in dark —
+    // matching the web's --color-primary swap.
+    final color = selected ? ThemeColors.primary(context) : Colors.white70;
     return Expanded(
       child: InkWell(
         onTap: onTap,

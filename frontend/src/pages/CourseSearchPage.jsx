@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import { getCourses } from '../api/courses.js';
 import { getErrorMessage } from '../api/client.js';
@@ -44,6 +44,35 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
     loadCourses(initialQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const visibleCourses = useMemo(() => {
+    let result = courses;
+
+    if (filterBy !== 'all') {
+      result = result.filter((course) => getDifficultyKey(course) === filterBy);
+    }
+
+    if (sortBy !== 'relevance') {
+      result = [...result].sort((a, b) => {
+        switch (sortBy) {
+          case 'name':
+            return (a.title ?? '').localeCompare(b.title ?? '');
+          case 'credits':
+            return (a.credits ?? 0) - (b.credits ?? 0);
+          case 'difficulty': {
+            // Unrated courses sink to the bottom
+            const aVal = a.numRatings ? a.avgDifficulty : Infinity;
+            const bVal = b.numRatings ? b.avgDifficulty : Infinity;
+            return aVal - bVal;
+          }
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return result;
+  }, [courses, filterBy, sortBy]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -108,10 +137,10 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
 
         {loading && <p className="results-count">Loading courses...</p>}
         {error && <p className="results-count">{error}</p>}
-        {!loading && !error && <p className="results-count">{courses.length} results</p>}
+        {!loading && !error && <p className="results-count">{visibleCourses.length} results</p>}
 
         <div className="class-list">
-          {!loading && !error && courses.map((course) => {
+          {!loading && !error && visibleCourses.map((course) => {
             const diffKey = getDifficultyKey(course);
             const diff = DIFFICULTY[diffKey];
             return (

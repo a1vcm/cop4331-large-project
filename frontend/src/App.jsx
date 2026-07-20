@@ -5,16 +5,26 @@ import AboutPage from './pages/AboutPage.jsx';
 import FaqPage from './pages/FaqPage.jsx';
 import CourseSearchPage from './pages/CourseSearchPage.jsx';
 import CourseDetailPage from './pages/CourseDetailPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import { isLoggedIn } from './api/client.js';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail'
+  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail' | 'profile'
   const [courseQuery, setCourseQuery] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState(null);
 
-  const goToAuth = () => setView('auth');
   const goToAbout = () => setView('about');
   const goToFaq = () => setView('faq');
   const goToHome = () => setView('home');
+
+  // Account icon: profile when logged in, auth page when not.
+  const goToAccount = () => setView(isLoggedIn() ? 'profile' : 'auth');
+
+  // AuthPage calls onBack both for the manual back arrow AND after a
+  // successful login/verify. By the time a successful login calls it, the
+  // token is already stored — so this lands logged-in users on their
+  // profile and everyone else back home. No AuthPage changes needed.
+  const exitAuth = () => setView(isLoggedIn() ? 'profile' : 'home');
 
   const goToCourses = (query = '') => {
     setCourseQuery(query);
@@ -29,10 +39,23 @@ function App() {
   if (view === 'auth') {
     return (
       <AuthPage
+        onBack={exitAuth}
+        onInfoClick={goToAbout}
+        onHelpClick={goToFaq}
+        onCoursesClick={() => goToCourses()}
+      />
+    );
+  }
+
+  if (view === 'profile') {
+    return (
+      <ProfilePage
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onLoggedOut={goToHome}
+        onCourseClick={goToCourseDetail}
       />
     );
   }
@@ -43,7 +66,7 @@ function App() {
         onBack={goToHome}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
-        onAccountClick={goToAuth}
+        onAccountClick={goToAccount}
       />
     );
   }
@@ -54,7 +77,7 @@ function App() {
         onBack={goToHome}
         onInfoClick={goToAbout}
         onCoursesClick={() => goToCourses()}
-        onAccountClick={goToAuth}
+        onAccountClick={goToAccount}
       />
     );
   }
@@ -65,7 +88,7 @@ function App() {
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
-        onAccountClick={goToAuth}
+        onAccountClick={goToAccount}
         initialQuery={courseQuery}
         onShowReviews={goToCourseDetail}
       />
@@ -77,14 +100,14 @@ function App() {
       <CourseDetailPage
         courseId={selectedCourseId}
         onBack={() => setView('courses')}
-        onAccountClick={goToAuth}
+        onAccountClick={goToAccount}
       />
     );
   }
 
   return (
     <Homepage
-      onAccountClick={goToAuth}
+      onAccountClick={goToAccount}
       onInfoClick={goToAbout}
       onHelpClick={goToFaq}
       onCoursesClick={() => goToCourses()}

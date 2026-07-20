@@ -33,5 +33,6 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', require('./routes/auth-routes'));
 app.use('/api/courses', require('./routes/course-routes'));
 app.use('/api/reviews', require('./routes/review-routes'));
+app.use('/api/users', require('./routes/users-routes'));
 
 module.exports = { app, client, dbReady };

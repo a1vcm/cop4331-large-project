@@ -16,6 +16,10 @@ const userSchema = new Schema(
     verificationCodeExpires: Date,
     passwordResetCode: String,
     passwordResetExpires: Date,
+    // Set while an email change is awaiting verification; the code fields
+    // above are reused for the change-email code (they're unused once a
+    // user is verified).
+    pendingEmail: { type: String, lowercase: true, trim: true },
   },
   { timestamps: true }
 );

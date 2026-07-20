@@ -102,6 +102,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register a Theme dependency so every text style in this screen
+    // repaints the moment the light/dark toggle fires.
+    Theme.of(context);
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
@@ -165,7 +168,7 @@ class _CourseHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.cardFill,
+        color: ThemeColors.surface(context),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -237,7 +240,7 @@ class _ReviewCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.grayLightest),
+        border: Border.all(color: ThemeColors.border(context)),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -368,9 +371,9 @@ class _ReviewFormSheetState extends State<_ReviewFormSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        decoration: BoxDecoration(
+          color: ThemeColors.surface(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -412,7 +415,7 @@ class _ReviewFormSheetState extends State<_ReviewFormSheet> {
               ),
               if (_error != null) ...[
                 const SizedBox(height: 4),
-                Text(_error!, style: AppTextStyles.muted.copyWith(color: Colors.red)),
+                Text(_error!, style: AppTextStyles.muted.copyWith(color: ThemeColors.error(context))),
               ],
               const SizedBox(height: 8),
               ElevatedButton(
@@ -451,7 +454,7 @@ class _RatingSelector extends StatelessWidget {
           return IconButton(
             icon: Icon(
               star <= value ? Icons.star : Icons.star_border,
-              color: AppColors.gold,
+              color: ThemeColors.primary(context),
               size: 22,
             ),
             onPressed: () => onChanged(star),
