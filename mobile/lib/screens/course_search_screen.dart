@@ -93,6 +93,9 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register a Theme dependency so every text style in this screen
+    // repaints the moment the light/dark toggle fires.
+    Theme.of(context);
     final results = _visibleCourses;
 
     return AppScaffold(
@@ -109,9 +112,9 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                     child: TextField(
                       controller: _searchController,
                       style: AppTextStyles.body,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Search for a class...',
-                        prefixIcon: Icon(Icons.search, color: AppColors.grayLight),
+                        prefixIcon: Icon(Icons.search, color: ThemeColors.textMuted(context)),
                       ),
                       onSubmitted: _load,
                     ),
@@ -195,7 +198,7 @@ class _CourseCard extends StatelessWidget {
     final diffKey = course.difficultyKey;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      color: AppColors.cardFill,
+      color: ThemeColors.surface(context),
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       child: Padding(

@@ -1,0 +1,396 @@
+.profile-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.profile-content {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 56px 24px 48px; /* extra top room for the overlapping avatar */
+  box-sizing: border-box;
+}
+
+.profile-card {
+  position: relative;
+  display: flex;
+  background: var(--color-surface);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: visible; /* lets the avatar hang over the corner like the wireframe */
+  min-height: 420px;
+}
+
+/* Avatar — overlaps the card's top-left corner */
+.profile-avatar {
+  position: absolute;
+  top: -32px;
+  left: -24px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--color-bg);
+  border: 4px solid var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.profile-avatar-initial {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--color-primary);
+}
+
+.profile-avatar-icon {
+  width: 44px;
+  height: 44px;
+  color: var(--color-primary); /* gold in light mode, blue in dark */
+}
+
+/* Sidebar */
+.profile-sidebar {
+  flex-shrink: 0;
+  width: 150px;
+  background: var(--color-bg);
+  border-radius: 16px 0 0 16px;
+  padding: 88px 0 24px; /* clears the avatar */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-nav-btn {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 10px 20px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-nav-btn:hover {
+  color: var(--color-text);
+}
+
+.profile-nav-btn.active {
+  color: var(--color-text);
+  font-weight: 700;
+  border-left-color: var(--color-primary);
+}
+
+/* Main area */
+.profile-main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-username {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 8px;
+}
+
+.profile-section-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text);
+  margin: 12px 0 4px;
+}
+
+.profile-muted {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.profile-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-review-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: var(--color-bg);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.profile-review-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.profile-review-course {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.profile-review-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.profile-review-comment {
+  font-size: 13px;
+  color: var(--color-text);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Settings */
+.profile-section-title {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0 0 8px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.settings-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.settings-value {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-change-btn {
+  flex-shrink: 0;
+  background: var(--color-emphasis);
+  color: var(--color-on-emphasis);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-change-btn:hover {
+  background: var(--color-emphasis-hover);
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 0 12px;
+}
+
+.settings-form input {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.settings-form input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.settings-form input:focus {
+  border-color: var(--color-primary);
+}
+
+.settings-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.settings-cancel {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.settings-save {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.settings-save:hover {
+  background: var(--color-primary-hover);
+}
+
+.settings-save:disabled,
+.settings-cancel:disabled,
+.delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-message {
+  font-size: 13px;
+  margin: 0;
+}
+
+.settings-message.error {
+  color: var(--color-error);
+}
+
+.settings-message.success {
+  color: var(--color-success);
+}
+
+.settings-divider {
+  border: none;
+  border-top: 1px dashed var(--color-border);
+  margin: 16px 0 4px;
+}
+
+.danger-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-error);
+  margin: 0;
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  background: var(--color-error);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.delete-btn:hover {
+  opacity: 0.85;
+}
+
+.delete-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .profile-content {
+    padding: 56px 16px 40px;
+  }
+
+  .profile-card {
+    flex-direction: column;
+  }
+
+  .profile-avatar {
+    left: 16px;
+  }
+
+  .profile-sidebar {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 76px 12px 12px;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .profile-nav-btn {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    padding: 8px 12px;
+  }
+
+  .profile-nav-btn.active {
+    border-bottom-color: var(--color-primary);
+  }
+
+  .profile-main {
+    padding: 24px 20px 28px;
+  }
+}

@@ -17,6 +17,9 @@ Future<void> main() async {
   // Restores a persisted login session before the first frame, so a
   // relaunch doesn't bounce a logged-in user back to the homepage.
   await AuthState.instance.loadFromDisk();
+  // Restores the saved light/dark choice (mirrors ThemeToggle.jsx +
+  // localStorage on the web).
+  await ThemeController.instance.loadFromDisk();
   runApp(const KnightRateApp());
 }
 
@@ -102,11 +105,19 @@ class KnightRateApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'KnightRate',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
-      routerConfig: _router,
+    // Rebuilds on theme toggle so the whole app flips skin instantly.
+    return ListenableBuilder(
+      listenable: ThemeController.instance,
+      builder: (context, _) {
+        return MaterialApp.router(
+          title: 'KnightRate',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ThemeController.instance.mode,
+          routerConfig: _router,
+        );
+      },
     );
   }
 }

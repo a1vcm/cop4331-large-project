@@ -81,8 +81,10 @@
   display: flex;
   align-items: center;
   background: var(--color-surface);
-  border-radius: 24px;
-  padding: 12px 20px;
+  border-radius: 28px;
+  /* Slim horizontal padding; the input and button provide the vertical
+     size so both hit the 44x44px minimum touch target (Lighthouse). */
+  padding: 4px 6px 4px 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   width: 100%;
   box-sizing: border-box;
@@ -91,11 +93,13 @@
 .search-bar input {
   flex: 1;
   min-width: 0;
+  min-height: 44px;
   border: none;
   outline: none;
   background: transparent;
   font-size: 15px;
   color: var(--color-text);
+  box-sizing: border-box;
 }
 
 .search-bar input::placeholder {
@@ -104,19 +108,23 @@
 }
 
 .search-bar button {
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
   border: none;
+  border-radius: 50%;
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-bar button svg {
-  width: 100%;
-  height: 100%;
+  width: 22px;
+  height: 22px;
 }
 
 .expandable-panel {
@@ -200,24 +208,18 @@
 }
 
 .intro-heading {
-  height: 6px;
-  width: 60%;
-  background: var(--color-text);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--color-text);
+  margin: 0;
 }
 
 .intro-line {
-  width: 100%;
-  height: 4px;
-  background: var(--color-text-muted);
-}
-
-.intro-line.short {
-  width: 40%;
-}
-
-.line {
-  display: block;
-  border-radius: 2px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
 }
 
 .popular-classes-heading {
