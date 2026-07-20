@@ -1,25 +1,29 @@
 import { useState, useEffect } from 'react';
- 
-//Decide the starting theme: a saved choice wins; otherwise follow the OS setting.
+
+// Decide the starting theme: a saved choice wins; otherwise follow the OS setting.
+// Guarded so environments without matchMedia (e.g. jsdom in tests) fall back to light.
 function getInitialTheme() {
   const saved = localStorage.getItem('theme');
   if (saved === 'light' || saved === 'dark') return saved;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
 }
- 
+
 function ThemeToggle() {
   const [theme, setTheme] = useState(getInitialTheme);
- 
+
   // Apply the theme to <html> and remember it whenever it changes.
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
- 
+
   const toggle = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
- 
+
   const isLight = theme === 'light';
- 
+
   return (
     <button
       aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
@@ -41,5 +45,5 @@ function ThemeToggle() {
     </button>
   );
 }
- 
+
 export default ThemeToggle;
