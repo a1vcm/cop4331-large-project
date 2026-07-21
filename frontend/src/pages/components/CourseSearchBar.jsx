@@ -24,9 +24,11 @@ function CourseSearchBar({
   useEffect(() => {
     const trimmed = value.trim();
     if (!trimmed) {
-      setSuggestions([]);
-      setOpen(false);
-      return;
+      const timer = setTimeout(() => {
+        setSuggestions([]);
+        setOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     let cancelled = false;
