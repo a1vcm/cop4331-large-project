@@ -6,11 +6,13 @@ import { getErrorMessage } from '../api/client.js';
 import './CourseSearchPage.css';
 
 const DIFFICULTY = {
-  easy: { label: 'Easy', color: '#7FCB8F' },
-  medium: { label: 'Medium', color: '#F2D14A' },
-  hard: { label: 'Hard', color: '#E57373' },
-  unrated: { label: 'Not yet rated', color: '#D9D9D9' },
+  easy: { label: 'Easy', className: 'difficulty-easy' },
+  medium: { label: 'Moderate', className: 'difficulty-medium' },
+  hard: { label: 'Hard', className: 'difficulty-hard' },
+  unrated: { label: 'Not yet rated', className: 'difficulty-unrated' },
 };
+
+const PAGE_SIZE_OPTIONS = [10, 5, 25, 50, 'all'];
 
 function getDifficultyKey(course) {
   if (!course.numRatings) return 'unrated';
@@ -22,7 +24,9 @@ function getDifficultyKey(course) {
 function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, onShowReviews, initialQuery = '' }) {
   const [query, setQuery] = useState(initialQuery);
   const [filterBy, setFilterBy] = useState('all');
+  const [prefixFilter, setPrefixFilter] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
+  const [pageSize, setPageSize] = useState(10);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,8 +50,17 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const prefixes = useMemo(() => {
+    const set = new Set(courses.map((course) => course.department).filter(Boolean));
+    return [...set].sort();
+  }, [courses]);
+
   const visibleCourses = useMemo(() => {
     let result = courses;
+
+    if (prefixFilter !== 'all') {
+      result = result.filter((course) => course.department === prefixFilter);
+    }
 
     if (filterBy !== 'all') {
       result = result.filter((course) => getDifficultyKey(course) === filterBy);
@@ -73,7 +86,12 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
     }
 
     return result;
-  }, [courses, filterBy, sortBy]);
+  }, [courses, prefixFilter, filterBy, sortBy]);
+
+  const displayedCourses = useMemo(() => {
+    if (pageSize === 'all') return visibleCourses;
+    return visibleCourses.slice(0, pageSize);
+  }, [visibleCourses, pageSize]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -114,8 +132,19 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
             <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
               <option value="all">Filter By</option>
               <option value="easy">Difficulty: Easy</option>
-              <option value="medium">Difficulty: Medium</option>
+              <option value="medium">Difficulty: Moderate</option>
               <option value="hard">Difficulty: Hard</option>
+            </select>
+          </label>
+
+          <label className="control-dropdown">
+            <select value={prefixFilter} onChange={(e) => setPrefixFilter(e.target.value)}>
+              <option value="all">All Prefixes</option>
+              {prefixes.map((prefix) => (
+                <option key={prefix} value={prefix}>
+                  {prefix}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -127,38 +156,52 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
               <option value="difficulty">Difficulty</option>
             </select>
           </label>
+
+          <label className="control-dropdown">
+            <select
+              value={pageSize}
+              onChange={(e) => setPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+            >
+              {PAGE_SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  Show {size === 'all' ? 'All' : size}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {loading && <p className="results-count">Loading courses...</p>}
         {error && <p className="results-count">{error}</p>}
-        {!loading && !error && <p className="results-count">{visibleCourses.length} results</p>}
+        {!loading && !error && (
+          <p className="results-count">
+            {visibleCourses.length} result{visibleCourses.length === 1 ? '' : 's'}
+            {displayedCourses.length < visibleCourses.length ? ` — showing ${displayedCourses.length}` : ''}
+          </p>
+        )}
 
         <div className="class-list">
-          {!loading && !error && visibleCourses.map((course) => {
+          {!loading && !error && displayedCourses.map((course) => {
             const diffKey = getDifficultyKey(course);
             const diff = DIFFICULTY[diffKey];
             return (
               <div key={course._id} className="class-card">
                 <div className="class-info">
-                  <h3 className="class-name">{course.title}</h3>
+                  <h3 className="class-name">
+                    {course.course_code} - {course.title}
+                  </h3>
                   <p className="class-meta">
-                    {course.credits ?? '—'} credits &nbsp;•&nbsp; {course.course_code}
-                    {course.department ? ` • ${course.department}` : ''}
+                    {course.credits ?? '—'} credits &nbsp;·&nbsp; {course.department ?? '—'}
                   </p>
                 </div>
 
                 <div className="class-actions">
-                  <span
-                    className="difficulty-badge"
-                    style={{ backgroundColor: diff.color }}
-                  >
-                    {diff.label}
-                  </span>
+                  <span className={`difficulty-badge ${diff.className}`}>{diff.label}</span>
                   <button
                     className="reviews-btn"
                     onClick={() => handleShowReviews(course)}
                   >
-                    Show Reviews
+                    View
                   </button>
                 </div>
               </div>
