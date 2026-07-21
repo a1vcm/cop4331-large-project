@@ -5,6 +5,7 @@ import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/auth_state.dart';
 import '../services/review_service.dart';
+import '../services/user_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
 import '../widgets/app_form_field.dart';
@@ -12,13 +13,6 @@ import '../widgets/app_form_field.dart';
 /// Mirrors frontend/src/pages/ProfilePage.jsx: an Overview tab (avatar,
 /// username/email, 3 most recent reviews) and an Account tab (change
 /// username / email / password, plus delete account).
-///
-/// UI-ONLY VERSION: the account-settings forms render and validate, but
-/// Save shows a "not connected yet" message instead of calling the API.
-/// The backend endpoints + a UserService mirroring frontend/src/api/users.js
-/// are a follow-up task — see the /api/users/* routes in the backend PR.
-/// Overview (recent reviews) and Log Out are fully functional: they only
-/// use endpoints that already exist.
 class ProfileDashboardScreen extends StatefulWidget {
   const ProfileDashboardScreen({super.key});
 
@@ -38,9 +32,16 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
   // one open section at a time, one message slot tagged with its section.
   String? _openSection; // 'username' | 'email' | 'password' | null
   ({String section, bool isError, String text})? _message;
+  bool _saving = false;
+
+  // Email change is a two-step flow: once the code has been requested, this
+  // holds the address awaiting verification and the section shows a code
+  // field instead of the email field.
+  String? _emailPendingNew;
 
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _emailCodeController = TextEditingController();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -62,6 +63,7 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
+    _emailCodeController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
@@ -89,21 +91,14 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
     }
   }
 
-  /// Placeholder handler until the /api/users endpoints are wired up.
-  void _notWired(String section) {
-    setState(() => _message = (
-          section: section,
-          isError: true,
-          text: "This isn't connected to the backend yet.",
-        ));
-  }
-
   void _toggleSection(String name) {
     setState(() {
       _message = null;
       _openSection = _openSection == name ? null : name;
+      _emailPendingNew = null;
       _usernameController.clear();
       _emailController.clear();
+      _emailCodeController.clear();
       _currentPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
@@ -114,6 +109,151 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
     await AuthService.logout();
     if (!mounted) return;
     context.go('/');
+  }
+
+  Future<void> _saveUsername() async {
+    final username = _usernameController.text.trim();
+    if (username.isEmpty) {
+      setState(() => _message = (section: 'username', isError: true, text: 'Username is required'));
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await UserService.changeUsername(username);
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _openSection = null;
+        _message = (section: 'username', isError: false, text: 'Username updated');
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _message = (section: 'username', isError: true, text: e.message);
+      });
+    }
+  }
+
+  Future<void> _requestEmailChange() async {
+    final newEmail = _emailController.text.trim();
+    if (newEmail.isEmpty) {
+      setState(() => _message = (section: 'email', isError: true, text: 'Email is required'));
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      final message = await UserService.requestEmailChange(newEmail);
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _emailPendingNew = newEmail;
+        _message = (section: 'email', isError: false, text: message);
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _message = (section: 'email', isError: true, text: e.message);
+      });
+    }
+  }
+
+  Future<void> _verifyEmailChange() async {
+    final code = _emailCodeController.text.trim();
+    if (code.isEmpty) {
+      setState(() => _message = (section: 'email', isError: true, text: 'Code is required'));
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await UserService.verifyEmailChange(code);
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _openSection = null;
+        _emailPendingNew = null;
+        _message = (section: 'email', isError: false, text: 'Email updated');
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _message = (section: 'email', isError: true, text: e.message);
+      });
+    }
+  }
+
+  Future<void> _savePassword() async {
+    final current = _currentPasswordController.text;
+    final next = _newPasswordController.text;
+    final confirm = _confirmPasswordController.text;
+    if (current.isEmpty || next.isEmpty) {
+      setState(() => _message = (section: 'password', isError: true, text: 'All fields are required'));
+      return;
+    }
+    if (next != confirm) {
+      setState(() => _message = (section: 'password', isError: true, text: 'Passwords do not match'));
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      final message = await UserService.changePassword(currentPassword: current, newPassword: next);
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _openSection = null;
+        _message = (section: 'password', isError: false, text: message);
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _message = (section: 'password', isError: true, text: e.message);
+      });
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final password = _deletePasswordController.text;
+    if (password.isEmpty) {
+      setState(() => _message = (section: 'delete', isError: true, text: 'Password is required'));
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete account?'),
+        content: const Text(
+          'This permanently removes your account and all of your reviews. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _saving = true);
+    try {
+      await UserService.deleteAccount(password);
+      if (!mounted) return;
+      context.go('/');
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _saving = false;
+        _message = (section: 'delete', isError: true, text: e.message);
+      });
+    }
   }
 
   @override
@@ -266,8 +406,9 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
       if (_openSection == 'username')
         _SettingsForm(
           saveLabel: 'Save',
+          saving: _saving,
           onCancel: () => setState(() => _openSection = null),
-          onSave: () => _notWired('username'),
+          onSave: _saveUsername,
           children: [
             AppTextField(
               controller: _usernameController,
@@ -286,17 +427,32 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
       if (_message?.section == 'email') _MessageText(message: _message!),
       if (_openSection == 'email')
         _SettingsForm(
-          saveLabel: 'Send Code',
+          saveLabel: _emailPendingNew == null ? 'Send Code' : 'Verify',
+          saving: _saving,
           onCancel: () => setState(() => _openSection = null),
-          onSave: () => _notWired('email'),
-          children: [
-            AppTextField(
-              controller: _emailController,
-              hint: 'New email address',
-              icon: Icons.alternate_email,
-              keyboardType: TextInputType.emailAddress,
-            ),
-          ],
+          onSave: _emailPendingNew == null ? _requestEmailChange : _verifyEmailChange,
+          children: _emailPendingNew == null
+              ? [
+                  AppTextField(
+                    controller: _emailController,
+                    hint: 'New email address',
+                    icon: Icons.alternate_email,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ]
+              : [
+                  Text(
+                    'Enter the code sent to $_emailPendingNew',
+                    style: AppTextStyles.muted,
+                  ),
+                  const SizedBox(height: 8),
+                  AppTextField(
+                    controller: _emailCodeController,
+                    hint: 'Verification code',
+                    icon: Icons.dialpad,
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
         ),
 
       // --- Password ---
@@ -309,8 +465,9 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
       if (_openSection == 'password')
         _SettingsForm(
           saveLabel: 'Save',
+          saving: _saving,
           onCancel: () => setState(() => _openSection = null),
-          onSave: () => _notWired('password'),
+          onSave: _savePassword,
           children: [
             AppTextField(
               controller: _currentPasswordController,
@@ -365,7 +522,7 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
             backgroundColor: ThemeColors.error(context),
             foregroundColor: AppColors.white,
           ),
-          onPressed: () => _notWired('delete'),
+          onPressed: _saving ? null : _confirmDelete,
           icon: const Icon(Icons.delete_outline, size: 18),
           label: const Text('Delete Account'),
         ),
@@ -482,12 +639,14 @@ class _SettingsForm extends StatelessWidget {
   final String saveLabel;
   final VoidCallback onCancel;
   final VoidCallback onSave;
+  final bool saving;
 
   const _SettingsForm({
     required this.children,
     required this.saveLabel,
     required this.onCancel,
     required this.onSave,
+    this.saving = false,
   });
 
   @override
@@ -503,13 +662,19 @@ class _SettingsForm extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: onCancel,
+                onPressed: saving ? null : onCancel,
                 child: Text('Cancel', style: AppTextStyles.muted),
               ),
               const SizedBox(width: 8),
               ElevatedButton(
-                onPressed: onSave,
-                child: Text(saveLabel),
+                onPressed: saving ? null : onSave,
+                child: saving
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(saveLabel),
               ),
             ],
           ),

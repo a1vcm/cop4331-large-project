@@ -28,6 +28,10 @@ class ApiException implements Exception {
 /// attaches the stored bearer token to every request and normalizes error
 /// messages from the backend's `{ message: "..." }` error shape.
 class ApiClient {
+  /// Overridable in tests (e.g. `ApiClient.client = MockClient(...)`); real
+  /// requests use a plain http.Client otherwise.
+  static http.Client client = http.Client();
+
   static Future<dynamic> get(String path, {Map<String, String>? query}) {
     return _send('GET', path, query: query);
   }
@@ -40,8 +44,10 @@ class ApiClient {
     return _send('PUT', path, body: body);
   }
 
-  static Future<dynamic> delete(String path) {
-    return _send('DELETE', path);
+  /// [body] mirrors axios's `api.delete(url, { data })` — DELETE /users/me
+  /// needs to send { password }, which a bodyless delete can't express.
+  static Future<dynamic> delete(String path, {Map<String, dynamic>? body}) {
+    return _send('DELETE', path, body: body);
   }
 
   static Future<dynamic> _send(
@@ -60,7 +66,7 @@ class ApiClient {
     if (body != null) request.body = jsonEncode(body);
 
     try {
-      final streamed = await request.send().timeout(const Duration(seconds: 15));
+      final streamed = await client.send(request).timeout(const Duration(seconds: 15));
       res = await http.Response.fromStream(streamed);
     } catch (_) {
       throw ApiException('Could not reach the server. Check your connection and try again.', 0);
