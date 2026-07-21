@@ -103,6 +103,29 @@ const COURSES = [
   { course_code: 'EGN5640', title: 'Entrepreneurship for Defense', department: 'EGN', credits: 3 },
   { course_code: 'MAP4384', title: 'Numerical Methods for Computational Sciences', department: 'MAP', credits: 3 },
   { course_code: 'PHY3650', title: 'Quantum Information Processing', department: 'PHY', credits: 3 },
+
+  // General education & common program prerequisites shared by CS/IT majors
+  // (confirmed against a real degree audit + the official CS flowchart/GEP
+  // worksheet — see conversation history, not fabricated).
+  { course_code: 'ENC1101', title: 'English Composition I', department: 'ENC', credits: 3 },
+  { course_code: 'ENC1102', title: 'English Composition II', department: 'ENC', credits: 3 },
+  { course_code: 'ENC3250', title: 'Technical Report Writing', department: 'ENC', credits: 3 },
+  { course_code: 'MAC1105C', title: 'College Algebra', department: 'MAC', credits: 3 },
+  { course_code: 'MAC1114', title: 'Trigonometry', department: 'MAC', credits: 3 },
+  { course_code: 'MAC1140', title: 'Precalculus Algebra', department: 'MAC', credits: 3 },
+  { course_code: 'MAC2311C', title: 'Calculus with Analytic Geometry I', department: 'MAC', credits: 4 },
+  { course_code: 'MAC2312', title: 'Calculus with Analytic Geometry II', department: 'MAC', credits: 4 },
+  { course_code: 'MAC2313', title: 'Calculus with Analytic Geometry III', department: 'MAC', credits: 4 },
+  { course_code: 'STA2023', title: 'Statistical Methods I', department: 'STA', credits: 3 },
+  { course_code: 'PHY2048', title: 'General Physics Using Calculus I', department: 'PHY', credits: 3 },
+  { course_code: 'PHY2048L', title: 'General Physics Using Calculus I Lab', department: 'PHY', credits: 1 },
+  { course_code: 'PHY2049', title: 'General Physics Using Calculus II', department: 'PHY', credits: 3 },
+  { course_code: 'PHY2049L', title: 'General Physics Using Calculus II Lab', department: 'PHY', credits: 1 },
+  { course_code: 'MAP2302', title: 'Elementary Differential Equations', department: 'MAP', credits: 3 },
+  { course_code: 'MAS3105', title: 'Matrix and Linear Algebra', department: 'MAS', credits: 4 },
+  { course_code: 'BSC2010C', title: 'Biology I', department: 'BSC', credits: 4 },
+  { course_code: 'BSC2011C', title: 'Biology II', department: 'BSC', credits: 4 },
+  { course_code: 'CHM2045C', title: 'Chemistry Fundamentals I', department: 'CHM', credits: 4 },
 ];
 
 async function seed() {
