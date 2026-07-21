@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import TopBar from './components/TopBar.jsx';
 import ucfSeal from '../assets/ucflogos.png';
 import pondsPhoto from '../assets/ponds.jpg';
@@ -43,57 +43,6 @@ const TEAM_MEMBERS = [
   },
 ];
 
-const FAQ_SECTIONS = [
-  {
-    id: 'section-1',
-    title: 'Getting Started',
-    questions: [
-      {
-        id: 'q1',
-        question: 'What is KnightRate?',
-        answer:
-          "KnightRate is a course review platform built for UCF Computer Science and IT students. Search the course catalog, see difficulty and quality ratings from students who've taken a class, and share your own experience once you have.",
-      },
-      {
-        id: 'q2',
-        question: 'How do I search for a class?',
-        answer:
-          'Use the search bar on the homepage or the Courses page and type a course code (like COP3502C) or a course name. You can filter by difficulty and sort by name, credits, or difficulty from the Courses page.',
-      },
-      {
-        id: 'q3',
-        question: 'Do I need an account to browse courses?',
-        answer:
-          'No — anyone can search the catalog and read reviews without an account. You only need to register and log in to write your own review.',
-      },
-    ],
-  },
-  {
-    id: 'section-2',
-    title: 'Account & Reviews',
-    questions: [
-      {
-        id: 'q4',
-        question: 'How do I create an account?',
-        answer:
-          "Click the account icon and choose Register. After signing up, we'll email you a verification code — enter it on the next screen to activate your account and log in automatically.",
-      },
-      {
-        id: 'q5',
-        question: 'How do I write or edit a review?',
-        answer:
-          "Open a course's page and click Write a Review. You can rate quality and difficulty, add the instructor, term, and grade, and leave a comment. You can only submit one review per course, but you can edit or delete it any time from that course's page.",
-      },
-      {
-        id: 'q6',
-        question: 'I forgot my password — what do I do?',
-        answer:
-          "On the Log In tab, click Forgot password?. We'll send a reset code to your email that you can use to set a new password.",
-      },
-    ],
-  },
-];
-
 function initials(name) {
   return name
     .split(' ')
@@ -131,13 +80,8 @@ function useReveal() {
   return rootRef;
 }
 
-function AboutPage({ onBack, onCoursesClick, onAccountClick }) {
-  const [openId, setOpenId] = useState(null);
+function AboutPage({ onBack, onHelpClick, onCoursesClick, onAccountClick }) {
   const rootRef = useReveal();
-
-  const toggleQuestion = (id) => {
-    setOpenId((prev) => (prev === id ? null : id));
-  };
 
   return (
     <div className="about-page" ref={rootRef}>
@@ -145,7 +89,7 @@ function AboutPage({ onBack, onCoursesClick, onAccountClick }) {
         showBackButton
         onBack={onBack}
         showInfoIcon={false}
-        showHelpIcon={false}
+        onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
         onAccountClick={onAccountClick}
         fixed
@@ -174,48 +118,6 @@ function AboutPage({ onBack, onCoursesClick, onAccountClick }) {
             Every rating comes from a verified fellow Knight, so you can trust what you're reading
             before you register. No more winging a class off a five-word review from three years ago.
           </p>
-        </div>
-      </section>
-
-      <section className="faq-band reveal">
-        <div className="section-heading-wrap">
-          <span className="section-kicker">Q &amp; A</span>
-          <h2 className="section-heading">Frequently Asked Questions</h2>
-        </div>
-
-        <div className="faq-content">
-          {FAQ_SECTIONS.map((section) => (
-            <div key={section.id} className="faq-section">
-              <h3 className="faq-section-title">{section.title}</h3>
-
-              <div className="faq-list">
-                {section.questions.map((item) => {
-                  const isOpen = openId === item.id;
-                  return (
-                    <div key={item.id} className="faq-item">
-                      <button
-                        className="faq-question"
-                        onClick={() => toggleQuestion(item.id)}
-                        aria-expanded={isOpen}
-                      >
-                        <span className="faq-question-label">{item.question}</span>
-                        <span className={`faq-toggle-icon ${isOpen ? 'open' : ''}`}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14" />
-                            <path d="M12 5v14" />
-                          </svg>
-                        </span>
-                      </button>
-
-                      <div className={`faq-answer-wrapper ${isOpen ? 'open' : ''}`}>
-                        <div className="faq-answer">{item.answer}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
