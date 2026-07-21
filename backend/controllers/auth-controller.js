@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../collections/User');
 const { sendEmail } = require('../utils/mailer');
 const { generateCode, minutesFromNow } = require('../utils/codes');
+const { validatePassword } = require('../utils/validatePassword');
 
 const VERIFICATION_CODE_TTL_MIN = 15;
 const RESET_CODE_TTL_MIN = 30;
@@ -34,6 +35,11 @@ async function registerUser(req, res) {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
       return res.status(400).json({ message: 'username, email, and password are required' });
+    }
+
+    const { valid, message } = validatePassword(password);
+    if (!valid) {
+      return res.status(400).json({ message });
     }
 
     const existing = await User.findOne({ email: email.toLowerCase() });
@@ -202,6 +208,11 @@ async function resetPassword(req, res) {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) {
       return res.status(400).json({ message: 'email, code, and newPassword are required' });
+    }
+
+    const { valid, message } = validatePassword(newPassword);
+    if (!valid) {
+      return res.status(400).json({ message });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });

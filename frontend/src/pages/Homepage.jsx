@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import Footer from './components/Footer.jsx';
+import CourseSearchBar from './components/CourseSearchBar.jsx';
 import ucfLogo from '../assets/ICON_UCF.png';
 import stockUcf from '../assets/STOCK_UCF.jpg';
 import { getCourses } from '../api/courses.js';
@@ -18,9 +20,10 @@ function Homepage({
   const [query, setQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const [popularCourses, setPopularCourses] = useState([]);
+  const touchStartY = useRef(null);
 
   useEffect(() => {
-    getCourses()
+    getCourses(undefined, { sort: 'recent' })
       .then((courses) => setPopularCourses(courses.slice(0, 4)))
       .catch(() => setPopularCourses([]));
   }, []);
@@ -33,6 +36,25 @@ function Homepage({
   const toggleExpanded = () => {
     setIsExpanded((prev) => !prev);
   };
+
+  // Swipe up on the hero to expand, swipe down on the handle to collapse.
+  // Click still works too — this is additive, not a replacement.
+  const SWIPE_THRESHOLD_PX = 40;
+
+  const handleTouchStart = (e) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const makeTouchEndHandler = (direction, action) => (e) => {
+    if (touchStartY.current === null) return;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartY.current = null;
+    const swiped = direction === 'up' ? deltaY < -SWIPE_THRESHOLD_PX : deltaY > SWIPE_THRESHOLD_PX;
+    if (swiped) action();
+  };
+
+  const handleHeroTouchEnd = makeTouchEndHandler('up', () => setIsExpanded(true));
+  const handlePanelTouchEnd = makeTouchEndHandler('down', () => setIsExpanded(false));
 
   return (
     <div className="homepage">
@@ -54,24 +76,19 @@ function Homepage({
         <section
           className={`hero ${isExpanded ? 'expanded-state' : ''}`}
           style={{ backgroundImage: `url(${stockUcf})` }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleHeroTouchEnd}
         >
           <div className="hero-overlay">
             <h1 className="hero-title">Welcome to KnightRate!</h1>
+            <p className="hero-tagline">Real course ratings from UCF students, for UCF students.</p>
 
-            <form className="search-bar" onSubmit={handleSearch}>
-              <input
-                type="text"
-                placeholder="Search for a class..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              <button type="submit" aria-label="Search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              </button>
-            </form>
+            <CourseSearchBar
+              value={query}
+              onChange={setQuery}
+              onSubmit={handleSearch}
+              onSelectCourse={(course) => (onCourseClick ? onCourseClick(course) : onCoursesClick?.())}
+            />
           </div>
         </section>
 
@@ -82,6 +99,8 @@ function Homepage({
             aria-label={isExpanded ? 'Collapse' : 'Show more'}
             aria-expanded={isExpanded}
             onClick={toggleExpanded}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handlePanelTouchEnd}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 15l7-7 7 7" />
@@ -101,7 +120,7 @@ function Homepage({
               </div>
             </section>
 
-            <h2 className="popular-classes-heading">Browse Classes</h2>
+            <h2 className="popular-classes-heading">Recently Reviewed</h2>
 
             <section className="cards-row">
               {popularCourses.length === 0 ? (
@@ -120,6 +139,8 @@ function Homepage({
                 ))
               )}
             </section>
+
+            <Footer />
           </div>
         </div>
       </main>

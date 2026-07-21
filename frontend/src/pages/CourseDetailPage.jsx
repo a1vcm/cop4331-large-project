@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import ReviewCard from './components/ReviewCard.jsx';
 import { getCourseById } from '../api/courses.js';
-import { getCourseReviews, createReview, updateReview, deleteReview } from '../api/reviews.js';
+import { getCourseReviews, deleteReview } from '../api/reviews.js';
+import { getMyBookmarks, createBookmark, deleteBookmark } from '../api/bookmarks.js';
 import { getErrorMessage, getAuthUser, isLoggedIn } from '../api/client.js';
 import './CourseDetailPage.css';
 
@@ -19,119 +21,25 @@ function getDifficultyKey(course) {
   return 'hard';
 }
 
-function Stars({ value, onChange }) {
-  return (
-    <div className="star-picker">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          type="button"
-          key={n}
-          className={`star-btn ${n <= value ? 'filled' : ''}`}
-          onClick={() => onChange(n)}
-          aria-label={`${n} star${n === 1 ? '' : 's'}`}
-        >
-          ★
-        </button>
-      ))}
-    </div>
-  );
-}
+const PAGE_SIZE = 5;
 
-function ReviewForm({ courseId, existing, onCancel, onSaved }) {
-  const [quality, setQuality] = useState(existing?.quality ?? 3);
-  const [difficulty, setDifficulty] = useState(existing?.difficulty ?? 3);
-  const [instructor, setInstructor] = useState(existing?.instructor ?? '');
-  const [term, setTerm] = useState(existing?.term ?? '');
-  const [grade, setGrade] = useState(existing?.grade ?? '');
-  const [comment, setComment] = useState(existing?.comment ?? '');
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
-    const payload = {
-      instructor: instructor.trim(),
-      term: term.trim(),
-      quality,
-      difficulty,
-      grade: grade.trim(),
-      comment: comment.trim(),
-    };
-    try {
-      if (existing) {
-        await updateReview(existing._id, payload);
-      } else {
-        await createReview({ courseId, ...payload });
-      }
-      onSaved();
-    } catch (err) {
-      setError(getErrorMessage(err, 'Failed to save review.'));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <form className="review-form" onSubmit={handleSubmit}>
-      <h3 className="review-form-heading">{existing ? 'Edit Your Review' : 'Write a Review'}</h3>
-
-      <div className="review-form-row">
-        <span className="review-form-label">Quality</span>
-        <Stars value={quality} onChange={setQuality} />
-      </div>
-      <div className="review-form-row">
-        <span className="review-form-label">Difficulty</span>
-        <Stars value={difficulty} onChange={setDifficulty} />
-      </div>
-
-      <input
-        type="text"
-        placeholder="Instructor (optional)"
-        value={instructor}
-        onChange={(e) => setInstructor(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Term, e.g. Fall 2026 (optional)"
-        value={term}
-        onChange={(e) => setTerm(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Grade received (optional)"
-        value={grade}
-        onChange={(e) => setGrade(e.target.value)}
-      />
-      <textarea
-        placeholder="Comments (optional)"
-        maxLength={1000}
-        rows={4}
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-
-      {error && <p className="review-form-error">{error}</p>}
-
-      <div className="review-form-actions">
-        <button type="button" className="review-form-cancel" onClick={onCancel} disabled={saving}>
-          Cancel
-        </button>
-        <button type="submit" className="review-form-submit" disabled={saving}>
-          {saving ? 'Saving…' : existing ? 'Save Changes' : 'Submit Review'}
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function CourseDetailPage({ courseId, onBack, onAccountClick }) {
+function CourseDetailPage({
+  courseId,
+  onBack,
+  onAccountClick,
+  onInfoClick,
+  onHelpClick,
+  onCoursesClick,
+  onWriteReview,
+  onViewResources,
+  refreshSignal,
+}) {
   const [course, setCourse] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [formMode, setFormMode] = useState(null); // null | 'new' | review object being edited
+  const [page, setPage] = useState(0);
 
   const currentUser = getAuthUser();
 
@@ -139,12 +47,16 @@ function CourseDetailPage({ courseId, onBack, onAccountClick }) {
     setLoading(true);
     setError(null);
     try {
-      const [courseData, reviewData] = await Promise.all([
+      // Bookmarks are secondary — an expired/invalid token shouldn't take
+      // down the whole page, just leave bookmark state empty.
+      const [courseData, reviewData, bookmarkData] = await Promise.all([
         getCourseById(courseId),
         getCourseReviews(courseId),
+        isLoggedIn() ? getMyBookmarks().catch(() => []) : Promise.resolve([]),
       ]);
       setCourse(courseData);
       setReviews(reviewData);
+      setBookmarkedIds(bookmarkData);
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load this course.'));
     } finally {
@@ -154,13 +66,29 @@ function CourseDetailPage({ courseId, onBack, onAccountClick }) {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
+    setPage(0);
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+  }, [courseId, refreshSignal]);
 
   const myReview = currentUser
     ? reviews.find((r) => (r.userId?._id ?? r.userId) === currentUser.id)
     : null;
+
+  const toggleBookmark = async (review) => {
+    const isBookmarked = bookmarkedIds.includes(review._id);
+    try {
+      if (isBookmarked) {
+        await deleteBookmark(review._id);
+        setBookmarkedIds((prev) => prev.filter((id) => id !== review._id));
+      } else {
+        await createBookmark(review._id);
+        setBookmarkedIds((prev) => [...prev, review._id]);
+      }
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to update bookmark.'));
+    }
+  };
 
   const handleDelete = async (review) => {
     if (!window.confirm("Delete this review? This can't be undone.")) return;
@@ -172,6 +100,21 @@ function CourseDetailPage({ courseId, onBack, onAccountClick }) {
     }
   };
 
+  // Star distribution, bucketed by rounded quality (1-5) — computed
+  // client-side from the already-fully-fetched reviews array.
+  const distribution = useMemo(() => {
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reviews.forEach((r) => {
+      const bucket = Math.min(5, Math.max(1, Math.round(r.quality)));
+      counts[bucket] += 1;
+    });
+    const max = Math.max(1, ...Object.values(counts));
+    return { counts, max };
+  }, [reviews]);
+
+  const totalPages = Math.max(1, Math.ceil(reviews.length / PAGE_SIZE));
+  const pagedReviews = reviews.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
   const diffKey = course ? getDifficultyKey(course) : 'unrated';
   const diff = DIFFICULTY[diffKey];
 
@@ -181,6 +124,9 @@ function CourseDetailPage({ courseId, onBack, onAccountClick }) {
         showBackButton
         onBack={onBack}
         showCoursesIcon={false}
+        onInfoClick={onInfoClick}
+        onHelpClick={onHelpClick}
+        onCoursesClick={onCoursesClick}
         onAccountClick={onAccountClick}
         fixed
       />
@@ -199,106 +145,113 @@ function CourseDetailPage({ courseId, onBack, onAccountClick }) {
                 {course.department ? ` • ${course.department}` : ''}
                 {course.credits ? ` • ${course.credits} credits` : ''}
               </p>
-              <div className="course-stats-row">
-                <div className="course-stat">
-                  <span className="course-stat-value">
-                    {course.numRatings === 0 ? '—' : course.avgRating.toFixed(1)}
+
+              <div className="course-rating-summary">
+                <div className="course-rating-left">
+                  <div className="course-rating-big">
+                    <span className="course-rating-number">
+                      {course.numRatings === 0 ? '—' : course.avgRating.toFixed(1)}
+                    </span>
+                    <span className="course-rating-outof">/ 5.0</span>
+                  </div>
+                  <span className="course-rating-count">
+                    {course.numRatings} {course.numRatings === 1 ? 'review' : 'reviews'}
                   </span>
-                  <span className="course-stat-label">Rating</span>
-                </div>
-                <div className="course-stat">
-                  <span className="course-stat-value">
-                    {course.numRatings === 0 ? '—' : course.avgDifficulty.toFixed(1)}
+                  <span className="difficulty-badge" style={{ backgroundColor: diff.color }}>
+                    {diff.label} difficulty
                   </span>
-                  <span className="course-stat-label">Difficulty</span>
+
+                  {!isLoggedIn() ? (
+                    <button type="button" className="review-link-btn primary" onClick={onAccountClick}>
+                      Log in to review
+                    </button>
+                  ) : (
+                    !myReview && (
+                      <button
+                        type="button"
+                        className="review-link-btn primary"
+                        onClick={() => onWriteReview(courseId)}
+                      >
+                        Write a Review
+                      </button>
+                    )
+                  )}
+
+                  {onViewResources && (
+                    <button
+                      type="button"
+                      className="review-link-btn course-resources-btn"
+                      onClick={() => onViewResources(courseId)}
+                    >
+                      Course Resources
+                    </button>
+                  )}
                 </div>
-                <div className="course-stat">
-                  <span className="course-stat-value">{course.numRatings}</span>
-                  <span className="course-stat-label">Reviews</span>
+
+                <div className="course-rating-right">
+                  {[5, 4, 3, 2, 1].map((star) => (
+                    <div className="distribution-row" key={star}>
+                      <span className="distribution-star-label">{star}★</span>
+                      <div className="distribution-bar-track">
+                        <div
+                          className="distribution-bar-fill"
+                          style={{ width: `${(distribution.counts[star] / distribution.max) * 100}%` }}
+                        />
+                      </div>
+                      <span className="distribution-count">{distribution.counts[star]}</span>
+                    </div>
+                  ))}
                 </div>
-                <span className="difficulty-badge" style={{ backgroundColor: diff.color }}>
-                  {diff.label}
-                </span>
               </div>
             </div>
 
             <div className="reviews-header-row">
               <h2 className="reviews-heading">Reviews ({reviews.length})</h2>
-              {!isLoggedIn() ? (
-                <button type="button" className="review-link-btn" onClick={onAccountClick}>
-                  Log in to review
-                </button>
-              ) : (
-                !myReview &&
-                formMode !== 'new' && (
-                  <button type="button" className="review-link-btn primary" onClick={() => setFormMode('new')}>
-                    Write a Review
-                  </button>
-                )
-              )}
             </div>
 
-            {formMode === 'new' && (
-              <ReviewForm
-                courseId={courseId}
-                onCancel={() => setFormMode(null)}
-                onSaved={() => {
-                  setFormMode(null);
-                  load();
-                }}
-              />
-            )}
-
-            {reviews.length === 0 && formMode !== 'new' && (
-              <p className="no-reviews">No reviews yet — be the first!</p>
-            )}
+            {reviews.length === 0 && <p className="no-reviews">No reviews yet — be the first!</p>}
 
             <div className="review-list">
-              {reviews.map((review) => {
+              {pagedReviews.map((review) => {
                 const isMine = currentUser && (review.userId?._id ?? review.userId) === currentUser.id;
-                const isEditing = formMode && formMode !== 'new' && formMode._id === review._id;
-                if (isEditing) {
-                  return (
-                    <ReviewForm
-                      key={review._id}
-                      courseId={courseId}
-                      existing={review}
-                      onCancel={() => setFormMode(null)}
-                      onSaved={() => {
-                        setFormMode(null);
-                        load();
-                      }}
-                    />
-                  );
-                }
                 return (
-                  <div key={review._id} className="review-card">
-                    <div className="review-card-top">
-                      <span className="review-author">
-                        {review.userId?.username || (isMine ? 'You' : 'Anonymous')}
-                      </span>
-                      {isMine && (
-                        <div className="review-card-actions">
-                          <button type="button" onClick={() => setFormMode(review)} aria-label="Edit review">
-                            Edit
-                          </button>
-                          <button type="button" onClick={() => handleDelete(review)} aria-label="Delete review">
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <p className="review-card-meta">
-                      Quality: {review.quality}/5 &nbsp;•&nbsp; Difficulty: {review.difficulty}/5
-                      {review.instructor ? ` • ${review.instructor}` : ''}
-                      {review.term ? ` • ${review.term}` : ''}
-                      {review.grade ? ` • Grade: ${review.grade}` : ''}
-                    </p>
-                    {review.comment && <p className="review-card-comment">{review.comment}</p>}
-                  </div>
+                  <ReviewCard
+                    key={review._id}
+                    review={review}
+                    isMine={isMine}
+                    isBookmarked={bookmarkedIds.includes(review._id)}
+                    isLoggedIn={isLoggedIn()}
+                    onToggleBookmark={() => toggleBookmark(review)}
+                    onEdit={() => onWriteReview(courseId, review)}
+                    onDelete={() => handleDelete(review)}
+                  />
                 );
               })}
             </div>
+
+            {totalPages > 1 && (
+              <div className="review-pagination">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  aria-label="Previous page"
+                >
+                  ← Prev
+                </button>
+                <span className="review-pagination-status">
+                  Page {page + 1} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                  aria-label="Next page"
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

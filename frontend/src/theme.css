@@ -65,6 +65,11 @@
 
   --color-error: var(--status-error);
   --color-success: var(--status-success);
+
+  /* Shared transition timing — used for hover/press states and fades. */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s ease;
 }
 
 /* Transparency helper (can't wrap a var in rgba directly): 

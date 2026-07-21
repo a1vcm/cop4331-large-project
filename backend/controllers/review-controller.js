@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const Review = require('../collections/Review');
 const Course = require('../collections/Course');
+const Bookmark = require('../collections/Bookmark');
 
 // Helper function to recalculate and update course statistics
 async function updateCourseStats(courseId) {
@@ -29,6 +30,7 @@ async function updateCourseStats(courseId) {
         numRatings: stats[0].numRatings,
         avgRating: Math.round(stats[0].avgRating * 10) / 10, // Rounds to 1 decimal place
         avgDifficulty: Math.round(stats[0].avgDifficulty * 10) / 10,
+        lastReviewedAt: new Date(),
       });
     } else {
       // Reset defaults if the last remaining review is deleted
@@ -36,6 +38,7 @@ async function updateCourseStats(courseId) {
         numRatings: 0,
         avgRating: 0,
         avgDifficulty: 0,
+        lastReviewedAt: null,
       });
     }
   } catch (err) {
@@ -48,7 +51,9 @@ async function updateCourseStats(courseId) {
 async function createReview(req, res) {
   try {
     // Destructuring to match your exact schema layout
-    const { courseId, instructor, term, quality, difficulty, grade, comment } = req.body;
+    const {
+      courseId, instructor, term, quality, difficulty, professorRating, attendance, grade, comment, tags,
+    } = req.body;
     const userId = req.user.id; // Populated by your JWT auth middleware
 
     if (!courseId || !quality || !difficulty) {
@@ -75,8 +80,11 @@ async function createReview(req, res) {
       term,
       quality,
       difficulty,
+      professorRating,
+      attendance,
       grade,
       comment,
+      tags,
     });
 
     // Recalculate average stats for the course
@@ -120,7 +128,9 @@ async function getMyReviews(req, res) {
 // @route   PUT /api/reviews/:id
 async function updateReview(req, res) {
   try {
-    const { instructor, term, quality, difficulty, grade, comment } = req.body;
+    const {
+      instructor, term, quality, difficulty, professorRating, attendance, grade, comment, tags,
+    } = req.body;
     const userId = req.user.id;
 
     const review = await Review.findById(req.params.id);
@@ -138,8 +148,11 @@ async function updateReview(req, res) {
     review.term = term !== undefined ? term : review.term;
     review.quality = quality !== undefined ? quality : review.quality;
     review.difficulty = difficulty !== undefined ? difficulty : review.difficulty;
+    review.professorRating = professorRating !== undefined ? professorRating : review.professorRating;
+    review.attendance = attendance !== undefined ? attendance : review.attendance;
     review.grade = grade !== undefined ? grade : review.grade;
     review.comment = comment !== undefined ? comment : review.comment;
+    review.tags = tags !== undefined ? tags : review.tags;
 
     await review.save();
     await updateCourseStats(review.courseId);
@@ -167,6 +180,7 @@ async function deleteReview(req, res) {
     }
 
     await review.deleteOne();
+    await Bookmark.deleteMany({ reviewId: review._id });
     await updateCourseStats(review.courseId);
 
     res.json({ message: 'Review deleted successfully' });

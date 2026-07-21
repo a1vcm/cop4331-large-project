@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import CourseSearchBar from './components/CourseSearchBar.jsx';
 import { getCourses } from '../api/courses.js';
 import { getErrorMessage } from '../api/client.js';
 import './CourseSearchPage.css';
@@ -97,20 +98,13 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
       <div className="course-search-top-spacer" />
 
       <div className="course-search-content">
-        <form className="course-search-bar" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Search for a class..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button type="submit" aria-label="Search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </button>
-        </form>
+        <CourseSearchBar
+          value={query}
+          onChange={setQuery}
+          onSubmit={handleSearch}
+          onSelectCourse={handleShowReviews}
+          formClassName="course-search-bar"
+        />
 
         <div className="course-search-controls">
           <label className="control-dropdown">

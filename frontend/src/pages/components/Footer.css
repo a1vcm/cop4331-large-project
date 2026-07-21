@@ -1,0 +1,21 @@
+/* Same background token as .top-bar (TopBar.css) so every page gets a
+   matching dark top+bottom frame. */
+.site-footer {
+  background: var(--black);
+  padding: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.site-footer-text {
+  margin: 0;
+  color: var(--white);
+  font-size: 13px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  opacity: 0.75;
+  text-align: center;
+}

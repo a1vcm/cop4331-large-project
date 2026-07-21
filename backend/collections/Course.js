@@ -10,6 +10,7 @@ const courseSchema = new Schema
     avgRating: { type: Number, default: 0 },
     avgDifficulty: { type: Number, default: 0 },
     numRatings: { type: Number, default: 0 },
+    lastReviewedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

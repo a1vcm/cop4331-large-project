@@ -5,8 +5,11 @@ const User = require('../collections/User');
 const Review = require('../collections/Review');
 const Course = require('../collections/Course');
 const Vote = require('../collections/Vote');
+const Bookmark = require('../collections/Bookmark');
+const Resource = require('../collections/Resource');
 const { sendEmail } = require('../utils/mailer');
 const { generateCode, minutesFromNow } = require('../utils/codes');
+const { validatePassword } = require('../utils/validatePassword');
 
 const EMAIL_CHANGE_CODE_TTL_MIN = 15;
 
@@ -42,12 +45,14 @@ async function updateCourseStats(courseId) {
         numRatings: stats[0].numRatings,
         avgRating: Math.round(stats[0].avgRating * 10) / 10,
         avgDifficulty: Math.round(stats[0].avgDifficulty * 10) / 10,
+        lastReviewedAt: new Date(),
       });
     } else {
       await Course.findByIdAndUpdate(courseId, {
         numRatings: 0,
         avgRating: 0,
         avgDifficulty: 0,
+        lastReviewedAt: null,
       });
     }
   } catch (err) {
@@ -151,6 +156,11 @@ async function changePassword(req, res) {
       return res.status(400).json({ message: 'currentPassword and newPassword are required' });
     }
 
+    const passwordCheck = validatePassword(newPassword);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({ message: passwordCheck.message });
+    }
+
     // protect strips passwordHash from req.user, so re-fetch it.
     const user = await User.findById(req.user._id);
     const valid = await bcrypt.compare(currentPassword, user.passwordHash);
@@ -211,13 +221,19 @@ async function deleteAccount(req, res) {
       await Vote.deleteMany({ userId: user._id });
     }
 
-    // 4. The reviews themselves, then refresh each affected course's stats
+    // 4. Bookmarks on this user's reviews (orphaned once reviews go), and
+    //    this user's own bookmarks/resources.
+    await Bookmark.deleteMany({ reviewId: { $in: myReviewIds } });
+    await Bookmark.deleteMany({ userId: user._id });
+    await Resource.deleteMany({ userId: user._id });
+
+    // 5. The reviews themselves, then refresh each affected course's stats
     await Review.deleteMany({ userId: user._id });
     for (const courseId of affectedCourseIds) {
       await updateCourseStats(courseId);
     }
 
-    // 5. Finally the user
+    // 6. Finally the user
     await user.deleteOne();
 
     res.json({ message: 'Account deleted' });
