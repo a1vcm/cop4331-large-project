@@ -74,7 +74,20 @@
 .course-search-controls {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+}
+
+.course-search-controls-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.control-dropdown-pagesize {
+  border: 1.5px solid var(--gold-base);
+  margin-left: auto;
 }
 
 .control-dropdown {
@@ -193,6 +206,27 @@
   border-color: var(--color-border);
 }
 
+/* Dark mode: the light-mode tints (mixed against a near-black surface)
+   read as muted/illegible, so switch to solid, saturated fills instead —
+   the same treatment star ratings already use to stay theme-invariant. */
+[data-theme="dark"] .difficulty-easy {
+  background: #3FA34D;
+  color: var(--white);
+  border-color: #3FA34D;
+}
+
+[data-theme="dark"] .difficulty-medium {
+  background: var(--gold-base);
+  color: var(--black);
+  border-color: var(--gold-base);
+}
+
+[data-theme="dark"] .difficulty-hard {
+  background: var(--status-error);
+  color: var(--white);
+  border-color: var(--status-error);
+}
+
 .reviews-btn {
   background: var(--color-emphasis);
   color: var(--color-on-emphasis);
@@ -216,8 +250,18 @@
     padding: 24px 16px 40px;
   }
 
-  .control-dropdown {
+  .course-search-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .course-search-controls-left .control-dropdown {
     flex: 1 1 calc(50% - 6px);
+  }
+
+  .control-dropdown-pagesize {
+    margin-left: 0;
+    width: 100%;
   }
 
   .class-card {

@@ -39,7 +39,7 @@
   font-weight: 700;
   font-size: 18px;
   letter-spacing: 0.02em;
-  color: var(--gold-base); /* UCF gold — stays put regardless of light/dark theme */
+  color: var(--color-primary); /* gold in light mode, blue in dark mode */
   white-space: nowrap;
 }
 

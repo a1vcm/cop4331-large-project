@@ -125,39 +125,41 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
         />
 
         <div className="course-search-controls">
-          <label className="control-dropdown">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 6h16M7 12h10M10 18h4" />
-            </svg>
-            <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
-              <option value="all">Filter By</option>
-              <option value="easy">Difficulty: Easy</option>
-              <option value="medium">Difficulty: Moderate</option>
-              <option value="hard">Difficulty: Hard</option>
-            </select>
-          </label>
+          <div className="course-search-controls-left">
+            <label className="control-dropdown">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 6h16M7 12h10M10 18h4" />
+              </svg>
+              <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+                <option value="all">Filter By</option>
+                <option value="easy">Difficulty: Easy</option>
+                <option value="medium">Difficulty: Moderate</option>
+                <option value="hard">Difficulty: Hard</option>
+              </select>
+            </label>
 
-          <label className="control-dropdown">
-            <select value={prefixFilter} onChange={(e) => setPrefixFilter(e.target.value)}>
-              <option value="all">All Prefixes</option>
-              {prefixes.map((prefix) => (
-                <option key={prefix} value={prefix}>
-                  {prefix}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="control-dropdown">
+              <select value={prefixFilter} onChange={(e) => setPrefixFilter(e.target.value)}>
+                <option value="all">All Prefixes</option>
+                {prefixes.map((prefix) => (
+                  <option key={prefix} value={prefix}>
+                    {prefix}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label className="control-dropdown">
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="relevance">Sort By</option>
-              <option value="name">Name</option>
-              <option value="credits">Credits</option>
-              <option value="difficulty">Difficulty</option>
-            </select>
-          </label>
+            <label className="control-dropdown">
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="relevance">Sort By</option>
+                <option value="name">Name</option>
+                <option value="credits">Credits</option>
+                <option value="difficulty">Difficulty</option>
+              </select>
+            </label>
+          </div>
 
-          <label className="control-dropdown">
+          <label className="control-dropdown control-dropdown-pagesize">
             <select
               value={pageSize}
               onChange={(e) => setPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
