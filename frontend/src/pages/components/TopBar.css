@@ -28,9 +28,13 @@
   background: color-mix(in srgb, var(--black) 60%, transparent);
 }
 
-.top-bar-spacer {
-  width: 26px;
-  height: 26px;
+.top-bar-brand {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  white-space: nowrap;
 }
 
 .back-btn {

@@ -115,9 +115,9 @@ function Homepage({
               ))
             )}
           </section>
-
-          <Footer />
         </div>
+
+        <Footer />
       </main>
     </div>
   );

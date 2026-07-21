@@ -158,8 +158,8 @@ function App() {
     );
   }
 
-  // Homepage mounts its own Footer inside the expandable panel (its panel is
-  // position:fixed and would otherwise cover a normal-flow footer below it).
+  // Homepage mounts its own Footer (full-bleed, outside its centered content
+  // wrapper) so it isn't rendered a second time here.
   const showFooter = view !== 'home';
 
   return (

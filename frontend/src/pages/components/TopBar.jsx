@@ -33,7 +33,7 @@ function TopBar({
           </svg>
         </button>
       ) : (
-        <div className="top-bar-spacer" />
+        <span className="top-bar-brand">KnightRate</span>
       )}
 
       <nav className="top-bar-icons">
