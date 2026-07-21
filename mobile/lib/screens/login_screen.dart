@@ -54,6 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register a Theme dependency so every text style in this screen
+    // repaints the moment the light/dark toggle fires.
+    Theme.of(context);
     return AppScaffold(
       showBack: true,
       onBack: () => context.canPop() ? context.pop() : context.go('/'),
@@ -64,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.cardFill,
+              color: ThemeColors.surface(context),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Column(
@@ -89,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _errorMessage!,
-                    style: AppTextStyles.muted.copyWith(color: Colors.red),
+                    style: AppTextStyles.muted.copyWith(color: ThemeColors.error(context)),
                     textAlign: TextAlign.center,
                   ),
                 ],

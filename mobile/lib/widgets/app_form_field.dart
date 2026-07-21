@@ -27,7 +27,7 @@ class AppTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: icon != null
-            ? Icon(icon, size: 18, color: AppColors.grayLight)
+            ? Icon(icon, size: 18, color: ThemeColors.textMuted(context))
             : null,
       ),
     );

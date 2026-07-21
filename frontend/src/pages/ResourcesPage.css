@@ -1,0 +1,151 @@
+.resources-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.resources-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.resources-content {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resources-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.resources-subheading {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: -8px 0 0;
+}
+
+.resources-status {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.resource-form {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resource-form input {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.resource-form input:focus {
+  border-color: var(--color-primary);
+}
+
+.resource-form-error {
+  color: var(--color-error);
+  font-size: 13px;
+  margin: 0;
+}
+
+.resource-form-submit {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--transition-base, 0.2s ease);
+}
+
+.resource-form-submit:hover {
+  background: var(--color-primary-hover);
+}
+
+.resource-form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resource-card {
+  background: var(--color-surface);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resource-link {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-primary);
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.resource-link:hover {
+  text-decoration: underline;
+}
+
+.resource-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.resource-delete {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.resource-delete:hover {
+  color: var(--color-error);
+}

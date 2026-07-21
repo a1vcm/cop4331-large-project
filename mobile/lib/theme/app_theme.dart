@@ -1,23 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// Brand color tokens — kept in exact sync with `frontend/src/theme.js`'s
-/// `C` export. If that file changes, update these hex values to match.
-class AppColors {
+/// Raw palette — kept in exact sync with `frontend/src/theme.css`'s
+/// `:root` block. If that file changes, update these hex values to match.
+class AppPalette {
+  // gold (light accent)
+  static const goldDark = Color(0xFFC89A0F);
   static const gold = Color(0xFFF2C417);
-  static const goldDark = Color(0xFFBD9A36);
-  static const goldLight = Color(0xFFF5D77A);
-  static const goldPale = Color(0xFFFBEBBE);
+  static const goldLight = Color(0xFFF7D75A);
 
-  static const black = Color(0xFF242021);
-  static const grayDark = Color(0xFF333333);
-  static const grayMedium = Color(0xFF555555);
-  static const grayLight = Color(0xFF888888);
-  static const grayLighter = Color(0xFFBBBBBB);
-  static const grayLightest = Color(0xFFEAEAEA);
+  // space-night (dark accent)
+  static const blue = Color(0xFF2E6BE6);
+  static const blueLight = Color(0xFF5B8DEF);
+  static const spaceBlack = Color(0xFF0A0E1A);
+  static const spaceSurface = Color(0xFF16203B);
+  static const spaceBorder = Color(0xFF2A3350);
+  static const spaceMuted = Color(0xFF9AA3B8);
+
+  // neutrals
+  static const black = Color(0xFF1A1A1A);
+  static const gray900 = Color(0xFF333333);
+  static const gray500 = Color(0xFF888888);
+  static const gray300 = Color(0xFFBBBBBB);
+  static const pageGray = Color(0xFFEDEFF1);
   static const white = Color(0xFFFFFFFF);
 
-  // --- Semantic aliases, mirroring the `T` object in theme.js ---
+  // status
+  static const error = Color(0xFFE57373);
+  static const success = Color(0xFF3FA34D);
+}
+
+/// Manual light/dark switching, mirroring the web app's ThemeToggle.jsx +
+/// localStorage persistence. A notifiable singleton (same pattern as
+/// AuthState) that MaterialApp listens to.
+class ThemeController extends ChangeNotifier {
+  ThemeController._();
+  static final ThemeController instance = ThemeController._();
+
+  static const _key = 'knightrate_theme';
+
+  ThemeMode mode = ThemeMode.light;
+
+  bool get isDark => mode == ThemeMode.dark;
+
+  /// Await once at startup, alongside AuthState.loadFromDisk().
+  Future<void> loadFromDisk() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_key);
+    mode = saved == 'dark' ? ThemeMode.dark : ThemeMode.light;
+    notifyListeners();
+  }
+
+  Future<void> toggle() async {
+    mode = isDark ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, isDark ? 'dark' : 'light');
+  }
+}
+
+/// Semantic, theme-aware colors — the Flutter mirror of theme.css's
+/// `--color-*` custom properties.
+///
+/// These take a BuildContext and read the ambient Theme's brightness, which
+/// registers a dependency: any widget calling e.g. ThemeColors.bg(context)
+/// automatically rebuilds the instant the skin flips. (An earlier revision
+/// used context-free getters; const screens then skipped rebuilding and the
+/// UI lagged one interaction behind the toggle.)
+class ThemeColors {
+  static bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  static Color bg(BuildContext c) => _isDark(c) ? AppPalette.spaceBlack : AppPalette.pageGray;
+  static Color surface(BuildContext c) => _isDark(c) ? AppPalette.spaceSurface : AppPalette.white;
+  static Color text(BuildContext c) => _isDark(c) ? AppPalette.white : AppPalette.black;
+  static Color textMuted(BuildContext c) => _isDark(c) ? AppPalette.spaceMuted : AppPalette.gray500;
+  static Color border(BuildContext c) => _isDark(c) ? AppPalette.spaceBorder : AppPalette.gray300;
+
+  static Color primary(BuildContext c) => _isDark(c) ? AppPalette.blue : AppPalette.gold;
+  static Color primaryHover(BuildContext c) => _isDark(c) ? AppPalette.blueLight : AppPalette.goldDark;
+  static Color onPrimary(BuildContext c) => _isDark(c) ? AppPalette.white : AppPalette.black;
+
+  static Color emphasis(BuildContext c) => _isDark(c) ? AppPalette.blue : AppPalette.black;
+  static Color emphasisHover(BuildContext c) => _isDark(c) ? AppPalette.blueLight : AppPalette.gray900;
+  static Color onEmphasis(BuildContext c) => AppPalette.white;
+
+  static Color error(BuildContext c) => AppPalette.error;
+  static Color success(BuildContext c) => AppPalette.success;
+}
+
+/// Fixed brand color tokens. Values refreshed to match theme.css's raw
+/// palette; names preserved so every existing screen keeps compiling.
+/// These do NOT change with dark mode — prefer ThemeColors for anything
+/// that should. Chrome colors (topBar/bottomBar) are intentionally fixed:
+/// the web app's TopBar.css also pins its background to var(--black) in
+/// both skins.
+class AppColors {
+  static const gold = AppPalette.gold;
+  static const goldDark = AppPalette.goldDark;
+  static const goldLight = AppPalette.goldLight;
+  static const goldPale = Color(0xFFFBEBBE);
+
+  static const black = AppPalette.black;
+  static const grayDark = AppPalette.gray900;
+  static const grayMedium = Color(0xFF555555);
+  static const grayLight = AppPalette.gray500;
+  static const grayLighter = AppPalette.gray300;
+  static const grayLightest = AppPalette.pageGray;
+  static const white = AppPalette.white;
+
   static const primary = gold;
   static const onPrimary = black;
   static const text = black;
@@ -26,7 +118,6 @@ class AppColors {
   static const surface = grayLightest;
   static const border = grayLight;
 
-  // Screen-chrome specific aliases used by AppScaffold/AppTopBar/etc.
   static const topBar = black;
   static const bottomBar = black;
   static const cardFill = grayLightest;
@@ -50,76 +141,108 @@ class AppFontWeights {
   static const bold = FontWeight.w700;
 }
 
-/// Typography.
-///
-/// theme.js defines three font stacks: `display` (Knockout), `heading`
-/// (Gotham), and `body` (Helvetica Neue) — all licensed fonts with fallback
-/// stacks. Flutter can't do CSS-style font-fallback-chains the same way,
-/// and bundling Knockout/Gotham raises the same licensing question we
-/// flagged earlier (worth raising with whoever owns the brand guide,
-/// since the web app is shipping those font names in its CSS too).
-///
-/// For now every style below uses Montserrat via google_fonts as a
-/// license-safe stand-in for both Gotham and Knockout. If your team gets
-/// a confirmed license, swap `GoogleFonts.montserrat(...)` for
-/// `GoogleFonts.knockout(...)` / a licensed Gotham asset — the rest of
-/// the app won't need to change since everything reads from here.
+/// Typography. Montserrat via google_fonts as the license-safe stand-in
+/// for Gotham/Knockout, same as the web app. Styles read ThemeColors so
+/// text flips correctly in dark mode wherever these are used.
 class AppTextStyles {
+  static bool get _dark => ThemeController.instance.isDark;
+  static Color get _text => _dark ? AppPalette.white : AppPalette.black;
+  static Color get _muted => _dark ? AppPalette.spaceMuted : AppPalette.gray500;
+
   static TextStyle get display => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.bold,
         fontSize: 28,
-        color: AppColors.text,
+        color: _text,
       );
 
   static TextStyle get heading => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.bold,
         fontSize: 20,
-        color: AppColors.text,
+        color: _text,
       );
 
   static TextStyle get subheading => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.medium,
         fontSize: 15,
-        color: AppColors.grayDark,
+        color: _text,
       );
 
   static TextStyle get body => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.regular,
         fontSize: 14,
-        color: AppColors.grayDark,
+        color: _text,
       );
 
   static TextStyle get muted => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.regular,
         fontSize: 12,
-        color: AppColors.textMuted,
+        color: _muted,
       );
 
   static TextStyle get button => GoogleFonts.montserrat(
         fontWeight: AppFontWeights.medium,
         fontSize: 14,
-        color: AppColors.white,
+        color: AppPalette.white,
       );
 }
 
-/// App-wide ThemeData, so MaterialApp components (buttons, inputs, etc.)
-/// pick up brand colors automatically without repeating styles per screen.
+/// Light + dark ThemeData mirroring theme.css's two skins. main.dart wires
+/// these to MaterialApp.theme / darkTheme with ThemeController driving
+/// themeMode.
 class AppTheme {
-  static ThemeData get theme {
+  static ThemeData get light => _build(
+        brightness: Brightness.light,
+        bg: AppPalette.pageGray,
+        surface: AppPalette.white,
+        text: AppPalette.black,
+        muted: AppPalette.gray500,
+        primary: AppPalette.gold,
+        onPrimary: AppPalette.black,
+        emphasis: AppPalette.black,
+      );
+
+  static ThemeData get dark => _build(
+        brightness: Brightness.dark,
+        bg: AppPalette.spaceBlack,
+        surface: AppPalette.spaceSurface,
+        text: AppPalette.white,
+        muted: AppPalette.spaceMuted,
+        primary: AppPalette.blue,
+        onPrimary: AppPalette.white,
+        emphasis: AppPalette.blue,
+      );
+
+  /// Kept for compatibility with any code still reading AppTheme.theme.
+  static ThemeData get theme => light;
+
+  static ThemeData _build({
+    required Brightness brightness,
+    required Color bg,
+    required Color surface,
+    required Color text,
+    required Color muted,
+    required Color primary,
+    required Color onPrimary,
+    required Color emphasis,
+  }) {
     return ThemeData(
-      scaffoldBackgroundColor: AppColors.background,
-      primaryColor: AppColors.primary,
-      textTheme: GoogleFonts.montserratTextTheme(),
+      brightness: brightness,
+      scaffoldBackgroundColor: bg,
+      primaryColor: primary,
+      textTheme: GoogleFonts.montserratTextTheme(
+        brightness == Brightness.dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
+      ),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.gold,
-        primary: AppColors.primary,
-        secondary: AppColors.goldDark,
-        surface: AppColors.surface,
+        brightness: brightness,
+        seedColor: primary,
+        primary: primary,
+        onPrimary: onPrimary,
+        surface: surface,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.grayDark,
-          foregroundColor: AppColors.white,
+          backgroundColor: emphasis,
+          foregroundColor: AppPalette.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
@@ -128,7 +251,9 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.fieldFill,
+        fillColor: brightness == Brightness.dark
+            ? AppPalette.spaceBorder.withValues(alpha: 0.5)
+            : AppColors.fieldFill,
         contentPadding: EdgeInsets.symmetric(
           vertical: AppSpacing.sm + 2,
           horizontal: AppSpacing.md - 4,
@@ -137,7 +262,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,
         ),
-        hintStyle: AppTextStyles.muted,
+        hintStyle: GoogleFonts.montserrat(
+          fontWeight: AppFontWeights.regular,
+          fontSize: 12,
+          color: muted,
+        ),
       ),
     );
   }

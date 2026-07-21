@@ -91,6 +91,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register a Theme dependency so every text style in this screen
+    // repaints the moment the light/dark toggle fires.
+    Theme.of(context);
     return AppScaffold(
       showBack: true,
       onBack: () => context.pop(),
@@ -101,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.cardFill,
+              color: ThemeColors.surface(context),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Column(
@@ -155,7 +158,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Text(
                     _message!,
                     style: AppTextStyles.muted.copyWith(
-                      color: _messageIsError ? Colors.red : Colors.green,
+                      color: _messageIsError ? ThemeColors.error(context) : ThemeColors.success(context),
                     ),
                     textAlign: TextAlign.center,
                   ),

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import PasswordRequirements from './components/PasswordRequirements.jsx';
 import { setAuthToken, setAuthUser, getErrorMessage } from '../api/client.js';
 import { register, verifyEmail, resendVerification, login, forgotPassword, resetPassword } from '../api/auth.js';
+import { MIN_PASSWORD_LENGTH, isPasswordValid } from '../utils/validatePassword.js';
 import './AuthPage.css';
 
 function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
@@ -50,6 +52,10 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
   const handleRegister = async (e) => {
     e.preventDefault();
     setAuthMessage(null);
+    if (!isPasswordValid(regPassword)) {
+      setAuthMessage({ type: 'error', text: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
+      return;
+    }
     if (regPassword !== regConfirmPassword) {
       setAuthMessage({ type: 'error', text: 'Passwords do not match' });
       return;
@@ -113,6 +119,10 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
+    if (!isPasswordValid(newPassword)) {
+      setForgotMessage({ type: 'error', text: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
+      return;
+    }
     if (newPassword !== newPasswordConfirm) {
       setForgotMessage({ type: 'error', text: 'Passwords do not match' });
       return;
@@ -259,6 +269,8 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                 />
               </label>
 
+              <PasswordRequirements password={regPassword} />
+
               <label className="input-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="5" y="11" width="14" height="9" rx="2" />
@@ -380,6 +392,8 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
                   />
+
+                  <PasswordRequirements password={newPassword} />
 
                   <input
                     type="password"
