@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Homepage from './pages/Homepage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
-import FaqPage from './pages/FaqPage.jsx';
 import CourseSearchPage from './pages/CourseSearchPage.jsx';
 import CourseDetailPage from './pages/CourseDetailPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
@@ -13,7 +12,7 @@ import ScrollToTopButton from './pages/components/ScrollToTopButton.jsx';
 import { isLoggedIn } from './api/client.js';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail' | 'profile' | 'resources' | 'writeReview'
+  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'courses' | 'courseDetail' | 'profile' | 'resources' | 'writeReview'
   const [courseQuery, setCourseQuery] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [reviewDraft, setReviewDraft] = useState(null); // null = new review, review object = editing
@@ -22,7 +21,8 @@ function App() {
   const [refreshSignal, setRefreshSignal] = useState(0);
 
   const goToAbout = () => setView('about');
-  const goToFaq = () => setView('faq');
+  // FAQ content now lives inside the unified About page.
+  const goToFaq = goToAbout;
   const goToHome = () => setView('home');
 
   // Account icon: profile when logged in, auth page when not.
@@ -88,16 +88,6 @@ function App() {
     content = (
       <AboutPage
         onBack={goToHome}
-        onHelpClick={goToFaq}
-        onCoursesClick={() => goToCourses()}
-        onAccountClick={goToAccount}
-      />
-    );
-  } else if (view === 'faq') {
-    content = (
-      <FaqPage
-        onBack={goToHome}
-        onInfoClick={goToAbout}
         onCoursesClick={() => goToCourses()}
         onAccountClick={goToAccount}
       />

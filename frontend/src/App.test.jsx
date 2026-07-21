@@ -10,7 +10,7 @@ describe('App', () => {
     expect(screen.getByPlaceholderText(/search classes/i)).toBeInTheDocument()
   })
 
-  it('navigates to the FAQ page via the Help nav icon', async () => {
+  it('navigates to the About page via the Help nav icon', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: /help/i }))
