@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import Footer from './components/Footer.jsx';
 import CourseSearchBar from './components/CourseSearchBar.jsx';
@@ -18,9 +18,7 @@ function Homepage({
   onCourseClick,
 }) {
   const [query, setQuery] = useState('');
-  const [isExpanded, setIsExpanded] = useState(false);
   const [popularCourses, setPopularCourses] = useState([]);
-  const touchStartY = useRef(null);
 
   useEffect(() => {
     getCourses(undefined, { sort: 'recent' })
@@ -33,28 +31,9 @@ function Homepage({
     if (onSearch) onSearch(query);
   };
 
-  const toggleExpanded = () => {
-    setIsExpanded((prev) => !prev);
+  const scrollToHowItWorks = () => {
+    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  // Swipe up on the hero to expand, swipe down on the handle to collapse.
-  // Click still works too — this is additive, not a replacement.
-  const SWIPE_THRESHOLD_PX = 40;
-
-  const handleTouchStart = (e) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const makeTouchEndHandler = (direction, action) => (e) => {
-    if (touchStartY.current === null) return;
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-    touchStartY.current = null;
-    const swiped = direction === 'up' ? deltaY < -SWIPE_THRESHOLD_PX : deltaY > SWIPE_THRESHOLD_PX;
-    if (swiped) action();
-  };
-
-  const handleHeroTouchEnd = makeTouchEndHandler('up', () => setIsExpanded(true));
-  const handlePanelTouchEnd = makeTouchEndHandler('down', () => setIsExpanded(false));
 
   return (
     <div className="homepage">
@@ -72,76 +51,70 @@ function Homepage({
       {/* <main> landmark for screen readers / Lighthouse; wraps everything
           below the (fixed) top bar. */}
       <main>
-        {/* Hero — fills the first screen */}
-        <section
-          className={`hero ${isExpanded ? 'expanded-state' : ''}`}
-          style={{ backgroundImage: `url(${stockUcf})` }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleHeroTouchEnd}
-        >
+        {/* Hero — a normal-flow banner, not a fixed 100vh panel. The page
+            simply scrolls from here into the sections below. */}
+        <section className="hero" style={{ backgroundImage: `url(${stockUcf})` }}>
           <div className="hero-overlay">
-            <h1 className="hero-title">Welcome to KnightRate!</h1>
-            <p className="hero-tagline">Real course ratings from UCF students, for UCF students.</p>
+            <h1 className="hero-title">KnightRate</h1>
+            <p className="hero-tagline">
+              Real ratings from real students, all in one place. Browse honest reviews on classes
+              and gauge valuable resources before you commit.
+            </p>
 
             <CourseSearchBar
               value={query}
               onChange={setQuery}
               onSubmit={handleSearch}
               onSelectCourse={(course) => (onCourseClick ? onCourseClick(course) : onCoursesClick?.())}
+              placeholder="Search classes..."
             />
+
+            <div className="hero-links">
+              <button type="button" className="hero-link" onClick={() => onCoursesClick?.()}>
+                Browse Categories
+              </button>
+              <span className="hero-link-divider" aria-hidden="true" />
+              <button type="button" className="hero-link" onClick={scrollToHowItWorks}>
+                How It Works
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* Expandable panel — slides up over the hero. Handle/arrow always sits at its top edge, so it can be clicked to expand OR collapse. */}
-        <div className={`expandable-panel ${isExpanded ? 'expanded' : ''}`}>
-          <button
-            className="pull-handle"
-            aria-label={isExpanded ? 'Collapse' : 'Show more'}
-            aria-expanded={isExpanded}
-            onClick={toggleExpanded}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handlePanelTouchEnd}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 15l7-7 7 7" />
-            </svg>
-          </button>
+        <div className="homepage-content">
+          <section className="intro" id="how-it-works">
+            <img src={ucfLogo} alt="UCF Logo" className="intro-logo" />
+            <div className="intro-text">
+              <h2 className="intro-heading">Made for Knights, by Knights</h2>
+              <p className="intro-line">
+                KnightRate started as a student project to help our own campus community make
+                better decisions. Every review, rating, and recommendation comes from someone
+                who&apos;s actually been there.
+              </p>
+            </div>
+          </section>
 
-          <div className="panel-content">
-            <section className="intro">
-              <img src={ucfLogo} alt="UCF Logo" className="intro-logo" />
-              <div className="intro-text">
-                <h2 className="intro-heading">Find the right class, from students who've taken it</h2>
-                <p className="intro-line">
-                  KnightRate is a course review platform built for UCF Computer Science and IT
-                  students — search the catalog, read real ratings for difficulty and quality, and
-                  share your own experience once you've taken a class.
-                </p>
-              </div>
-            </section>
+          <h2 className="popular-classes-heading">Trending Classes This Week</h2>
 
-            <h2 className="popular-classes-heading">Recently Reviewed</h2>
+          <section className="cards-row">
+            {popularCourses.length === 0 ? (
+              <p className="cards-row-empty">Loading classes…</p>
+            ) : (
+              popularCourses.map((course) => (
+                <button
+                  key={course._id}
+                  type="button"
+                  className="card"
+                  onClick={() => (onCourseClick ? onCourseClick(course) : onCoursesClick?.())}
+                >
+                  <span className="card-code">{course.course_code}</span>
+                  <span className="card-title">{course.title}</span>
+                </button>
+              ))
+            )}
+          </section>
 
-            <section className="cards-row">
-              {popularCourses.length === 0 ? (
-                <p className="cards-row-empty">Loading classes…</p>
-              ) : (
-                popularCourses.map((course) => (
-                  <button
-                    key={course._id}
-                    type="button"
-                    className="card"
-                    onClick={() => (onCourseClick ? onCourseClick(course) : onCoursesClick?.())}
-                  >
-                    <span className="card-code">{course.course_code}</span>
-                    <span className="card-title">{course.title}</span>
-                  </button>
-                ))
-              )}
-            </section>
-
-            <Footer />
-          </div>
+          <Footer />
         </div>
       </main>
     </div>
