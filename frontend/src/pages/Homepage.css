@@ -45,6 +45,13 @@
   box-sizing: border-box;
 }
 
+.hero-wordmark {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: -16px;
+}
+
 .hero-title {
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
@@ -272,6 +279,10 @@
   .hero {
     height: 56vh;
     min-height: 400px;
+  }
+
+  .hero-wordmark {
+    height: 36px;
   }
 
   .hero-title {

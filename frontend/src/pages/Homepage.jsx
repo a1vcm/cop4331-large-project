@@ -3,6 +3,7 @@ import TopBar from './components/TopBar.jsx';
 import Footer from './components/Footer.jsx';
 import CourseSearchBar from './components/CourseSearchBar.jsx';
 import ucfLogo from '../assets/ucflogos.png';
+import ucfWordmark from '../assets/logo.png';
 import campusPhoto from '../assets/ucfcampus.png';
 import { getCourses } from '../api/courses.js';
 import './Homepage.css';
@@ -55,6 +56,7 @@ function Homepage({
             simply scrolls from here into the sections below. */}
         <section className="hero" style={{ backgroundImage: `url(${campusPhoto})` }}>
           <div className="hero-overlay">
+            <img src={ucfWordmark} alt="UCF" className="hero-wordmark" />
             <h1 className="hero-title">KnightRate</h1>
             <p className="hero-tagline">
               Real ratings from real students, all in one place. Browse honest reviews on classes
