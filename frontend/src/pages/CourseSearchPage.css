@@ -98,7 +98,7 @@
 .control-dropdown select {
   border: none;
   outline: none;
-  background: transparent;
+  background: var(--color-surface);
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 13px;
   color: var(--color-text);
