@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
+import PasswordRequirements from './components/PasswordRequirements.jsx';
 import { getMyReviews } from '../api/reviews.js';
 import {
   changeUsername,
@@ -9,6 +10,7 @@ import {
   deleteAccount,
 } from '../api/users.js';
 import { getAuthUser, setAuthUser, clearAuthSession, getErrorMessage } from '../api/client.js';
+import { MIN_PASSWORD_LENGTH, isPasswordValid } from '../utils/validatePassword.js';
 import './ProfilePage.css';
 
 function ProfilePage({
@@ -126,6 +128,10 @@ function ProfilePage({
 
   const handlePassword = async (e) => {
     e.preventDefault();
+    if (!isPasswordValid(newPassword)) {
+      say('password', 'error', `Password must be at least ${MIN_PASSWORD_LENGTH} characters`);
+      return;
+    }
     if (newPassword !== newPasswordConfirm) {
       say('password', 'error', 'Passwords do not match');
       return;
@@ -410,6 +416,7 @@ function ProfilePage({
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                     />
+                    <PasswordRequirements password={newPassword} />
                     <input
                       type="password"
                       placeholder="Confirm new password"

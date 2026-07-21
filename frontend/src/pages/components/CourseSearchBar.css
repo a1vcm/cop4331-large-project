@@ -1,0 +1,51 @@
+.course-search-bar-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  background: var(--color-surface);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.search-suggestion {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.15s ease);
+}
+
+.search-suggestion:hover,
+.search-suggestion.highlighted {
+  background: var(--color-bg);
+}
+
+.suggestion-code {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--gold-base);
+  flex-shrink: 0;
+}
+
+.suggestion-title {
+  font-size: 13px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

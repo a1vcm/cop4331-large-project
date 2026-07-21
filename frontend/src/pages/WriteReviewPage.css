@@ -1,0 +1,194 @@
+.write-review-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.write-review-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.write-review-content {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+}
+
+.write-review-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text);
+  margin: 0 0 20px;
+}
+
+.write-review-form {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.write-review-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.write-review-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.write-review-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.write-review-value-readout {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.write-review-select-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.write-review-form select,
+.write-review-form input[type="text"] {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.write-review-form select:focus,
+.write-review-form input[type="text"]:focus {
+  border-color: var(--color-primary);
+}
+
+.write-review-tags-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.write-review-tag-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-chip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.15s ease), color var(--transition-fast, 0.15s ease),
+    border-color var(--transition-fast, 0.15s ease);
+}
+
+.tag-chip.selected {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: var(--color-primary);
+}
+
+.write-review-comment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.write-review-comment-field textarea {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.write-review-comment-field textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.write-review-word-count {
+  align-self: flex-end;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.write-review-error {
+  color: var(--color-error);
+  font-size: 13px;
+  margin: 0;
+}
+
+.write-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.write-review-cancel {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.write-review-submit {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background var(--transition-base, 0.2s ease);
+}
+
+.write-review-submit:hover {
+  background: var(--color-primary-hover);
+}
+
+.write-review-submit:disabled,
+.write-review-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

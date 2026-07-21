@@ -9,6 +9,8 @@ require("./collections/Instructor");
 require("./collections/Review");
 require("./collections/User");
 require("./collections/Vote");
+require("./collections/Bookmark");
+require("./collections/Resource");
 
 const dbReady = connectDB();
 
@@ -34,5 +36,7 @@ app.use('/api/auth', require('./routes/auth-routes'));
 app.use('/api/courses', require('./routes/course-routes'));
 app.use('/api/reviews', require('./routes/review-routes'));
 app.use('/api/users', require('./routes/users-routes'));
+app.use('/api/bookmarks', require('./routes/bookmark-routes'));
+app.use('/api/resources', require('./routes/resource-routes'));
 
 module.exports = { app, client, dbReady };

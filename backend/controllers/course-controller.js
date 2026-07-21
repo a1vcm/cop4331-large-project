@@ -11,7 +11,7 @@ function escapeRegExp(str) {
 // input going straight into $regex.
 async function getCourses(req, res) {
   try {
-    const { q } = req.query;
+    const { q, sort } = req.query;
     const filter = q
       ? {
           $or: [
@@ -20,7 +20,13 @@ async function getCourses(req, res) {
           ],
         }
       : {};
-    const courses = await Course.find(filter).limit(100);
+    let query = Course.find(filter).limit(100);
+    if (sort === 'recent') {
+      // Mongo sorts null after real dates in descending order, so
+      // never-reviewed courses automatically fall to the end.
+      query = query.sort({ lastReviewedAt: -1 });
+    }
+    const courses = await query;
     res.json(courses);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch courses', error: err.message });
