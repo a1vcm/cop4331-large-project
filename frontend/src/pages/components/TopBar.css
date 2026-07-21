@@ -28,6 +28,12 @@
   background: color-mix(in srgb, var(--black) 60%, transparent);
 }
 
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .top-bar-brand {
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;

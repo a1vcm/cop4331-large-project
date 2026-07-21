@@ -1,5 +1,4 @@
 .about-page {
-  --serif: "Fraunces", "Georgia", serif;
   min-height: 100vh;
   width: 100%;
   background: var(--color-bg);
@@ -54,14 +53,15 @@
 }
 
 .about-hero-title {
-  font-family: var(--serif);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  font-style: italic;
-  font-size: clamp(48px, 9vw, 96px);
-  line-height: 1;
+  font-size: clamp(36px, 6vw, 60px);
+  line-height: 1.1;
   color: var(--white);
   margin: 0;
-  letter-spacing: -0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .about-hero-tagline {
@@ -117,57 +117,34 @@
 }
 
 .section-heading {
-  font-family: var(--serif);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: clamp(24px, 3.5vw, 34px);
   color: var(--color-text);
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-/* ---------- Story split (black band, gold accents) ---------- */
+/* ---------- Story band (black, gold accents) ---------- */
 
 .story-section {
   position: relative;
   width: 100%;
   background: var(--black);
-  display: grid;
-  grid-template-columns: minmax(0, 480px) minmax(0, 560px);
-  align-items: center;
+  display: flex;
   justify-content: center;
-  gap: 64px;
-  padding: 88px 48px;
+  padding: 48px 32px;
   box-sizing: border-box;
-}
-
-.story-media {
-  position: relative;
-  justify-self: end;
-}
-
-.story-media img {
-  display: block;
-  width: 100%;
-  max-width: 480px;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  border-radius: 2px;
-}
-
-.story-media-frame {
-  position: absolute;
-  top: 18px;
-  left: -18px;
-  right: -18px;
-  bottom: -18px;
-  border: 2px solid var(--gold-base);
-  z-index: -1;
 }
 
 .story-copy {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-width: 480px;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  max-width: 640px;
 }
 
 .story-kicker {
@@ -180,13 +157,14 @@
 }
 
 .story-heading {
-  font-family: var(--serif);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
-  font-style: italic;
-  font-size: clamp(30px, 4vw, 44px);
+  font-size: clamp(24px, 3.5vw, 34px);
   color: var(--white);
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .story-line {
@@ -222,10 +200,9 @@
 }
 
 .faq-section-title {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-style: italic;
-  font-size: 19px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
   color: var(--color-text);
   margin: 0 0 8px;
 }
@@ -346,7 +323,7 @@
   border-radius: 50%;
   background: linear-gradient(150deg, var(--gold-light) 0%, var(--gold-base) 55%, var(--gold-dark) 100%);
   color: var(--black);
-  font-family: var(--serif);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 26px;
   display: flex;
@@ -357,7 +334,7 @@
 }
 
 .team-name {
-  font-family: var(--serif);
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 16px;
   color: var(--color-text);
@@ -383,28 +360,6 @@
 
 /* ---------- Responsive ---------- */
 
-@media (max-width: 900px) {
-  .story-section {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 40px;
-    padding: 64px 32px;
-    text-align: center;
-  }
-
-  .story-media {
-    justify-self: center;
-  }
-
-  .story-media img {
-    max-width: 360px;
-  }
-
-  .story-copy {
-    align-items: center;
-  }
-}
-
 @media (max-width: 600px) {
   .about-hero {
     height: 58vh;
@@ -423,14 +378,7 @@
   }
 
   .story-section {
-    padding: 48px 20px;
-  }
-
-  .story-media-frame {
-    top: 12px;
-    left: -12px;
-    right: -12px;
-    bottom: -12px;
+    padding: 36px 20px;
   }
 
   .team-grid {

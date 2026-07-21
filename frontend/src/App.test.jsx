@@ -10,10 +10,10 @@ describe('App', () => {
     expect(screen.getByPlaceholderText(/search classes/i)).toBeInTheDocument()
   })
 
-  it('navigates to the About page via the Help nav icon', async () => {
+  it('navigates to the About page via the Info nav icon', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await user.click(screen.getByRole('button', { name: /help/i }))
+    await user.click(screen.getByRole('button', { name: /info/i }))
     expect(screen.getByRole('heading', { name: /getting started/i })).toBeInTheDocument()
   })
 })

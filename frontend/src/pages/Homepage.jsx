@@ -13,7 +13,6 @@ function Homepage({
   onBack,
   onAccountClick,
   onInfoClick,
-  onHelpClick,
   onCoursesClick,
   onSearch,
   onCourseClick,
@@ -43,7 +42,7 @@ function Homepage({
         onBack={onBack}
         onAccountClick={onAccountClick}
         onInfoClick={onInfoClick}
-        onHelpClick={onHelpClick}
+        showHelpIcon={false}
         onCoursesClick={onCoursesClick}
         fixed
         transparent

@@ -140,7 +140,6 @@ function App() {
       <Homepage
         onAccountClick={goToAccount}
         onInfoClick={goToAbout}
-        onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
         onSearch={goToCourses}
         onCourseClick={goToCourseDetail}

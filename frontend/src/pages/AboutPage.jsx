@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import ucfSeal from '../assets/ucflogos.png';
 import pondsPhoto from '../assets/ponds.jpg';
-import campusPhoto from '../assets/ucfcampus.png';
 import './AboutPage.css';
 
 const TEAM_MEMBERS = [
@@ -163,10 +162,6 @@ function AboutPage({ onBack, onCoursesClick, onAccountClick }) {
       </section>
 
       <section className="story-section reveal">
-        <div className="story-media">
-          <img src={campusPhoto} alt="UCF campus" />
-          <span className="story-media-frame" aria-hidden="true" />
-        </div>
         <div className="story-copy">
           <span className="story-kicker">Why KnightRate</span>
           <h2 className="story-heading">For students, by students</h2>
