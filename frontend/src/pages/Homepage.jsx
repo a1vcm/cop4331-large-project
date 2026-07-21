@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import Footer from './components/Footer.jsx';
 import CourseSearchBar from './components/CourseSearchBar.jsx';
-import ucfLogo from '../assets/ICON_UCF.png';
-import stockUcf from '../assets/STOCK_UCF.jpg';
+import ucfLogo from '../assets/ucflogos.png';
+import campusPhoto from '../assets/ucfcampus.png';
 import { getCourses } from '../api/courses.js';
 import './Homepage.css';
 
@@ -53,7 +53,7 @@ function Homepage({
       <main>
         {/* Hero — a normal-flow banner, not a fixed 100vh panel. The page
             simply scrolls from here into the sections below. */}
-        <section className="hero" style={{ backgroundImage: `url(${stockUcf})` }}>
+        <section className="hero" style={{ backgroundImage: `url(${campusPhoto})` }}>
           <div className="hero-overlay">
             <h1 className="hero-title">KnightRate</h1>
             <p className="hero-tagline">

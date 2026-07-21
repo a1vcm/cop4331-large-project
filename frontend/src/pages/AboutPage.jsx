@@ -1,5 +1,4 @@
 import TopBar from './components/TopBar.jsx';
-import stockUcf1 from '../assets/STOCK_UCF_1.jpg';
 import './AboutPage.css';
 
 const TEAM_MEMBERS = [
@@ -61,10 +60,7 @@ function AboutPage({ onBack, onHelpClick, onCoursesClick, onAccountClick }) {
       />
       <div className="about-page-top-spacer" />
 
-      <section
-        className="about-hero"
-        style={{ backgroundImage: `url(${stockUcf1})` }}
-      >
+      <section className="about-hero">
         <div className="about-hero-overlay" />
         <h1 className="about-hero-title">Meet the Team!</h1>
       </section>

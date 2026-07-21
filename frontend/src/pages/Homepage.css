@@ -13,6 +13,7 @@
   height: 62vh;
   min-height: 460px;
   max-height: 660px;
+  background: linear-gradient(135deg, var(--black) 0%, var(--gold-dark) 100%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
