@@ -26,15 +26,16 @@ function TopBar({
 
   return (
     <header className={classNames}>
-      {showBackButton ? (
-        <button aria-label="Back" className="back-btn" onClick={onBack}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-      ) : (
-        <div className="top-bar-spacer" />
-      )}
+      <div className="top-bar-left">
+        {showBackButton && (
+          <button aria-label="Back" className="back-btn" onClick={onBack}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        )}
+        <span className="top-bar-brand">KnightRate</span>
+      </div>
 
       <nav className="top-bar-icons">
         {showThemeToggle && <ThemeToggle />}

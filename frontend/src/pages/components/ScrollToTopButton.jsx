@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './ScrollToTopButton.css';
 
-const SHOW_AFTER_PX = 300;
+const SHOW_AFTER_PX = 80;
 
 function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);

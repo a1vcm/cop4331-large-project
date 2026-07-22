@@ -28,9 +28,19 @@
   background: color-mix(in srgb, var(--black) 60%, transparent);
 }
 
-.top-bar-spacer {
-  width: 26px;
-  height: 26px;
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-bar-brand {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--color-primary); /* gold in light mode, blue in dark mode */
+  white-space: nowrap;
 }
 
 .back-btn {
