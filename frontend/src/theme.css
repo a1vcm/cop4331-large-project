@@ -29,6 +29,7 @@
 
 /* LIGHT mode (default) */
 :root {
+  color-scheme: light;
   --color-bg: var(--page-gray);
   --color-surface: var(--white);
   --color-text: var(--black);
@@ -49,6 +50,7 @@
 
 /* DARK mode: UCF space-night (black, blue, white) */
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-bg: var(--space-black);
   --color-surface: var(--space-surface);
   --color-text: var(--white);
