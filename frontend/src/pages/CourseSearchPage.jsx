@@ -27,6 +27,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
   const [prefixFilter, setPrefixFilter] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [pageSize, setPageSize] = useState(10);
+  const [visibleCount, setVisibleCount] = useState(10);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -90,11 +91,42 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
 
   const displayedCourses = useMemo(() => {
     if (pageSize === 'all') return visibleCourses;
-    return visibleCourses.slice(0, pageSize);
-  }, [visibleCourses, pageSize]);
+    return visibleCourses.slice(0, visibleCount);
+  }, [visibleCourses, visibleCount, pageSize]);
+
+  const resetVisibleCount = (size = pageSize) => {
+    setVisibleCount(size);
+  };
+
+  const handleFilterByChange = (value) => {
+    setFilterBy(value);
+    resetVisibleCount();
+  };
+
+  const handlePrefixFilterChange = (value) => {
+    setPrefixFilter(value);
+    resetVisibleCount();
+  };
+
+  const handleSortByChange = (value) => {
+    setSortBy(value);
+    resetVisibleCount();
+  };
+
+  const handlePageSizeChange = (value) => {
+    const size = value === 'all' ? 'all' : Number(value);
+    setPageSize(size);
+    resetVisibleCount(size);
+  };
+
+  const handleShowMore = () => {
+    if (pageSize === 'all') return;
+    setVisibleCount((count) => count + pageSize);
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    resetVisibleCount();
     loadCourses(query);
   };
 
@@ -130,7 +162,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 6h16M7 12h10M10 18h4" />
               </svg>
-              <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)}>
+              <select value={filterBy} onChange={(e) => handleFilterByChange(e.target.value)}>
                 <option value="all">Filter By</option>
                 <option value="easy">Difficulty: Easy</option>
                 <option value="medium">Difficulty: Moderate</option>
@@ -139,7 +171,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
             </label>
 
             <label className="control-dropdown">
-              <select value={prefixFilter} onChange={(e) => setPrefixFilter(e.target.value)}>
+              <select value={prefixFilter} onChange={(e) => handlePrefixFilterChange(e.target.value)}>
                 <option value="all">All Prefixes</option>
                 {prefixes.map((prefix) => (
                   <option key={prefix} value={prefix}>
@@ -150,7 +182,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
             </label>
 
             <label className="control-dropdown">
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <select value={sortBy} onChange={(e) => handleSortByChange(e.target.value)}>
                 <option value="relevance">Sort By</option>
                 <option value="name">Name</option>
                 <option value="credits">Credits</option>
@@ -162,7 +194,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
           <label className="control-dropdown control-dropdown-pagesize">
             <select
               value={pageSize}
-              onChange={(e) => setPageSize(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+              onChange={(e) => handlePageSizeChange(e.target.value)}
             >
               {PAGE_SIZE_OPTIONS.map((size) => (
                 <option key={size} value={size}>
@@ -210,6 +242,12 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
             );
           })}
         </div>
+
+        {!loading && !error && displayedCourses.length < visibleCourses.length && (
+          <button className="show-more-btn" onClick={handleShowMore}>
+            Next
+          </button>
+        )}
       </div>
     </div>
   );

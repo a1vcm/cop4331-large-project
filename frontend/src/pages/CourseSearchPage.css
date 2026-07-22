@@ -245,6 +245,35 @@
   background: var(--color-emphasis-hover);
 }
 
+.show-more-btn {
+  align-self: center;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1.5px solid var(--gold-base);
+  border-radius: 10px;
+  padding: 10px 28px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.show-more-btn:hover {
+  background: var(--gold-base);
+  color: var(--black);
+}
+
+[data-theme="dark"] .show-more-btn {
+  border-color: var(--blue-base);
+}
+
+[data-theme="dark"] .show-more-btn:hover {
+  background: var(--blue-base);
+  color: var(--white);
+}
+
 @media (max-width: 600px) {
   .course-search-content {
     padding: 24px 16px 40px;
