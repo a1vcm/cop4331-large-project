@@ -204,6 +204,11 @@
   cursor: pointer;
 }
 
+.sort-bar select option {
+  color: var(--black);
+  background: var(--white);
+}
+
 .no-reviews {
   font-size: 14px;
   color: var(--color-text-muted);
