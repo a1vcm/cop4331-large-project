@@ -227,6 +227,11 @@
   box-sizing: border-box;
 }
 
+[data-theme="dark"] .review-list > *,
+[data-theme="dark"] .review-list > * * {
+  color: var(--black) !important;
+}
+
 .review-pagination {
   display: flex;
   align-items: center;
