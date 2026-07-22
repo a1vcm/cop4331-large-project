@@ -15,6 +15,7 @@ function Homepage({
   onInfoClick,
   onHelpClick,
   onCoursesClick,
+  onBookmarksClick,
   onSearch,
   onCourseClick,
 }) {
@@ -45,6 +46,7 @@ function Homepage({
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         fixed
         transparent
       />

@@ -6,7 +6,7 @@ import { register, verifyEmail, resendVerification, login, forgotPassword, reset
 import { MIN_PASSWORD_LENGTH, isPasswordValid } from '../utils/validatePassword.js';
 import './AuthPage.css';
 
-function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
+function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick, onBookmarksClick }) {
   const [mode, setMode] = useState('login');
   const [showVerification, setShowVerification] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -148,6 +148,7 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         fixed
       />
       <div className="auth-page-top-spacer" />

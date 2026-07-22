@@ -8,12 +8,13 @@ import CourseDetailPage from './pages/CourseDetailPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import ResourcesPage from './pages/ResourcesPage.jsx';
 import WriteReviewPage from './pages/WriteReviewPage.jsx';
+import BookmarksPage from './pages/BookmarksPage.jsx';
 import Footer from './pages/components/Footer.jsx';
 import ScrollToTopButton from './pages/components/ScrollToTopButton.jsx';
 import { isLoggedIn } from './api/client.js';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail' | 'profile' | 'resources' | 'writeReview'
+  const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail' | 'profile' | 'resources' | 'writeReview' | 'bookmarks'
   const [courseQuery, setCourseQuery] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [reviewDraft, setReviewDraft] = useState(null); // null = new review, review object = editing
@@ -27,6 +28,10 @@ function App() {
 
   // Account icon: profile when logged in, auth page when not.
   const goToAccount = () => setView(isLoggedIn() ? 'profile' : 'auth');
+
+  // Bookmarks icon: bookmarks list when logged in, auth page when not
+  // (bookmarking requires an account).
+  const goToBookmarks = () => setView(isLoggedIn() ? 'bookmarks' : 'auth');
 
   // AuthPage calls onBack both for the manual back arrow AND after a
   // successful login/verify. By the time a successful login calls it, the
@@ -71,6 +76,7 @@ function App() {
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
       />
     );
   } else if (view === 'profile') {
@@ -80,6 +86,7 @@ function App() {
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
         onLoggedOut={goToHome}
         onCourseClick={goToCourseDetail}
       />
@@ -90,6 +97,7 @@ function App() {
         onBack={goToHome}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
         onAccountClick={goToAccount}
       />
     );
@@ -99,6 +107,7 @@ function App() {
         onBack={goToHome}
         onInfoClick={goToAbout}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
         onAccountClick={goToAccount}
       />
     );
@@ -108,6 +117,7 @@ function App() {
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
+        onBookmarksClick={goToBookmarks}
         onAccountClick={goToAccount}
         initialQuery={courseQuery}
         onShowReviews={goToCourseDetail}
@@ -122,6 +132,7 @@ function App() {
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
         onViewResources={goToResources}
         onWriteReview={goToWriteReview}
         refreshSignal={refreshSignal}
@@ -132,6 +143,7 @@ function App() {
       <ResourcesPage
         courseId={selectedCourseId}
         onBack={() => setView('courseDetail')}
+        onBookmarksClick={goToBookmarks}
         onAccountClick={goToAccount}
       />
     );
@@ -143,6 +155,18 @@ function App() {
         onCancel={exitWriteReview}
         onSaved={handleReviewSaved}
         onAccountClick={goToAccount}
+        onViewResources={goToResources}
+      />
+    );
+  } else if (view === 'bookmarks') {
+    content = (
+      <BookmarksPage
+        onBack={goToHome}
+        onInfoClick={goToAbout}
+        onHelpClick={goToFaq}
+        onCoursesClick={() => goToCourses()}
+        onAccountClick={goToAccount}
+        onCourseClick={goToCourseDetail}
       />
     );
   } else {
@@ -152,6 +176,7 @@ function App() {
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
+        onBookmarksClick={goToBookmarks}
         onSearch={goToCourses}
         onCourseClick={goToCourseDetail}
       />

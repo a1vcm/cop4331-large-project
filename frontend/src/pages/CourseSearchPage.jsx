@@ -21,7 +21,15 @@ function getDifficultyKey(course) {
   return 'hard';
 }
 
-function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, onShowReviews, initialQuery = '' }) {
+function CourseSearchPage({
+  onBack,
+  onInfoClick,
+  onHelpClick,
+  onBookmarksClick,
+  onAccountClick,
+  onShowReviews,
+  initialQuery = '',
+}) {
   const [query, setQuery] = useState(initialQuery);
   const [filterBy, setFilterBy] = useState('all');
   const [prefixFilter, setPrefixFilter] = useState('all');
@@ -142,6 +150,7 @@ function CourseSearchPage({ onBack, onInfoClick, onHelpClick, onAccountClick, on
         showCoursesIcon={false}
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
+        onBookmarksClick={onBookmarksClick}
         onAccountClick={onAccountClick}
         fixed
       />
