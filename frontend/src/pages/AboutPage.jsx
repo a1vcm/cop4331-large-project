@@ -15,7 +15,7 @@ const TEAM_MEMBERS = [
     id: 2,
     name: 'Mariem Touati',
     role: 'Frontend Developer',
-    description: '',
+    description: 'Focused on the UI/UX, some theming, and ensuring a flawless user flow.',
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ const TEAM_MEMBERS = [
     id: 5,
     name: 'Egor Schevchenko',
     role: 'UI/UX Designer',
-    description: '',
+    description: 'Developed the necessary API endpoints and middleware for KnightRate to function.',
   },
   {
     id: 6,
