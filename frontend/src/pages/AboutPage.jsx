@@ -32,7 +32,7 @@ const TEAM_MEMBERS = [
   {
     id: 5,
     name: 'Egor Schevchenko',
-    role: 'UI/UX Designer',
+    role: 'API, Backend',
     description: 'Developed the necessary API endpoints and middleware for KnightRate to function.',
   },
   {
