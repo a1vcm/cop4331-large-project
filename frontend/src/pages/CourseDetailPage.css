@@ -228,7 +228,7 @@
 }
 
 [data-theme="dark"] .review-list > *,
-[data-theme="dark"] .review-list > * *:not(.star-class-here) {
+[data-theme="dark"] .review-list > * *:not(.star, .review-star, .tag, .review-tag) {
   color: var(--black) !important;
 }
 
