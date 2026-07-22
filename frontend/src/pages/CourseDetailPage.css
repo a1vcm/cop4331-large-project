@@ -219,6 +219,14 @@
   gap: 12px;
 }
 
+.review-list > * {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
 .review-pagination {
   display: flex;
   align-items: center;
