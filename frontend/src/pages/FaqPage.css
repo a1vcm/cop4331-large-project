@@ -54,7 +54,7 @@
 }
 
 .faq-item {
-  background: var(--black);
+  background: var(--color-surface);
   border-left: 4px solid var(--gold-base);
   border-radius: 6px;
   overflow: hidden;
@@ -78,7 +78,7 @@
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 15px;
-  color: var(--white);
+  color: var(--color-text);
   display: flex;
   gap: 8px;
 }
@@ -127,7 +127,7 @@
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-text-muted);
   padding: 0 20px;
 }
 
