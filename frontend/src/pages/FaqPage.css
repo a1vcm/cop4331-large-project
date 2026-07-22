@@ -131,6 +131,10 @@
   padding: 0 20px;
 }
 
+[data-theme="dark"] .faq-answer {
+  color: var(--white);
+}
+
 .faq-answer-wrapper.open .faq-answer {
   padding: 0 20px 20px;
 }
