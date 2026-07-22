@@ -266,6 +266,10 @@
   color: var(--gold-dark);
 }
 
+[data-theme="dark"] .homepage .card-code {
+  color: var(--gold-light);
+}
+
 .card-title {
   font-size: 12px;
   color: var(--color-text);
