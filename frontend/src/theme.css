@@ -1,7 +1,7 @@
 /* --- Raw palette: fixed values, referenced by the themes below --- */
 :root {
   /* gold (light accent) */
-  --gold-dark: #C89A0F;
+  --gold-dark: #896805;
   --gold-base: #F2C417;
   --gold-light: #F7D75A;
 
