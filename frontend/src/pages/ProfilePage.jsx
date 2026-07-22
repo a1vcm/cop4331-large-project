@@ -18,6 +18,7 @@ function ProfilePage({
   onInfoClick,
   onHelpClick,
   onCoursesClick,
+  onBookmarksClick,
   onLoggedOut,
   onCourseClick,
 }) {
@@ -175,6 +176,7 @@ function ProfilePage({
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         fixed
       />
       <div className="profile-top-spacer" />

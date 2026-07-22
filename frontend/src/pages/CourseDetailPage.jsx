@@ -22,6 +22,14 @@ function getDifficultyKey(course) {
 }
 
 const PAGE_SIZE = 5;
+const MAX_PAGE_BUTTONS = 5;
+
+const SORT_OPTIONS = [
+  { value: 'recent', label: 'Most Recent' },
+  { value: 'highest', label: 'Highest Rated' },
+  { value: 'lowest', label: 'Lowest Rated' },
+  { value: 'helpful', label: 'Most Helpful' },
+];
 
 function CourseDetailPage({
   courseId,
@@ -30,6 +38,7 @@ function CourseDetailPage({
   onInfoClick,
   onHelpClick,
   onCoursesClick,
+  onBookmarksClick,
   onWriteReview,
   onViewResources,
   refreshSignal,
@@ -40,6 +49,7 @@ function CourseDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
+  const [sortBy, setSortBy] = useState('recent');
 
   const currentUser = getAuthUser();
 
@@ -56,7 +66,7 @@ function CourseDetailPage({
       ]);
       setCourse(courseData);
       setReviews(reviewData);
-      setBookmarkedIds(bookmarkData);
+      setBookmarkedIds(bookmarkData.map((b) => b.reviewId?._id).filter(Boolean));
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to load this course.'));
     } finally {
@@ -112,8 +122,40 @@ function CourseDetailPage({
     return { counts, max };
   }, [reviews]);
 
-  const totalPages = Math.max(1, Math.ceil(reviews.length / PAGE_SIZE));
-  const pagedReviews = reviews.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  const sortedReviews = useMemo(() => {
+    const list = [...reviews];
+    switch (sortBy) {
+      case 'highest':
+        return list.sort((a, b) => b.quality - a.quality);
+      case 'lowest':
+        return list.sort((a, b) => a.quality - b.quality);
+      case 'helpful':
+        return list.sort(
+          (a, b) =>
+            (b.voteScore?.helpful ?? 0) - (b.voteScore?.notHelpful ?? 0) -
+            ((a.voteScore?.helpful ?? 0) - (a.voteScore?.notHelpful ?? 0))
+        );
+      case 'recent':
+      default:
+        return list.sort((a, b) => new Date(b.createdAt ?? 0) - new Date(a.createdAt ?? 0));
+    }
+  }, [reviews, sortBy]);
+
+  const handleSortChange = (value) => {
+    setSortBy(value);
+    setPage(0);
+  };
+
+  const totalPages = Math.max(1, Math.ceil(sortedReviews.length / PAGE_SIZE));
+  const pagedReviews = sortedReviews.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
+  const pageButtons = useMemo(() => {
+    const half = Math.floor(MAX_PAGE_BUTTONS / 2);
+    let start = Math.max(0, page - half);
+    const end = Math.min(totalPages, start + MAX_PAGE_BUTTONS);
+    start = Math.max(0, end - MAX_PAGE_BUTTONS);
+    return Array.from({ length: end - start }, (_, i) => start + i);
+  }, [page, totalPages]);
 
   const diffKey = course ? getDifficultyKey(course) : 'unrated';
   const diff = DIFFICULTY[diffKey];
@@ -127,6 +169,7 @@ function CourseDetailPage({
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         onAccountClick={onAccountClick}
         fixed
       />
@@ -139,24 +182,20 @@ function CourseDetailPage({
         {!loading && !error && course && (
           <>
             <div className="course-header-card">
-              <h1 className="course-header-title">{course.title}</h1>
-              <p className="course-header-meta">
-                {course.course_code}
-                {course.department ? ` • ${course.department}` : ''}
-                {course.credits ? ` • ${course.credits} credits` : ''}
-              </p>
-
               <div className="course-rating-summary">
                 <div className="course-rating-left">
                   <div className="course-rating-big">
                     <span className="course-rating-number">
                       {course.numRatings === 0 ? '—' : course.avgRating.toFixed(1)}
                     </span>
-                    <span className="course-rating-outof">/ 5.0</span>
+                    <span className="course-rating-star" aria-hidden="true">★</span>
                   </div>
                   <span className="course-rating-count">
-                    {course.numRatings} {course.numRatings === 1 ? 'review' : 'reviews'}
+                    Based on {course.numRatings} {course.numRatings === 1 ? 'review' : 'reviews'}
                   </span>
+                  <p className="course-header-meta">
+                    {course.course_code} - {course.title}
+                  </p>
                   <span className="difficulty-badge" style={{ backgroundColor: diff.color }}>
                     {diff.label} difficulty
                   </span>
@@ -180,10 +219,10 @@ function CourseDetailPage({
                   {onViewResources && (
                     <button
                       type="button"
-                      className="review-link-btn course-resources-btn"
+                      className="review-link-btn secondary"
                       onClick={() => onViewResources(courseId)}
                     >
-                      Course Resources
+                      View Resources
                     </button>
                   )}
                 </div>
@@ -205,9 +244,16 @@ function CourseDetailPage({
               </div>
             </div>
 
-            <div className="reviews-header-row">
-              <h2 className="reviews-heading">Reviews ({reviews.length})</h2>
-            </div>
+            <label className="sort-bar">
+              Sort by:
+              <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             {reviews.length === 0 && <p className="no-reviews">No reviews yet — be the first!</p>}
 
@@ -231,24 +277,26 @@ function CourseDetailPage({
 
             {totalPages > 1 && (
               <div className="review-pagination">
+                {pageButtons.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    className={`review-page-btn ${p === page ? 'active' : ''}`}
+                    onClick={() => setPage(p)}
+                    aria-label={`Page ${p + 1}`}
+                    aria-current={p === page ? 'page' : undefined}
+                  >
+                    {p + 1}
+                  </button>
+                ))}
                 <button
                   type="button"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  aria-label="Previous page"
-                >
-                  ← Prev
-                </button>
-                <span className="review-pagination-status">
-                  Page {page + 1} of {totalPages}
-                </span>
-                <button
-                  type="button"
+                  className="review-page-btn review-page-next"
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
                   aria-label="Next page"
                 >
-                  Next →
+                  ›
                 </button>
               </div>
             )}

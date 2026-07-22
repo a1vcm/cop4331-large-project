@@ -23,6 +23,8 @@ const reviewSchema = new Schema(
       },
     },
     difficulty: { type: Number, min: 1, max: 5, required: true },
+    workload: { type: Number, min: 1, max: 5 },
+    gradingFairness: { type: Number, min: 1, max: 5 },
     professorRating: { type: Number, min: 1, max: 5 },
     attendance: { type: Number, min: 1, max: 5 },
     grade: { type: String, enum: GRADE_OPTIONS, default: '' },

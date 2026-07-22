@@ -5,7 +5,7 @@ import { getCourseResources, createResource, deleteResource } from '../api/resou
 import { getAuthUser, isLoggedIn, getErrorMessage } from '../api/client.js';
 import './ResourcesPage.css';
 
-function ResourcesPage({ courseId, onBack, onAccountClick }) {
+function ResourcesPage({ courseId, onBack, onBookmarksClick, onAccountClick }) {
   const [course, setCourse] = useState(null);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +72,14 @@ function ResourcesPage({ courseId, onBack, onAccountClick }) {
 
   return (
     <div className="resources-page">
-      <TopBar showBackButton onBack={onBack} showCoursesIcon={false} onAccountClick={onAccountClick} fixed />
+      <TopBar
+        showBackButton
+        onBack={onBack}
+        showCoursesIcon={false}
+        onBookmarksClick={onBookmarksClick}
+        onAccountClick={onAccountClick}
+        fixed
+      />
       <div className="resources-top-spacer" />
 
       <div className="resources-content">

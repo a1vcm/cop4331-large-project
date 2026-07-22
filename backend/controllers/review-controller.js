@@ -52,7 +52,8 @@ async function createReview(req, res) {
   try {
     // Destructuring to match your exact schema layout
     const {
-      courseId, instructor, term, quality, difficulty, professorRating, attendance, grade, comment, tags,
+      courseId, instructor, term, quality, difficulty, workload, gradingFairness,
+      professorRating, attendance, grade, comment, tags,
     } = req.body;
     const userId = req.user.id; // Populated by your JWT auth middleware
 
@@ -80,6 +81,8 @@ async function createReview(req, res) {
       term,
       quality,
       difficulty,
+      workload,
+      gradingFairness,
       professorRating,
       attendance,
       grade,
@@ -129,7 +132,8 @@ async function getMyReviews(req, res) {
 async function updateReview(req, res) {
   try {
     const {
-      instructor, term, quality, difficulty, professorRating, attendance, grade, comment, tags,
+      instructor, term, quality, difficulty, workload, gradingFairness,
+      professorRating, attendance, grade, comment, tags,
     } = req.body;
     const userId = req.user.id;
 
@@ -148,6 +152,8 @@ async function updateReview(req, res) {
     review.term = term !== undefined ? term : review.term;
     review.quality = quality !== undefined ? quality : review.quality;
     review.difficulty = difficulty !== undefined ? difficulty : review.difficulty;
+    review.workload = workload !== undefined ? workload : review.workload;
+    review.gradingFairness = gradingFairness !== undefined ? gradingFairness : review.gradingFairness;
     review.professorRating = professorRating !== undefined ? professorRating : review.professorRating;
     review.attendance = attendance !== undefined ? attendance : review.attendance;
     review.grade = grade !== undefined ? grade : review.grade;

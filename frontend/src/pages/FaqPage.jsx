@@ -64,7 +64,7 @@ const FAQ_SECTIONS = [
   },
 ];
 
-function FaqPage({ onBack, onInfoClick, onCoursesClick, onAccountClick }) {
+function FaqPage({ onBack, onInfoClick, onCoursesClick, onBookmarksClick, onAccountClick }) {
   const [openId, setOpenId] = useState(null);
 
   const toggleQuestion = (id) => {
@@ -79,6 +79,7 @@ function FaqPage({ onBack, onInfoClick, onCoursesClick, onAccountClick }) {
         showHelpIcon={false}
         onInfoClick={onInfoClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         onAccountClick={onAccountClick}
         fixed
       />

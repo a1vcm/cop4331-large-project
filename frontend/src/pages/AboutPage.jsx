@@ -80,7 +80,7 @@ function useReveal() {
   return rootRef;
 }
 
-function AboutPage({ onBack, onHelpClick, onCoursesClick, onAccountClick }) {
+function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAccountClick }) {
   const rootRef = useReveal();
 
   return (
@@ -91,6 +91,7 @@ function AboutPage({ onBack, onHelpClick, onCoursesClick, onAccountClick }) {
         showInfoIcon={false}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         onAccountClick={onAccountClick}
         fixed
         transparent
