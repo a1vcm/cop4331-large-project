@@ -34,6 +34,23 @@
   gap: 12px;
 }
 
+.top-bar-brand-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.top-bar-mark {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .top-bar-brand {
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;

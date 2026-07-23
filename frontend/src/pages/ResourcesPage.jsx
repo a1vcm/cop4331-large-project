@@ -5,7 +5,7 @@ import { getCourseResources, createResource, deleteResource } from '../api/resou
 import { getAuthUser, isLoggedIn, getErrorMessage } from '../api/client.js';
 import './ResourcesPage.css';
 
-function ResourcesPage({ courseId, onBack, onBookmarksClick, onAccountClick }) {
+function ResourcesPage({ courseId, onBack, onBookmarksClick, onAccountClick, onLogoClick }) {
   const [course, setCourse] = useState(null);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,6 +75,7 @@ function ResourcesPage({ courseId, onBack, onBookmarksClick, onAccountClick }) {
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showCoursesIcon={false}
         onBookmarksClick={onBookmarksClick}
         onAccountClick={onAccountClick}

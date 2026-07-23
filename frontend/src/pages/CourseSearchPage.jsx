@@ -28,6 +28,7 @@ function CourseSearchPage({
   onBookmarksClick,
   onAccountClick,
   onShowReviews,
+  onLogoClick,
   initialQuery = '',
 }) {
   const [query, setQuery] = useState(initialQuery);
@@ -147,6 +148,7 @@ function CourseSearchPage({
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showCoursesIcon={false}
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}

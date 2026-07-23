@@ -41,6 +41,7 @@ function CourseDetailPage({
   onBookmarksClick,
   onWriteReview,
   onViewResources,
+  onLogoClick,
   refreshSignal,
 }) {
   const [course, setCourse] = useState(null);
@@ -165,6 +166,7 @@ function CourseDetailPage({
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showCoursesIcon={false}
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}

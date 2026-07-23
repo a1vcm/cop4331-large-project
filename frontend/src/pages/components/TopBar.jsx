@@ -1,5 +1,6 @@
 import './TopBar.css';
 import ThemeToggle from './ThemeToggle';
+import knightMark from '../../assets/knightrate_mark.webp';
 
 function TopBar({
   showBackButton = false,
@@ -17,6 +18,7 @@ function TopBar({
   showThemeToggle = true,
   fixed = false,
   transparent = false,
+  onLogoClick,
 }) {
   const classNames = [
     'top-bar',
@@ -36,7 +38,17 @@ function TopBar({
             </svg>
           </button>
         )}
-        <span className="top-bar-brand">KnightRate</span>
+        {onLogoClick ? (
+          <button type="button" className="top-bar-brand-btn" onClick={onLogoClick}>
+            <img src={knightMark} alt="" className="top-bar-mark" width="28" height="30" />
+            <span className="top-bar-brand">KnightRate</span>
+          </button>
+        ) : (
+          <>
+            <img src={knightMark} alt="" className="top-bar-mark" width="28" height="30" />
+            <span className="top-bar-brand">KnightRate</span>
+          </>
+        )}
       </div>
 
       <nav className="top-bar-icons">

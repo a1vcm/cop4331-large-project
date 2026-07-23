@@ -80,7 +80,7 @@ function useReveal() {
   return rootRef;
 }
 
-function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAccountClick }) {
+function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAccountClick, onLogoClick }) {
   const rootRef = useReveal();
 
   return (
@@ -88,6 +88,7 @@ function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAc
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showInfoIcon={false}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}

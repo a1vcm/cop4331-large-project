@@ -28,7 +28,7 @@ function buildTermOptions(existingTerm) {
 
 // One dedicated page for both creating and editing a review — same
 // existing-prop pattern the old inline ReviewForm used.
-function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick, onViewResources }) {
+function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick, onViewResources, onLogoClick }) {
   const [course, setCourse] = useState(null);
   const [quality, setQuality] = useState(existing?.quality ?? 3);
   const [difficulty, setDifficulty] = useState(existing?.difficulty ?? 3);
@@ -111,7 +111,14 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
 
   return (
     <div className="write-review-page">
-      <TopBar showBackButton onBack={onCancel} showCoursesIcon={false} onAccountClick={onAccountClick} fixed />
+      <TopBar
+        showBackButton
+        onBack={onCancel}
+        onLogoClick={onLogoClick}
+        showCoursesIcon={false}
+        onAccountClick={onAccountClick}
+        fixed
+      />
       <div className="write-review-top-spacer" />
 
       <div className="write-review-content">
