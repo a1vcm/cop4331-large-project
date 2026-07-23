@@ -73,7 +73,7 @@ class AppTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
     final bar = Padding(
-      padding: EdgeInsets.only(top: topInset, left: 20, right: 12),
+      padding: EdgeInsets.only(top: topInset, left: 20, right: 4),
       child: SizedBox(
         height: contentHeight,
         child: Row(
@@ -94,8 +94,8 @@ class AppTopBar extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset('assets/images/knightrate_mark.png', height: 28, width: 26, fit: BoxFit.contain),
-                    const SizedBox(width: 8),
+                    Image.asset('assets/images/knightrate_mark.png', height: 26, width: 22, fit: BoxFit.contain),
+                    const SizedBox(width: 4),
                     Text(
                       'KnightRate',
                       style: AppTextStyles.button.copyWith(
