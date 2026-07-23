@@ -41,5 +41,6 @@ flutter:
   #   ponds.jpg     -> assets/images/about_hero_bg.jpg
   #   ucflogos.png  -> assets/images/ucf_logo.png (seal)
   #   logo.png      -> assets/images/ucf_wordmark.png (hero wordmark)
+  #   knightrate_mark.webp -> assets/images/knightrate_mark.png (nav bar mark)
   assets:
     - assets/images/
