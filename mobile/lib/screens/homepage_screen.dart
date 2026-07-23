@@ -46,10 +46,18 @@ class _HomepageScreenState extends State<HomepageScreen> {
   }
 
   void _search(String q) {
+    // Pushing '/courses' alone doesn't move the shell's active branch off
+    // Home (go_router keeps whichever branch was active across a push into
+    // a different branch's navigator) — goBranch first so the bottom tab
+    // bar actually highlights Courses/Search once the results show.
+    StatefulNavigationShell.of(context).goBranch(1);
     context.push(q.isEmpty ? '/courses' : '/courses?q=${Uri.encodeQueryComponent(q)}');
   }
 
-  void _goToCourse(Course course) => context.push('/courses/${course.id}');
+  void _goToCourse(Course course) {
+    StatefulNavigationShell.of(context).goBranch(1);
+    context.push('/courses/${course.id}');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +121,13 @@ class _HomepageScreenState extends State<HomepageScreen> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                _HeroLink(label: 'Browse Categories', onTap: () => context.push('/courses')),
+                                _HeroLink(
+                                  label: 'Browse Categories',
+                                  onTap: () {
+                                    StatefulNavigationShell.of(context).goBranch(1);
+                                    context.push('/courses');
+                                  },
+                                ),
                                 Container(
                                   width: 4,
                                   height: 4,
