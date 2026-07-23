@@ -86,12 +86,26 @@ class AppTopBar extends StatelessWidget {
                 padding: EdgeInsets.zero,
               ),
             SizedBox(width: showBack ? 4 : 0),
-            Text(
-              'KnightRate',
-              style: AppTextStyles.button.copyWith(
-                color: ThemeColors.primary(context),
-                fontWeight: AppFontWeights.bold,
-                fontSize: 18,
+            InkWell(
+              onTap: () => context.go('/'),
+              customBorder: const StadiumBorder(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset('assets/images/knightrate_mark.png', height: 28, width: 26, fit: BoxFit.contain),
+                    const SizedBox(width: 8),
+                    Text(
+                      'KnightRate',
+                      style: AppTextStyles.button.copyWith(
+                        color: ThemeColors.primary(context),
+                        fontWeight: AppFontWeights.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const Spacer(),
