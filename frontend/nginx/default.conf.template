@@ -34,9 +34,22 @@ server {
     }
 
     # React SPA
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Vite fingerprints build output filenames with a content hash, so any
+    # file under /assets/ is safe to cache forever — a code change always
+    # ships under a new filename, never mutates one already cached.
+    location /assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # index.html (and any other file matched by the SPA fallback below)
+    # must always be revalidated, otherwise browsers/CDNs can pin visitors
+    # to a stale build that references assets which no longer exist.
     location / {
-        root /usr/share/nginx/html;
-        index index.html;
         try_files $uri /index.html;
+        add_header Cache-Control "no-cache";
     }
 }

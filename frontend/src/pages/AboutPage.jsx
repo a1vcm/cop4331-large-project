@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import TopBar from './components/TopBar.jsx';
-import ucfSeal from '../assets/ucflogos.png';
-import pondsPhoto from '../assets/ponds.jpg';
+import ucfSeal from '../assets/ucflogos.webp';
+import pondsPhoto from '../assets/ponds.webp';
 import './AboutPage.css';
 
 const TEAM_MEMBERS = [
@@ -100,7 +100,7 @@ function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAc
       <section className="about-hero" style={{ backgroundImage: `url(${pondsPhoto})` }}>
         <div className="about-hero-overlay" />
         <div className="about-hero-content">
-          <img src={ucfSeal} alt="UCF" className="about-hero-seal" />
+          <img src={ucfSeal} alt="UCF" className="about-hero-seal" width="400" height="252" />
           <h1 className="about-hero-title">About Us</h1>
           <p className="about-hero-tagline">Meet the people behind it, and their thought process.</p>
         </div>

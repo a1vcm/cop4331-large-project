@@ -14,13 +14,15 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: /info/i }))
-    expect(screen.getByRole('heading', { name: /meet the team/i })).toBeInTheDocument()
+    // AboutPage is a lazy chunk now, so it mounts asynchronously behind Suspense.
+    expect(await screen.findByRole('heading', { name: /meet the team/i })).toBeInTheDocument()
   })
 
   it('navigates to the FAQ page via the Help nav icon', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByRole('button', { name: /help/i }))
-    expect(screen.getByRole('heading', { name: /general/i })).toBeInTheDocument()
+    // FaqPage is a lazy chunk now, so it mounts asynchronously behind Suspense.
+    expect(await screen.findByRole('heading', { name: /general/i })).toBeInTheDocument()
   })
 })
