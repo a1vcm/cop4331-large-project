@@ -21,7 +21,7 @@ const TEAM_MEMBERS = [
     id: 3,
     name: 'Jesus Gonzalez',
     role: 'Frontend, Backend, Mobile',
-    description: '',
+    description: 'Developed the CI/CD pipeline and docker setup for easy testing, worked as a floater.',
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const TEAM_MEMBERS = [
     id: 6,
     name: 'Justin Ciar',
     role: 'Frontend, Mobile',
-    description: '',
+    description: 'Focused on building the lo fi React web frontend and the Flutter mobile app.',
   },
 ];
 
@@ -106,7 +106,7 @@ function AboutPage({ onBack, onHelpClick, onCoursesClick, onBookmarksClick, onAc
         </div>
       </section>
 
-      <section className="story-section reveal">
+      <section className="story-section">
         <div className="story-copy">
           <span className="story-kicker">Why KnightRate</span>
           <h2 className="story-heading">For students, by students</h2>

@@ -15,7 +15,11 @@ const _teamMembers = [
     role: 'Frontend Developer',
     description: 'Focused on the UI/UX, some theming, and ensuring a flawless user flow.',
   ),
-  (name: 'Jesus Gonzalez', role: 'Frontend, Backend, Mobile', description: ''),
+  (
+    name: 'Jesus Gonzalez',
+    role: 'Frontend, Backend, Mobile',
+    description: 'Developed the CI/CD pipeline and docker setup for easy testing, worked as a floater.',
+  ),
   (
     name: 'Jaden Harris',
     role: 'Frontend, Database',
@@ -26,7 +30,11 @@ const _teamMembers = [
     role: 'API, Backend',
     description: 'Developed the necessary API endpoints and middleware for KnightRate to function.',
   ),
-  (name: 'Justin Ciar', role: 'Frontend, Mobile', description: ''),
+  (
+    name: 'Justin Ciar',
+    role: 'Frontend, Mobile',
+    description: 'Focused on building the lo fi React web frontend and the Flutter mobile app.',
+  ),
 ];
 
 String _initials(String name) {
@@ -163,14 +171,21 @@ class AboutScreen extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text('MEET THE TEAM', style: AppTextStyles.heading.copyWith(fontSize: 24)),
                   const SizedBox(height: 28),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 24,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.85,
-                    children: [for (final m in _teamMembers) _TeamCard(member: m)],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final cardWidth = (constraints.maxWidth - 16) / 2;
+                      return Wrap(
+                        spacing: 16,
+                        runSpacing: 28,
+                        children: [
+                          for (final m in _teamMembers)
+                            SizedBox(
+                              width: cardWidth,
+                              child: _TeamCard(member: m),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
