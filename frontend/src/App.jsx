@@ -77,6 +77,7 @@ function App() {
   if (view === 'auth') {
     content = (
       <AuthPage
+        onLogoClick={goToHome}
         onBack={exitAuth}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
@@ -87,6 +88,7 @@ function App() {
   } else if (view === 'profile') {
     content = (
       <ProfilePage
+        onLogoClick={goToHome}
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
@@ -99,6 +101,7 @@ function App() {
   } else if (view === 'about') {
     content = (
       <AboutPage
+        onLogoClick={goToHome}
         onBack={goToHome}
         onHelpClick={goToFaq}
         onCoursesClick={() => goToCourses()}
@@ -109,6 +112,7 @@ function App() {
   } else if (view === 'faq') {
     content = (
       <FaqPage
+        onLogoClick={goToHome}
         onBack={goToHome}
         onInfoClick={goToAbout}
         onCoursesClick={() => goToCourses()}
@@ -119,6 +123,7 @@ function App() {
   } else if (view === 'courses') {
     content = (
       <CourseSearchPage
+        onLogoClick={goToHome}
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}
@@ -132,6 +137,7 @@ function App() {
     content = (
       <CourseDetailPage
         courseId={selectedCourseId}
+        onLogoClick={goToHome}
         onBack={() => setView('courses')}
         onAccountClick={goToAccount}
         onInfoClick={goToAbout}
@@ -147,6 +153,7 @@ function App() {
     content = (
       <ResourcesPage
         courseId={selectedCourseId}
+        onLogoClick={goToHome}
         onBack={() => setView('courseDetail')}
         onBookmarksClick={goToBookmarks}
         onAccountClick={goToAccount}
@@ -157,6 +164,7 @@ function App() {
       <WriteReviewPage
         courseId={selectedCourseId}
         existing={reviewDraft}
+        onLogoClick={goToHome}
         onCancel={exitWriteReview}
         onSaved={handleReviewSaved}
         onAccountClick={goToAccount}
@@ -166,6 +174,7 @@ function App() {
   } else if (view === 'bookmarks') {
     content = (
       <BookmarksPage
+        onLogoClick={goToHome}
         onBack={goToHome}
         onInfoClick={goToAbout}
         onHelpClick={goToFaq}

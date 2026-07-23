@@ -21,6 +21,7 @@ function ProfilePage({
   onBookmarksClick,
   onLoggedOut,
   onCourseClick,
+  onLogoClick,
 }) {
   const [user, setUser] = useState(getAuthUser());
   const [tab, setTab] = useState('overview'); // 'overview' | 'edit'
@@ -172,6 +173,7 @@ function ProfilePage({
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showAccountIcon={false}
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}

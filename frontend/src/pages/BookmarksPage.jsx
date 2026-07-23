@@ -5,7 +5,7 @@ import { getMyBookmarks, deleteBookmark } from '../api/bookmarks.js';
 import { getErrorMessage } from '../api/client.js';
 import './BookmarksPage.css';
 
-function BookmarksPage({ onBack, onInfoClick, onHelpClick, onCoursesClick, onAccountClick, onCourseClick }) {
+function BookmarksPage({ onBack, onInfoClick, onHelpClick, onCoursesClick, onAccountClick, onCourseClick, onLogoClick }) {
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +38,7 @@ function BookmarksPage({ onBack, onInfoClick, onHelpClick, onCoursesClick, onAcc
       <TopBar
         showBackButton
         onBack={onBack}
+        onLogoClick={onLogoClick}
         showBookmarksIcon={false}
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
