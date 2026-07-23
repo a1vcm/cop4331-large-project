@@ -263,7 +263,7 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
     }
 
     return AppScaffold(
-      title: 'My Dashboard',
+      showAccountIcon: false,
       body: RefreshIndicator(
         onRefresh: _loadReviews,
         child: ListenableBuilder(
@@ -276,49 +276,75 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
             final email = AuthState.instance.email ?? '';
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Avatar with the user's initial, mirroring
-                      // .profile-avatar-initial in ProfilePage.css.
-                      CircleAvatar(
-                        radius: 32,
-                        backgroundColor: ThemeColors.surface(context),
+              padding: const EdgeInsets.fromLTRB(20, 56, 20, 40),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ThemeColors.surface(context),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 2))],
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Sidebar-tint nav band, mirrors .profile-sidebar's
+                        // mobile-breakpoint row layout.
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(12, 44, 12, 12),
+                          decoration: BoxDecoration(
+                            color: ThemeColors.bg(context),
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          ),
+                          child: _NavRow(
+                            tab: _tab,
+                            onOverview: () => setState(() => _tab = 'overview'),
+                            onAccount: () => setState(() {
+                              _tab = 'edit';
+                              _openSection = null;
+                              _message = null;
+                            }),
+                            onLogout: _logout,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(username, style: AppTextStyles.heading.copyWith(fontSize: 24)),
+                              Text(email, style: AppTextStyles.muted),
+                              const SizedBox(height: 16),
+                              if (_tab == 'overview') ..._buildOverview() else ..._buildAccount(),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Avatar overlapping the top-left of the card, mirrors
+                    // .profile-avatar's mobile-breakpoint left:16px offset.
+                    Positioned(
+                      top: -32,
+                      left: 16,
+                      child: Container(
+                        width: 96,
+                        height: 96,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: ThemeColors.bg(context),
+                          border: Border.all(color: ThemeColors.surface(context), width: 4),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 2))],
+                        ),
+                        alignment: Alignment.center,
                         child: Text(
                           username.isNotEmpty ? username[0].toUpperCase() : '?',
-                          style: AppTextStyles.display.copyWith(color: ThemeColors.primary(context)),
+                          style: AppTextStyles.display.copyWith(color: ThemeColors.primary(context), fontSize: 36),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(username, style: AppTextStyles.heading),
-                            Text(email, style: AppTextStyles.muted),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _NavRow(
-                    tab: _tab,
-                    onOverview: () => setState(() => _tab = 'overview'),
-                    onAccount: () => setState(() {
-                      _tab = 'edit';
-                      _openSection = null;
-                      _message = null;
-                    }),
-                    onLogout: _logout,
-                  ),
-                  const SizedBox(height: 20),
-                  if (_tab == 'overview') ..._buildOverview() else ..._buildAccount(),
-                ],
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -348,10 +374,10 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
             onTap: () => context.push('/courses/${review.courseId}'),
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: ThemeColors.surface(context),
-                borderRadius: BorderRadius.circular(6),
+                color: ThemeColors.bg(context),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

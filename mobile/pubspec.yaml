@@ -19,6 +19,7 @@ dependencies:
   google_fonts: ^6.2.1 # loads Montserrat at runtime, no font files needed
   http: ^1.6.0
   shared_preferences: ^2.5.5
+  url_launcher: ^6.3.1 # opens resource links externally (Safari/in-app browser)
 
 dev_dependencies:
   flutter_test:
@@ -34,9 +35,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Shared brand imagery, copied from frontend/src/assets (see repo docs):
-  #   STOCK_UCF.jpg   -> assets/images/homepage_hero_bg.jpg
-  #   ICON_UCF.png    -> assets/images/ucf_logo.png
-  #   STOCK_UCF_1.jpg -> assets/images/about_hero_bg.jpg
+  # Shared brand imagery, copied from frontend/src/assets (keep in sync if
+  # the web app's images change):
+  #   ucfcampus.png -> assets/images/homepage_hero_bg.png
+  #   ponds.jpg     -> assets/images/about_hero_bg.jpg
+  #   ucflogos.png  -> assets/images/ucf_logo.png (seal)
+  #   logo.png      -> assets/images/ucf_wordmark.png (hero wordmark)
   assets:
     - assets/images/

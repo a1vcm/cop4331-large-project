@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// `:root` block. If that file changes, update these hex values to match.
 class AppPalette {
   // gold (light accent)
-  static const goldDark = Color(0xFFC89A0F);
+  static const goldDark = Color(0xFF896805);
   static const gold = Color(0xFFF2C417);
   static const goldLight = Color(0xFFF7D75A);
 
@@ -21,7 +21,7 @@ class AppPalette {
   // neutrals
   static const black = Color(0xFF1A1A1A);
   static const gray900 = Color(0xFF333333);
-  static const gray500 = Color(0xFF888888);
+  static const gray500 = Color(0xFF4c4c4c);
   static const gray300 = Color(0xFFBBBBBB);
   static const pageGray = Color(0xFFEDEFF1);
   static const white = Color(0xFFFFFFFF);
@@ -125,6 +125,29 @@ class AppColors {
   static const accent = gold;
 }
 
+/// Review-card container styling. ReviewCard.css's own base rule
+/// (`--color-bg`/10px radius/16-18px padding/blur-4 shadow) applies by
+/// default; CourseDetailPage.css and BookmarksPage.css both override it
+/// with a hardcoded-white/12px/16px/blur-3 variant via a `.review-list > *`
+/// / `.bookmarks-list > *` child-combinator rule — a known pre-existing
+/// quirk that ignores dark mode on the web too, reproduced here as-is via
+/// the `whiteOverride` flag on ReviewCard.
+class AppCardStyle {
+  static const baseRadius = 10.0;
+  static const baseHPad = 18.0;
+  static const baseVPad = 16.0;
+  static List<BoxShadow> baseShadow(BuildContext context) => [
+        BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 1)),
+      ];
+
+  static const whiteOverrideRadius = 12.0;
+  static const whiteOverridePad = 16.0;
+  static const whiteOverrideBg = Colors.white;
+  static List<BoxShadow> whiteOverrideShadow() => [
+        const BoxShadow(color: Color(0x0F000000), blurRadius: 3, offset: Offset(0, 1)),
+      ];
+}
+
 /// Spacing scale — matches `S` in theme.js exactly.
 class AppSpacing {
   static const xs = 4.0;
@@ -167,13 +190,19 @@ class AppTextStyles {
         color: _text,
       );
 
-  static TextStyle get body => GoogleFonts.montserrat(
+  // Body/muted text mirrors the web's "Helvetica Neue", Arial, sans-serif
+  // stack — only headings/tabs/buttons use Montserrat there. Leaving
+  // fontFamily unset falls back to the platform default (San Francisco on
+  // iOS), which is the closest native equivalent to Helvetica Neue and
+  // matches what the rest of the app's chrome (nav bar, tab bar) already
+  // renders in, instead of forcing Montserrat everywhere.
+  static TextStyle get body => TextStyle(
         fontWeight: AppFontWeights.regular,
         fontSize: 14,
         color: _text,
       );
 
-  static TextStyle get muted => GoogleFonts.montserrat(
+  static TextStyle get muted => TextStyle(
         fontWeight: AppFontWeights.regular,
         fontSize: 12,
         color: _muted,
@@ -229,9 +258,11 @@ class AppTheme {
       brightness: brightness,
       scaffoldBackgroundColor: bg,
       primaryColor: primary,
-      textTheme: GoogleFonts.montserratTextTheme(
-        brightness == Brightness.dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
-      ),
+      // System font (San Francisco on iOS) as the default, matching the
+      // web's Helvetica Neue body-text stack — Montserrat is applied
+      // explicitly via AppTextStyles.display/heading/subheading/button
+      // only, mirroring exactly which elements the web sets Montserrat on.
+      textTheme: brightness == Brightness.dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
       colorScheme: ColorScheme.fromSeed(
         brightness: brightness,
         seedColor: primary,

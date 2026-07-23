@@ -62,5 +62,60 @@ void main() {
       expect(review.userId, 'u1');
       expect(review.authorUsername, 'ci-tester');
     });
+
+    test('quality parses as a double, preserving half-star increments', () {
+      final review = Review.fromJson({
+        '_id': 'r1',
+        'courseId': 'c1',
+        'userId': 'u1',
+        'quality': 4.5,
+        'difficulty': 2,
+      });
+
+      expect(review.quality, 4.5);
+      expect(review.quality, isA<double>());
+    });
+
+    test('parses workload/gradingFairness/professorRating/attendance/tags/voteScore', () {
+      final review = Review.fromJson({
+        '_id': 'r1',
+        'courseId': 'c1',
+        'userId': 'u1',
+        'quality': 4,
+        'difficulty': 2,
+        'workload': 3,
+        'gradingFairness': 5,
+        'professorRating': 4,
+        'attendance': 2,
+        'tags': ['Easy A', 'Amazing Lectures'],
+        'voteScore': {'helpful': 7, 'notHelpful': 1},
+      });
+
+      expect(review.workload, 3);
+      expect(review.gradingFairness, 5);
+      expect(review.professorRating, 4);
+      expect(review.attendance, 2);
+      expect(review.tags, ['Easy A', 'Amazing Lectures']);
+      expect(review.voteHelpful, 7);
+      expect(review.voteNotHelpful, 1);
+    });
+
+    test('optional rating dimensions default to null/empty when absent', () {
+      final review = Review.fromJson({
+        '_id': 'r1',
+        'courseId': 'c1',
+        'userId': 'u1',
+        'quality': 4,
+        'difficulty': 2,
+      });
+
+      expect(review.workload, isNull);
+      expect(review.gradingFairness, isNull);
+      expect(review.professorRating, isNull);
+      expect(review.attendance, isNull);
+      expect(review.tags, isEmpty);
+      expect(review.voteHelpful, 0);
+      expect(review.voteNotHelpful, 0);
+    });
   });
 }

@@ -4,11 +4,13 @@ import '../models/course.dart';
 import '../services/course_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
+import '../widgets/course_search_field.dart';
+import '../widgets/footer.dart';
 
-/// Mirrors frontend/src/pages/Homepage.jsx: a full-bleed campus hero with a
-/// dark scrim, centered "Welcome to KnightRate!" title, a pill search bar,
-/// and an expandable bottom panel (pull-handle arrow) containing the intro
-/// blurb and a Browse Classes card grid.
+/// Mirrors frontend/src/pages/Homepage.jsx exactly: a normal-flow (not
+/// fixed-height) hero banner under a transparent fixed TopBar, an intro
+/// section, a "Trending Classes This Week" 2-column card grid, and a
+/// Footer — the page just scrolls, there's no expandable panel.
 class HomepageScreen extends StatefulWidget {
   const HomepageScreen({super.key});
 
@@ -18,10 +20,7 @@ class HomepageScreen extends StatefulWidget {
 
 class _HomepageScreenState extends State<HomepageScreen> {
   final _searchController = TextEditingController();
-  bool _isExpanded = false;
   List<Course> _popularCourses = [];
-
-  static const _collapsedPanelHeight = 56.0;
 
   @override
   void initState() {
@@ -37,7 +36,7 @@ class _HomepageScreenState extends State<HomepageScreen> {
 
   Future<void> _loadCourses() async {
     try {
-      final courses = await CourseService.getCourses();
+      final courses = await CourseService.getCourses(null, 'recent');
       if (!mounted) return;
       setState(() => _popularCourses = courses.take(4).toList());
     } catch (_) {
@@ -47,261 +46,194 @@ class _HomepageScreenState extends State<HomepageScreen> {
   }
 
   void _search(String q) {
-    context.go(q.isEmpty ? '/courses' : '/courses?q=${Uri.encodeQueryComponent(q)}');
+    context.push(q.isEmpty ? '/courses' : '/courses?q=${Uri.encodeQueryComponent(q)}');
   }
+
+  void _goToCourse(Course course) => context.push('/courses/${course.id}');
 
   @override
   Widget build(BuildContext context) {
     // Register a Theme dependency so every text style in this screen
     // repaints the moment the light/dark toggle fires.
     Theme.of(context);
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final expandedPanelHeight = (screenHeight * 0.55).clamp(320.0, 480.0);
 
     return AppScaffold(
-      body: Stack(
-        children: [
-          // --- Hero: campus photo + dark scrim, mirrors .hero/.hero::before ---
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/homepage_hero_bg.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: ColoredBox(color: Colors.black.withValues(alpha: 0.4)),
-          ),
-
-          // --- Centered title + pill search, mirrors .hero-overlay ---
-          Positioned.fill(
-            bottom: _isExpanded ? expandedPanelHeight : _collapsedPanelHeight,
-            child: AnimatedPadding(
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.easeInOut,
-              padding: EdgeInsets.zero,
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // The web hides the title when the panel expands.
-                      AnimatedCrossFade(
-                        duration: const Duration(milliseconds: 250),
-                        crossFadeState: _isExpanded
-                            ? CrossFadeState.showSecond
-                            : CrossFadeState.showFirst,
-                        firstChild: Padding(
-                          padding: const EdgeInsets.only(bottom: 28),
-                          child: Text(
-                            'Welcome to KnightRate!',
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.display.copyWith(
-                              color: AppPalette.white,
-                              fontSize: 30,
-                            ),
-                          ),
-                        ),
-                        secondChild: const SizedBox(width: double.infinity),
-                      ),
-                      _PillSearchBar(
-                        controller: _searchController,
-                        onSubmitted: _search,
-                      ),
-                    ],
-                  ),
+      transparent: true,
+      floating: true,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // --- Hero: campus photo + dark scrim, mirrors .hero ---
+            Stack(
+              children: [
+                SizedBox(
+                  height: 560,
+                  child: Image.asset('assets/images/homepage_hero_bg.png', fit: BoxFit.cover, width: double.infinity),
                 ),
-              ),
-            ),
-          ),
-
-          // --- Expandable bottom panel, mirrors .expandable-panel ---
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.easeInOut,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: _isExpanded ? expandedPanelHeight : _collapsedPanelHeight,
-            child: Container(
-              decoration: BoxDecoration(
-                color: ThemeColors.surface(context),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 20,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  // Pull handle — tap to expand/collapse, arrow flips.
-                  SizedBox(
-                    height: _collapsedPanelHeight,
-                    child: InkWell(
-                      onTap: () => setState(() => _isExpanded = !_isExpanded),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                      child: Center(
-                        child: AnimatedRotation(
-                          duration: const Duration(milliseconds: 400),
-                          turns: _isExpanded ? 0.5 : 0,
-                          child: Icon(
-                            Icons.keyboard_arrow_up,
-                            size: 28,
-                            color: ThemeColors.text(context),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Intro row, mirrors .intro
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/images/ucf_logo.png',
-                                width: 48,
-                                height: 48,
-                                fit: BoxFit.contain,
+                Positioned.fill(
+                  child: ColoredBox(color: Colors.black.withValues(alpha: 0.4)),
+                ),
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 100),
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset('assets/images/ucf_wordmark.png', height: 36),
+                            const SizedBox(height: 12),
+                            Text(
+                              'KNIGHTRATE',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.display.copyWith(
+                                color: AppColors.white,
+                                fontSize: 32,
+                                letterSpacing: 1.4,
                               ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Find the right class, from students who've taken it",
-                                      style: AppTextStyles.subheading,
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      'KnightRate is a course review platform built for UCF '
-                                      'Computer Science and IT students — search the catalog, '
-                                      'read real ratings for difficulty and quality, and share '
-                                      "your own experience once you've taken a class.",
-                                      style: AppTextStyles.muted,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Text('Browse Classes', style: AppTextStyles.heading),
-                          const SizedBox(height: 12),
-                          // Cards, mirrors .cards-row (2×2 on a phone)
-                          if (_popularCourses.isEmpty)
-                            Text('Loading classes…', style: AppTextStyles.muted)
-                          else
-                            GridView.count(
-                              crossAxisCount: 2,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              childAspectRatio: 2.2,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Real ratings from real students, all in one place. Browse honest reviews '
+                              'on classes and gauge valuable resources before you commit.',
+                              textAlign: TextAlign.center,
+                              style: AppTextStyles.body.copyWith(color: AppColors.white.withValues(alpha: 0.85), fontSize: 14),
+                            ),
+                            const SizedBox(height: 20),
+                            CourseSearchField(
+                              controller: _searchController,
+                              onSubmitted: _search,
+                              onSelectCourse: _goToCourse,
+                              hintText: 'Search classes...',
+                              pillStyle: true,
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                for (final course in _popularCourses)
-                                  _CourseCard(course: course),
+                                _HeroLink(label: 'Browse Categories', onTap: () => context.push('/courses')),
+                                Container(
+                                  width: 4,
+                                  height: 4,
+                                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: const BoxDecoration(color: Colors.white54, shape: BoxShape.circle),
+                                ),
+                                _HeroLink(
+                                  label: 'How It Works',
+                                  onTap: () {
+                                    // Mirrors scrollToHowItWorks(); there's
+                                    // no in-page anchor on mobile, so this
+                                    // is a no-op scroll cue instead.
+                                  },
+                                ),
                               ],
                             ),
-                        ],
+                          ],
+                        ),
                       ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // --- Intro row, mirrors .intro ---
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 32, 20, 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/ucf_logo.png', width: 90, height: 90, fit: BoxFit.contain),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Made for Knights, by Knights', style: AppTextStyles.subheading.copyWith(fontSize: 17)),
+                        const SizedBox(height: 6),
+                        Text(
+                          "KnightRate started as a student project to help our own campus community make "
+                          "better decisions. Every review, rating, and recommendation comes from someone "
+                          "who's actually been there.",
+                          style: AppTextStyles.muted.copyWith(height: 1.5),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-/// White pill-shaped search bar with a trailing magnifier, mirrors
-/// .search-bar in Homepage.css.
-class _PillSearchBar extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onSubmitted;
-
-  const _PillSearchBar({required this.controller, required this.onSubmitted});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ThemeColors.surface(context),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.only(left: 20, right: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              textInputAction: TextInputAction.search,
-              onSubmitted: onSubmitted,
-              style: AppTextStyles.body,
-              decoration: InputDecoration(
-                hintText: 'Search for a class...',
-                hintStyle: AppTextStyles.muted.copyWith(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                ),
-                filled: false,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
-              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Text('Trending Classes This Week', style: AppTextStyles.heading.copyWith(fontSize: 20)),
             ),
-          ),
-          IconButton(
-            onPressed: () => onSubmitted(controller.text),
-            tooltip: 'Search',
-            icon: Icon(Icons.search, color: ThemeColors.text(context), size: 22),
-            // 44x44 minimum touch target, matching the web fix.
-            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-            padding: EdgeInsets.zero,
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+              child: _popularCourses.isEmpty
+                  ? Text('Loading classes…', style: AppTextStyles.muted)
+                  : GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.8,
+                      children: [for (final course in _popularCourses) _CourseCard(course: course, onTap: () => _goToCourse(course))],
+                    ),
+            ),
+            const Footer(),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// One Browse Classes card: gold/blue course code over the title, mirrors
-/// .card/.card-code/.card-title in Homepage.css.
-class _CourseCard extends StatelessWidget {
-  final Course course;
+class _HeroLink extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
 
-  const _CourseCard({required this.course});
+  const _HeroLink({required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push('/courses/${course.id}'),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          label,
+          style: AppTextStyles.muted.copyWith(color: AppColors.white, fontWeight: AppFontWeights.medium, fontSize: 13),
+        ),
+      ),
+    );
+  }
+}
+
+/// One trending-class card: gold/blue course code over the title, mirrors
+/// .card/.card-code/.card-title in Homepage.css.
+class _CourseCard extends StatelessWidget {
+  final Course course;
+  final VoidCallback onTap;
+
+  const _CourseCard({required this.course, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: ThemeColors.bg(context),
+          color: ThemeColors.surface(context),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: ThemeColors.border(context), width: 0.5),
+          border: Border.all(color: ThemeColors.border(context), width: 1),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 3, offset: const Offset(0, 1))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,7 +242,7 @@ class _CourseCard extends StatelessWidget {
             Text(
               course.courseCode,
               style: AppTextStyles.muted.copyWith(
-                color: ThemeColors.primary(context),
+                color: isDark ? AppPalette.goldLight : AppPalette.goldDark,
                 fontWeight: AppFontWeights.bold,
                 fontSize: 12,
               ),
@@ -320,10 +252,7 @@ class _CourseCard extends StatelessWidget {
               course.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.muted.copyWith(
-                color: ThemeColors.text(context),
-                fontSize: 12,
-              ),
+              style: AppTextStyles.muted.copyWith(color: ThemeColors.text(context), fontSize: 12),
             ),
           ],
         ),

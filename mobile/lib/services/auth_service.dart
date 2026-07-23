@@ -32,8 +32,13 @@ class AuthService {
     await _storeSession(res as Map<String, dynamic>);
   }
 
-  static Future<void> forgotPassword({required String email}) async {
-    await ApiClient.post('/auth/forgot-password', body: {'email': email});
+  /// Returns the backend's confirmation message (always a generic "if
+  /// registered" string, deliberately not confirming whether the email
+  /// exists) so callers can display it directly, matching the web.
+  static Future<String> forgotPassword({required String email}) async {
+    final res = await ApiClient.post('/auth/forgot-password', body: {'email': email});
+    return (res as Map<String, dynamic>)['message'] as String? ??
+        'If that email is registered, a reset code has been sent.';
   }
 
   static Future<void> resetPassword({
