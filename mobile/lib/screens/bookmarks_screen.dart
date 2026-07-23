@@ -108,7 +108,6 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                               onToggleBookmark: () => _remove(bookmark),
                               courseLabel: courseLabel,
                               onCourseClick: () => context.push('/courses/${review.courseId}'),
-                              whiteOverride: true,
                             );
                           },
                         ),

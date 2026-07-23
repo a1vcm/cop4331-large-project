@@ -125,26 +125,19 @@ class AppColors {
   static const accent = gold;
 }
 
-/// Review-card container styling. ReviewCard.css's own base rule
-/// (`--color-bg`/10px radius/16-18px padding/blur-4 shadow) applies by
-/// default; CourseDetailPage.css and BookmarksPage.css both override it
-/// with a hardcoded-white/12px/16px/blur-3 variant via a `.review-list > *`
-/// / `.bookmarks-list > *` child-combinator rule — a known pre-existing
-/// quirk that ignores dark mode on the web too, reproduced here as-is via
-/// the `whiteOverride` flag on ReviewCard.
+/// Review-card container styling. Matches ReviewCard.css's own base rule
+/// (`--color-bg`/10px radius/16-18px padding/blur-4 shadow) — always
+/// theme-aware, unlike the web version where CourseDetailPage.css and
+/// BookmarksPage.css both hardcode a white background via a
+/// `.review-list > *` / `.bookmarks-list > *` child-combinator rule that
+/// ignores dark mode. Mobile intentionally diverges here rather than
+/// reproducing that bug.
 class AppCardStyle {
   static const baseRadius = 10.0;
   static const baseHPad = 18.0;
   static const baseVPad = 16.0;
   static List<BoxShadow> baseShadow(BuildContext context) => [
         BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 1)),
-      ];
-
-  static const whiteOverrideRadius = 12.0;
-  static const whiteOverridePad = 16.0;
-  static const whiteOverrideBg = Colors.white;
-  static List<BoxShadow> whiteOverrideShadow() => [
-        const BoxShadow(color: Color(0x0F000000), blurRadius: 3, offset: Offset(0, 1)),
       ];
 }
 
@@ -277,7 +270,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.sm + 4),
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.sm + 4, horizontal: AppSpacing.md),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

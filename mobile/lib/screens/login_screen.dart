@@ -60,7 +60,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.canPop() ? context.pop() : context.go('/'),
-      title: 'Log In',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32),

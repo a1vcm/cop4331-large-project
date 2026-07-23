@@ -8,12 +8,6 @@ import 'stars.dart';
 /// edit/delete) and the bookmarks screen (cross-course, shows a
 /// [courseLabel] link back to the course instead). Bookmark/edit/delete
 /// controls only render when their callback is non-null.
-///
-/// `whiteOverride` reproduces a pre-existing web quirk: CourseDetailPage.css
-/// and BookmarksPage.css both hardcode `.review-list > *` /
-/// `.bookmarks-list > *` to a white background regardless of theme,
-/// overriding ReviewCard.css's own theme-aware styling — intentionally kept
-/// as-is here rather than "fixed", to match the live site.
 class ReviewCard extends StatelessWidget {
   final Review review;
   final bool isMine;
@@ -23,7 +17,6 @@ class ReviewCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final String? courseLabel;
   final VoidCallback? onCourseClick;
-  final bool whiteOverride;
 
   const ReviewCard({
     super.key,
@@ -35,7 +28,6 @@ class ReviewCard extends StatelessWidget {
     this.onDelete,
     this.courseLabel,
     this.onCourseClick,
-    this.whiteOverride = false,
   });
 
   @override
@@ -50,16 +42,16 @@ class ReviewCard extends StatelessWidget {
       if (review.grade != null && review.grade!.isNotEmpty) 'Grade: ${review.grade}',
     ];
 
-    final textColor = whiteOverride ? AppPalette.black : ThemeColors.text(context);
-    final mutedColor = whiteOverride ? AppPalette.gray500 : ThemeColors.textMuted(context);
+    final textColor = ThemeColors.text(context);
+    final mutedColor = ThemeColors.textMuted(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(whiteOverride ? AppCardStyle.whiteOverridePad : AppCardStyle.baseVPad),
+      padding: const EdgeInsets.all(AppCardStyle.baseVPad),
       decoration: BoxDecoration(
-        color: whiteOverride ? AppCardStyle.whiteOverrideBg : ThemeColors.bg(context),
-        borderRadius: BorderRadius.circular(whiteOverride ? AppCardStyle.whiteOverrideRadius : AppCardStyle.baseRadius),
-        boxShadow: whiteOverride ? AppCardStyle.whiteOverrideShadow() : AppCardStyle.baseShadow(context),
+        color: ThemeColors.surface(context),
+        borderRadius: BorderRadius.circular(AppCardStyle.baseRadius),
+        boxShadow: AppCardStyle.baseShadow(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

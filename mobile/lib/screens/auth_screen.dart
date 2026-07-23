@@ -199,7 +199,6 @@ class _AuthScreenState extends State<AuthScreen> {
     return AppScaffold(
       showBack: true,
       onBack: () => context.canPop() ? context.pop() : context.go('/'),
-      showAccountIcon: false,
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: isDark

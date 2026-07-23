@@ -258,7 +258,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           onDelete: review.userId == AuthState.instance.userId
                               ? () => _deleteReview(review)
                               : null,
-                          whiteOverride: true,
                         ),
                       if (totalPages > 1)
                         _ReviewPagination(
