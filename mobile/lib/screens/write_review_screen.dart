@@ -12,7 +12,22 @@ import '../widgets/app_chrome.dart';
 import '../widgets/stars.dart';
 
 const _gradeOptions = [
-  '', 'A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'W', 'P',
+  '',
+  'A+',
+  'A',
+  'A-',
+  'B+',
+  'B',
+  'B-',
+  'C+',
+  'C',
+  'C-',
+  'D+',
+  'D',
+  'D-',
+  'F',
+  'W',
+  'P',
 ];
 const _terms = ['Spring', 'Summer', 'Fall'];
 const _commentCharLimit = 500;
@@ -29,7 +44,9 @@ List<String> _buildTermOptions(String? existingTerm) {
       options.add('${_terms[i]} $y');
     }
   }
-  if (existingTerm != null && existingTerm.isNotEmpty && !options.contains(existingTerm)) {
+  if (existingTerm != null &&
+      existingTerm.isNotEmpty &&
+      !options.contains(existingTerm)) {
     options.insert(0, existingTerm);
   }
   return options;
@@ -63,8 +80,12 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
   late String _grade = widget.existing?.grade ?? '';
   late String _term = widget.existing?.term ?? '';
   late final List<String> _tags = List.of(widget.existing?.tags ?? const []);
-  late final _instructorController = TextEditingController(text: widget.existing?.instructor);
-  late final _commentController = TextEditingController(text: widget.existing?.comment);
+  late final _instructorController = TextEditingController(
+    text: widget.existing?.instructor,
+  );
+  late final _commentController = TextEditingController(
+    text: widget.existing?.comment,
+  );
   late final _termOptions = _buildTermOptions(widget.existing?.term);
 
   bool _showResourceForm = false;
@@ -154,7 +175,11 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
         // failed resource attach must not fail the review save, which has
         // already succeeded by this point.
         try {
-          await ResourceService.create(courseId: widget.courseId, title: resourceTitle, url: resourceUrl);
+          await ResourceService.create(
+            courseId: widget.courseId,
+            title: resourceTitle,
+            url: resourceUrl,
+          );
         } catch (_) {
           // ignore
         }
@@ -177,177 +202,253 @@ class _WriteReviewScreenState extends State<WriteReviewScreen> {
       showInfoIcon: false,
       showHelpIcon: false,
       showBookmarksIcon: false,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: ThemeColors.surface(context),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 4, offset: const Offset(0, 1))],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                widget.existing != null ? 'Edit Your Review' : 'Rate the Course',
-                style: AppTextStyles.heading,
-              ),
-              const SizedBox(height: 16),
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: ThemeColors.surface(context),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  widget.existing != null
+                      ? 'Edit Your Review'
+                      : 'Rate the Course',
+                  style: AppTextStyles.heading,
+                ),
+                const SizedBox(height: 16),
 
-              if (_course != null) _CourseInfoCard(course: _course!, instructorController: _instructorController),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _termOptions.contains(_term) ? _term : null,
-                isExpanded: true,
-                decoration: const InputDecoration(hintText: 'Select term'),
-                items: _termOptions.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-                onChanged: (v) => setState(() => _term = v ?? ''),
-              ),
-              const SizedBox(height: 20),
+                if (_course != null)
+                  _CourseInfoCard(
+                    course: _course!,
+                    instructorController: _instructorController,
+                  ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: _termOptions.contains(_term) ? _term : null,
+                  isExpanded: true,
+                  decoration: const InputDecoration(hintText: 'Select term'),
+                  items: _termOptions
+                      .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                      .toList(),
+                  onChanged: (v) => setState(() => _term = v ?? ''),
+                ),
+                const SizedBox(height: 20),
 
-              Text('Overall Rating', style: AppTextStyles.subheading),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Stars(value: _quality, allowHalf: true, size: 32, onChange: (v) => setState(() => _quality = v)),
-                  const SizedBox(width: 12),
-                  Text('${_quality.toStringAsFixed(1)} / 5.0', style: AppTextStyles.muted),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Mirrors .rating-grid: a single-column stack of label+stars
-              // rows with dividers — this is the CSS's actual layout at
-              // every screen width, not just a mobile fallback.
-              Container(
-                decoration: BoxDecoration(color: ThemeColors.bg(context), borderRadius: BorderRadius.circular(10)),
-                child: Column(
+                Text('Overall Rating', style: AppTextStyles.subheading),
+                const SizedBox(height: 8),
+                Row(
                   children: [
-                    _RatingRow(
-                      label: 'Difficulty',
-                      value: _difficulty.toDouble(),
-                      onChanged: (v) => setState(() => _difficulty = v.round()),
+                    Stars(
+                      value: _quality,
+                      allowHalf: true,
+                      size: 32,
+                      onChange: (v) => setState(() => _quality = v),
                     ),
-                    _RatingRow(
-                      label: 'Workload',
-                      value: _workload.toDouble(),
-                      onChanged: (v) => setState(() => _workload = v.round()),
-                    ),
-                    _RatingRow(
-                      label: 'Grading Fairness',
-                      value: _gradingFairness.toDouble(),
-                      onChanged: (v) => setState(() => _gradingFairness = v.round()),
-                    ),
-                    _RatingRow(
-                      label: 'Professor Quality',
-                      value: _professorRating.toDouble(),
-                      onChanged: (v) => setState(() => _professorRating = v.round()),
-                      isLast: true,
+                    const SizedBox(width: 12),
+                    Text(
+                      '${_quality.toStringAsFixed(1)} / 5.0',
+                      style: AppTextStyles.muted,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 12),
-              _RatingRow(
-                label: 'Attendance (optional)',
-                value: _attendance.toDouble(),
-                onChanged: (v) => setState(() => _attendance = v.round()),
-                bare: true,
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 16),
 
-              Text('Grade received', style: AppTextStyles.subheading),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                initialValue: _grade,
-                isExpanded: true,
-                items: _gradeOptions.map((g) => DropdownMenuItem(value: g, child: Text(g.isEmpty ? 'Select grade' : g))).toList(),
-                onChanged: (v) => setState(() => _grade = v ?? ''),
-              ),
-              const SizedBox(height: 20),
-
-              Text('Attach Resources', style: AppTextStyles.subheading),
-              const SizedBox(height: 8),
-              if (!_showResourceForm)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: OutlinedButton(
-                    onPressed: () => setState(() => _showResourceForm = true),
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(44, 44)),
-                    child: const Text('Attach File, Link, or Document'),
+                // Mirrors .rating-grid: a single-column stack of label+stars
+                // rows with dividers — this is the CSS's actual layout at
+                // every screen width, not just a mobile fallback.
+                Container(
+                  decoration: BoxDecoration(
+                    color: ThemeColors.bg(context),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      controller: _resourceTitleController,
-                      maxLength: 120,
-                      decoration: const InputDecoration(hintText: 'Title, e.g. Course syllabus'),
+                  child: Column(
+                    children: [
+                      _RatingRow(
+                        label: 'Difficulty',
+                        value: _difficulty.toDouble(),
+                        onChanged: (v) =>
+                            setState(() => _difficulty = v.round()),
+                      ),
+                      _RatingRow(
+                        label: 'Workload',
+                        value: _workload.toDouble(),
+                        onChanged: (v) => setState(() => _workload = v.round()),
+                      ),
+                      _RatingRow(
+                        label: 'Grading Fairness',
+                        value: _gradingFairness.toDouble(),
+                        onChanged: (v) =>
+                            setState(() => _gradingFairness = v.round()),
+                      ),
+                      _RatingRow(
+                        label: 'Professor Quality',
+                        value: _professorRating.toDouble(),
+                        onChanged: (v) =>
+                            setState(() => _professorRating = v.round()),
+                        isLast: true,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _RatingRow(
+                  label: 'Attendance (optional)',
+                  value: _attendance.toDouble(),
+                  onChanged: (v) => setState(() => _attendance = v.round()),
+                  bare: true,
+                ),
+                const SizedBox(height: 8),
+
+                Text('Grade received', style: AppTextStyles.subheading),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  initialValue: _grade,
+                  isExpanded: true,
+                  items: _gradeOptions
+                      .map(
+                        (g) => DropdownMenuItem(
+                          value: g,
+                          child: Text(g.isEmpty ? 'Select grade' : g),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) => setState(() => _grade = v ?? ''),
+                ),
+                const SizedBox(height: 20),
+
+                Text('Attach Resources', style: AppTextStyles.subheading),
+                const SizedBox(height: 8),
+                if (!_showResourceForm)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton(
+                      onPressed: () => setState(() => _showResourceForm = true),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(44, 44),
+                      ),
+                      child: const Text('Attach File, Link, or Document'),
                     ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _resourceUrlController,
-                      keyboardType: TextInputType.url,
-                      decoration: const InputDecoration(hintText: 'https://…'),
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _resourceTitleController,
+                        maxLength: 120,
+                        decoration: const InputDecoration(
+                          hintText: 'Title, e.g. Course syllabus',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _resourceUrlController,
+                        keyboardType: TextInputType.url,
+                        decoration: const InputDecoration(
+                          hintText: 'https://…',
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => setState(() {
+                            _showResourceForm = false;
+                            _resourceTitleController.clear();
+                            _resourceUrlController.clear();
+                          }),
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size(44, 44),
+                          ),
+                          child: const Text('Remove'),
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 20),
+
+                Text('Add Tags', style: AppTextStyles.subheading),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: kReviewTags
+                      .map(
+                        (tag) => _TagToggle(
+                          label: tag,
+                          selected: _tags.contains(tag),
+                          onTap: () => _toggleTag(tag),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 20),
+
+                Text('Write a Review', style: AppTextStyles.subheading),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _commentController,
+                  maxLines: 6,
+                  maxLength: _commentCharLimit,
+                  decoration: const InputDecoration(
+                    hintText: "Share your experience with this course…",
+                    alignLabelWithHint: true,
+                  ),
+                ),
+
+                if (_error != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    _error!,
+                    style: AppTextStyles.muted.copyWith(
+                      color: ThemeColors.error(context),
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => setState(() {
-                          _showResourceForm = false;
-                          _resourceTitleController.clear();
-                          _resourceUrlController.clear();
-                        }),
-                        style: TextButton.styleFrom(minimumSize: const Size(44, 44)),
-                        child: const Text('Remove'),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _saving ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  ],
-                ),
-              const SizedBox(height: 20),
-
-              Text('Add Tags', style: AppTextStyles.subheading),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: kReviewTags.map((tag) => _TagToggle(label: tag, selected: _tags.contains(tag), onTap: () => _toggleTag(tag))).toList(),
-              ),
-              const SizedBox(height: 20),
-
-              Text('Write a Review', style: AppTextStyles.subheading),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _commentController,
-                maxLines: 6,
-                maxLength: _commentCharLimit,
-                decoration: const InputDecoration(
-                  hintText: "Share your experience with this course…",
-                  alignLabelWithHint: true,
-                ),
-              ),
-
-              if (_error != null) ...[
-                const SizedBox(height: 4),
-                Text(_error!, style: AppTextStyles.muted.copyWith(color: ThemeColors.error(context))),
-              ],
-              const SizedBox(height: 12),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _saving ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    child: _saving
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            widget.existing != null
+                                ? 'Save Changes'
+                                : 'Submit Review',
+                          ),
                   ),
-                  child: _saving
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text(widget.existing != null ? 'Save Changes' : 'Submit Review'),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -361,28 +462,44 @@ class _CourseInfoCard extends StatelessWidget {
   final Course course;
   final TextEditingController instructorController;
 
-  const _CourseInfoCard({required this.course, required this.instructorController});
+  const _CourseInfoCard({
+    required this.course,
+    required this.instructorController,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: ThemeColors.bg(context), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: ThemeColors.bg(context),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
           Container(
             width: 44,
             height: 44,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: ThemeColors.border(context)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: ThemeColors.border(context),
+            ),
             alignment: Alignment.center,
-            child: Icon(Icons.school_outlined, color: ThemeColors.textMuted(context), size: 20),
+            child: Icon(
+              Icons.school_outlined,
+              color: ThemeColors.textMuted(context),
+              size: 20,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${course.courseCode} - ${course.title}', style: AppTextStyles.subheading.copyWith(fontSize: 14)),
+                Text(
+                  '${course.courseCode} - ${course.title}',
+                  style: AppTextStyles.subheading.copyWith(fontSize: 14),
+                ),
                 const SizedBox(height: 4),
                 TextField(
                   controller: instructorController,
@@ -430,7 +547,13 @@ class _RatingRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: AppTextStyles.body.copyWith(fontWeight: AppFontWeights.medium, fontSize: 13)),
+          Text(
+            label,
+            style: AppTextStyles.body.copyWith(
+              fontWeight: AppFontWeights.medium,
+              fontSize: 13,
+            ),
+          ),
           const SizedBox(height: 8),
           Stars(value: value, size: 20, onChange: onChanged),
         ],
@@ -440,7 +563,11 @@ class _RatingRow extends StatelessWidget {
     return Container(
       decoration: isLast
           ? null
-          : BoxDecoration(border: Border(bottom: BorderSide(color: ThemeColors.border(context)))),
+          : BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: ThemeColors.border(context)),
+              ),
+            ),
       child: row,
     );
   }
@@ -454,11 +581,17 @@ class _TagToggle extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _TagToggle({required this.label, required this.selected, required this.onTap});
+  const _TagToggle({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? ThemeColors.onPrimary(context) : ThemeColors.textMuted(context);
+    final color = selected
+        ? ThemeColors.onPrimary(context)
+        : ThemeColors.textMuted(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -468,11 +601,24 @@ class _TagToggle extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? ThemeColors.primary(context) : ThemeColors.bg(context),
+            color: selected
+                ? ThemeColors.primary(context)
+                : ThemeColors.bg(context),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: selected ? ThemeColors.primary(context) : ThemeColors.border(context)),
+            border: Border.all(
+              color: selected
+                  ? ThemeColors.primary(context)
+                  : ThemeColors.border(context),
+            ),
           ),
-          child: Text(label, style: AppTextStyles.muted.copyWith(color: color, fontWeight: AppFontWeights.bold, fontSize: 12)),
+          child: Text(
+            label,
+            style: AppTextStyles.muted.copyWith(
+              color: color,
+              fontWeight: AppFontWeights.bold,
+              fontSize: 12,
+            ),
+          ),
         ),
       ),
     );
