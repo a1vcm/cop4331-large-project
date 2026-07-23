@@ -263,7 +263,6 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
     }
 
     return AppScaffold(
-      showAccountIcon: false,
       body: RefreshIndicator(
         onRefresh: _loadReviews,
         child: ListenableBuilder(
@@ -292,7 +291,7 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
                         // Sidebar-tint nav band, mirrors .profile-sidebar's
                         // mobile-breakpoint row layout.
                         Container(
-                          padding: const EdgeInsets.fromLTRB(12, 44, 12, 12),
+                          padding: const EdgeInsets.fromLTRB(12, 76, 12, 12),
                           decoration: BoxDecoration(
                             color: ThemeColors.bg(context),
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),

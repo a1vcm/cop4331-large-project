@@ -7,10 +7,10 @@ import '../theme/app_theme.dart';
 import '../widgets/app_chrome.dart';
 import '../widgets/course_search_field.dart';
 
-/// Mirrors frontend/src/pages/CourseSearchPage.jsx exactly: autocomplete
-/// search bar, prefix/difficulty filters + sort, a page-size dropdown
-/// (10/5/25/50/All) and a "Next" button that cumulatively reveals more
-/// results — not page-jumping, just a growing `visibleCount`.
+/// Mirrors frontend/src/pages/CourseSearchPage.jsx's autocomplete search
+/// bar, prefix/difficulty filters + sort, and page-size dropdown
+/// (10/5/25/50/All), but diverges on pagination: mobile uses real
+/// prev/next page-jumping instead of web's cumulative-reveal "Next".
 class CourseSearchScreen extends StatefulWidget {
   final String? initialQuery;
 
@@ -38,7 +38,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
   String _prefixFilter = 'all';
   String _sortBy = 'relevance';
   int _pageSize = 10; // -1 == 'all'
-  int _visibleCount = 10;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -105,13 +105,19 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
     return list;
   }
 
+  int get _totalPages {
+    if (_pageSize == -1) return 1;
+    return (_visibleCourses.length / _pageSize).ceil().clamp(1, 1 << 30);
+  }
+
   List<Course> get _displayedCourses {
     final visible = _visibleCourses;
     if (_pageSize == -1) return visible;
-    return visible.take(_visibleCount).toList();
+    final page = _currentPage.clamp(0, _totalPages - 1);
+    return visible.skip(page * _pageSize).take(_pageSize).toList();
   }
 
-  void _resetVisibleCount([int? size]) => _visibleCount = size ?? _pageSize;
+  void _resetPage() => _currentPage = 0;
 
   void _goToCourse(Course course) => context.push('/courses/${course.id}');
 
@@ -122,6 +128,8 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
     Theme.of(context);
     final visibleCourses = _visibleCourses;
     final displayedCourses = _displayedCourses;
+    final totalPages = _totalPages;
+    final page = _currentPage.clamp(0, totalPages - 1);
 
     return AppScaffold(
       body: SafeArea(
@@ -131,7 +139,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
             CourseSearchField(
               controller: _searchController,
               onSubmitted: (q) {
-                setState(_resetVisibleCount);
+                setState(_resetPage);
                 _load(q);
               },
               onSelectCourse: _goToCourse,
@@ -152,7 +160,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   },
                   onChanged: (v) => setState(() {
                     _filterBy = v ?? 'all';
-                    _resetVisibleCount();
+                    _resetPage();
                   }),
                 ),
                 _ControlDropdown(
@@ -164,7 +172,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   },
                   onChanged: (v) => setState(() {
                     _prefixFilter = v ?? 'all';
-                    _resetVisibleCount();
+                    _resetPage();
                   }),
                 ),
                 _ControlDropdown(
@@ -178,7 +186,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   },
                   onChanged: (v) => setState(() {
                     _sortBy = v ?? 'relevance';
-                    _resetVisibleCount();
+                    _resetPage();
                   }),
                 ),
                 _ControlDropdown(
@@ -191,7 +199,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
                   onChanged: (v) => setState(() {
                     final size = int.tryParse(v ?? '10') ?? 10;
                     _pageSize = size;
-                    _resetVisibleCount(size);
+                    _resetPage();
                   }),
                 ),
               ],
@@ -200,9 +208,7 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
             Text(
               _loading
                   ? 'Loading courses...'
-                  : _error ??
-                      '${visibleCourses.length} result${visibleCourses.length == 1 ? '' : 's'}'
-                          '${displayedCourses.length < visibleCourses.length ? ' — showing ${displayedCourses.length}' : ''}',
+                  : _error ?? '${visibleCourses.length} result${visibleCourses.length == 1 ? '' : 's'}',
               style: AppTextStyles.muted,
             ),
             const SizedBox(height: 10),
@@ -210,13 +216,25 @@ class _CourseSearchScreenState extends State<CourseSearchScreen> {
               const Padding(padding: EdgeInsets.symmetric(vertical: 40), child: Center(child: CircularProgressIndicator()))
             else if (_error == null) ...[
               for (final course in displayedCourses) _CourseCard(course: course, onTap: () => _goToCourse(course)),
-              if (displayedCourses.length < visibleCourses.length)
+              if (totalPages > 1)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Center(
-                    child: _NextButton(
-                      onPressed: () => setState(() => _visibleCount += _pageSize == -1 ? 0 : _pageSize),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _PageNavButton(
+                        icon: Icons.chevron_left,
+                        onPressed: page > 0 ? () => setState(() => _currentPage = page - 1) : null,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('Page ${page + 1} of $totalPages', style: AppTextStyles.muted),
+                      ),
+                      _PageNavButton(
+                        icon: Icons.chevron_right,
+                        onPressed: page < totalPages - 1 ? () => setState(() => _currentPage = page + 1) : null,
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -274,24 +292,27 @@ class _ControlDropdown extends StatelessWidget {
   }
 }
 
-/// Mirrors .show-more-btn: outlined gold pill (blue in dark mode).
-class _NextButton extends StatelessWidget {
-  final VoidCallback onPressed;
+/// Icon-only prev/next pager control: outlined gold circle (blue in dark
+/// mode), disabled (greyed, no-op) at the first/last page.
+class _PageNavButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onPressed;
 
-  const _NextButton({required this.onPressed});
+  const _PageNavButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
+    final enabled = onPressed != null;
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: ThemeColors.primary(context), width: 1.5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-        minimumSize: const Size(0, 44),
-        foregroundColor: ThemeColors.text(context),
+        shape: const CircleBorder(),
+        side: BorderSide(color: enabled ? ThemeColors.primary(context) : ThemeColors.border(context), width: 1.5),
+        padding: EdgeInsets.zero,
+        minimumSize: const Size(44, 44),
+        foregroundColor: enabled ? ThemeColors.text(context) : ThemeColors.border(context),
       ),
-      child: const Text('Next'),
+      child: Icon(icon, size: 20),
     );
   }
 }
