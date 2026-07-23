@@ -404,8 +404,10 @@ class _CourseInfoCard extends StatelessWidget {
   }
 }
 
-/// One "Label ⭐⭐⭐⭐⭐" row, matching .rating-grid-row: a divider between
-/// rows, none after the last.
+/// One label-over-stars block, matching .rating-grid-row: a divider between
+/// rows, none after the last. Label stacks above the stars (rather than
+/// sharing a row) so the 5-star row — each star a >=44pt tap target —
+/// always has full width and never overflows on narrow screens.
 class _RatingRow extends StatelessWidget {
   final String label;
   final double value;
@@ -425,10 +427,11 @@ class _RatingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final row = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: AppTextStyles.body.copyWith(fontWeight: AppFontWeights.medium, fontSize: 13)),
+          const SizedBox(height: 8),
           Stars(value: value, size: 20, onChange: onChanged),
         ],
       ),

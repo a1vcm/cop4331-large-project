@@ -64,7 +64,7 @@ class AppTopBar extends StatelessWidget {
     this.showInfoIcon = true,
     this.showHelpIcon = true,
     this.showBookmarksIcon = true,
-    this.showAccountIcon = true,
+    this.showAccountIcon = false,
   });
 
   static const double contentHeight = 64;
@@ -283,7 +283,7 @@ class AppScaffold extends StatelessWidget {
     this.showInfoIcon = true,
     this.showHelpIcon = true,
     this.showBookmarksIcon = true,
-    this.showAccountIcon = true,
+    this.showAccountIcon = false,
   });
 
   @override

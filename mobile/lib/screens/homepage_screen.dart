@@ -167,7 +167,7 @@ class _HomepageScreenState extends State<HomepageScreen> {
             ),
 
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
               child: Text('Trending Classes This Week', style: AppTextStyles.heading.copyWith(fontSize: 20)),
             ),
             Padding(
