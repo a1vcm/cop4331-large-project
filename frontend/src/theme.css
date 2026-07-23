@@ -1,7 +1,7 @@
 /* --- Raw palette: fixed values, referenced by the themes below --- */
 :root {
   /* gold (light accent) */
-  --gold-dark: #C89A0F;
+  --gold-dark: #896805;
   --gold-base: #F2C417;
   --gold-light: #F7D75A;
 
@@ -17,7 +17,7 @@
   --black: #1A1A1A;
   --black-rgb: 26, 26, 26;
   --gray-900: #333333;
-  --gray-500: #888888;
+  --gray-500: #4c4c4c;
   --gray-300: #BBBBBB;
   --page-gray: #EDEFF1;
   --white: #FFFFFF;
@@ -82,4 +82,43 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Site-wide scrollbar: UCF gold in light mode, blue accent in dark mode
+   (Firefox + WebKit/Chromium). */
+* {
+  scrollbar-color: var(--gold-base) transparent;
+}
+
+[data-theme="dark"],
+[data-theme="dark"] * {
+  scrollbar-color: var(--blue-base) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--gold-base);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--gold-dark);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: var(--blue-base);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--blue-light);
 }

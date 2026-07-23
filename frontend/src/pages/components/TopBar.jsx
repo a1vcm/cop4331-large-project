@@ -10,6 +10,8 @@ function TopBar({
   onHelpClick,
   showCoursesIcon = true,
   onCoursesClick,
+  showBookmarksIcon = true,
+  onBookmarksClick,
   showAccountIcon = true,
   onAccountClick,
   showThemeToggle = true,
@@ -26,15 +28,16 @@ function TopBar({
 
   return (
     <header className={classNames}>
-      {showBackButton ? (
-        <button aria-label="Back" className="back-btn" onClick={onBack}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-      ) : (
-        <div className="top-bar-spacer" />
-      )}
+      <div className="top-bar-left">
+        {showBackButton && (
+          <button aria-label="Back" className="back-btn" onClick={onBack}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        )}
+        <span className="top-bar-brand">KnightRate</span>
+      </div>
 
       <nav className="top-bar-icons">
         {showThemeToggle && <ThemeToggle />}
@@ -62,6 +65,13 @@ function TopBar({
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M2 9l10-5 10 5-10 5-10-5z" />
               <path d="M6 11v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5" />
+            </svg>
+          </button>
+        )}
+        {showBookmarksIcon && (
+          <button aria-label="Bookmarks" className="icon-btn" onClick={onBookmarksClick}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" />
             </svg>
           </button>
         )}

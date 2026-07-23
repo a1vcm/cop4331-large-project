@@ -35,11 +35,23 @@ async function deleteBookmark(req, res) {
   }
 }
 
-// GET /api/bookmarks/mine — returns just the reviewIds the user has bookmarked.
+// GET /api/bookmarks/mine — returns the user's bookmarked reviews, populated
+// with the review's course + author so the Bookmarks page can render full
+// cards without extra round-trips. Reviews that were since deleted are
+// filtered out (reviewId populates to null).
 async function getMyBookmarks(req, res) {
   try {
-    const bookmarks = await Bookmark.find({ userId: req.user._id }).select('reviewId');
-    res.json(bookmarks.map((b) => b.reviewId));
+    const bookmarks = await Bookmark.find({ userId: req.user._id })
+      .populate({
+        path: 'reviewId',
+        populate: [
+          { path: 'courseId', select: 'course_code title department' },
+          { path: 'userId', select: 'username' },
+        ],
+      })
+      .sort({ createdAt: -1 });
+
+    res.json(bookmarks.filter((b) => b.reviewId));
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch bookmarks', error: err.message });
   }

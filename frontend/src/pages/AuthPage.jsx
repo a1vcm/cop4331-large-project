@@ -6,7 +6,7 @@ import { register, verifyEmail, resendVerification, login, forgotPassword, reset
 import { MIN_PASSWORD_LENGTH, isPasswordValid } from '../utils/validatePassword.js';
 import './AuthPage.css';
 
-function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
+function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick, onBookmarksClick }) {
   const [mode, setMode] = useState('login');
   const [showVerification, setShowVerification] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -148,6 +148,7 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
         onInfoClick={onInfoClick}
         onHelpClick={onHelpClick}
         onCoursesClick={onCoursesClick}
+        onBookmarksClick={onBookmarksClick}
         fixed
       />
       <div className="auth-page-top-spacer" />
@@ -157,133 +158,156 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
           <div className="auth-tabs">
             <button
               type="button"
+              className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
+              onClick={() => setMode('register')}
+            >
+              <span>Register</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+            </button>
+            <button
+              type="button"
               className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
               onClick={() => setMode('login')}
             >
+              <span>Login</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                 <path d="M10 17l5-5-5-5" />
                 <path d="M15 12H3" />
               </svg>
-              <span>Log In</span>
-            </button>
-            <button
-              type="button"
-              className={`auth-tab ${mode === 'register' ? 'active' : ''}`}
-              onClick={() => setMode('register')}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                <path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6" />
-                <path d="M18 8v6M15 11h6" />
-              </svg>
-              <span>Register</span>
             </button>
           </div>
 
           {mode === 'login' && (
             <form className="auth-form" onSubmit={handleLogin}>
-              <h1 className="auth-heading">Welcome Back</h1>
+              <h1 className="auth-heading">Login</h1>
 
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="5" width="18" height="14" rx="2" />
-                  <path d="M3 7l9 6 9-6" />
-                </svg>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={loginEmail}
-                  onChange={(e) => setLoginEmail(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Email:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="M3 7l9 6 9-6" />
+                  </svg>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
 
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="5" y="11" width="14" height="9" rx="2" />
-                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                </svg>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Password:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
 
               {authMessage && <p className={`auth-message ${authMessage.type}`}>{authMessage.text}</p>}
 
-              <button type="submit" className="auth-submit">Log In</button>
+              <button type="submit" className="auth-submit">Login</button>
 
               <button type="button" className="auth-link" onClick={openForgotPassword}>
                 Forgot password?
               </button>
+
+              <p className="auth-switch">
+                Don't have an account?{' '}
+                <button type="button" className="auth-switch-link" onClick={() => setMode('register')}>
+                  Register.
+                </button>
+              </p>
             </form>
           )}
 
           {mode === 'register' && (
             <form className="auth-form" onSubmit={handleRegister}>
-              <h1 className="auth-heading">Create Your Account</h1>
+              <h1 className="auth-heading">Register Your Account</h1>
 
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="5" width="18" height="14" rx="2" />
-                  <path d="M3 7l9 6 9-6" />
-                </svg>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Email:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="M3 7l9 6 9-6" />
+                  </svg>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
 
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={regUsername}
-                  onChange={(e) => setRegUsername(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Full name:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
 
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="5" y="11" width="14" height="9" rx="2" />
-                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                </svg>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Password:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    required
+                  />
+                </label>
+                <PasswordRequirements password={regPassword} />
+              </div>
 
-              <PasswordRequirements password={regPassword} />
-
-              <label className="input-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="5" y="11" width="14" height="9" rx="2" />
-                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                </svg>
-                <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={regConfirmPassword}
-                  onChange={(e) => setRegConfirmPassword(e.target.value)}
-                  required
-                />
-              </label>
+              <div className="field-group">
+                <span className="field-label">Verify Password:</span>
+                <label className="input-field">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  <input
+                    type="password"
+                    placeholder="Verify your password"
+                    value={regConfirmPassword}
+                    onChange={(e) => setRegConfirmPassword(e.target.value)}
+                    required
+                  />
+                </label>
+              </div>
 
               <label className="checkbox-field">
                 <input
@@ -291,12 +315,19 @@ function AuthPage({ onBack, onInfoClick, onHelpClick, onCoursesClick }) {
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                 />
-                <span>I agree to the Terms of Service</span>
+                <span>By checking this box, you are agreeing to our terms of service.</span>
               </label>
 
               {authMessage && <p className={`auth-message ${authMessage.type}`}>{authMessage.text}</p>}
 
-              <button type="submit" className="auth-submit">Create Account</button>
+              <button type="submit" className="auth-submit">Register</button>
+
+              <p className="auth-switch">
+                Already have an account?{' '}
+                <button type="button" className="auth-switch-link" onClick={() => setMode('login')}>
+                  Login.
+                </button>
+              </p>
             </form>
           )}
 

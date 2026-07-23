@@ -73,7 +73,21 @@
 
 .course-search-controls {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
+}
+
+.course-search-controls-left {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.control-dropdown-pagesize {
+  border: 1.5px solid var(--gold-base);
+  margin-left: auto;
 }
 
 .control-dropdown {
@@ -162,10 +176,55 @@
   font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
   font-weight: 700;
   font-size: 12px;
-  color: var(--black); /* sits on a bright difficulty color set inline — stays dark */
   padding: 6px 14px;
   border-radius: 14px;
   white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.difficulty-easy {
+  background: color-mix(in srgb, var(--status-success) 18%, var(--color-surface));
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 35%, transparent);
+}
+
+.difficulty-medium {
+  background: color-mix(in srgb, var(--gold-base) 25%, var(--color-surface));
+  color: var(--gold-dark);
+  border-color: color-mix(in srgb, var(--gold-base) 45%, transparent);
+}
+
+.difficulty-hard {
+  background: color-mix(in srgb, var(--status-error) 18%, var(--color-surface));
+  color: var(--status-error);
+  border-color: color-mix(in srgb, var(--status-error) 35%, transparent);
+}
+
+.difficulty-unrated {
+  background: var(--color-border);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* Dark mode: the light-mode tints (mixed against a near-black surface)
+   read as muted/illegible, so switch to solid, saturated fills instead —
+   the same treatment star ratings already use to stay theme-invariant. */
+[data-theme="dark"] .difficulty-easy {
+  background: #3FA34D;
+  color: var(--white);
+  border-color: #3FA34D;
+}
+
+[data-theme="dark"] .difficulty-medium {
+  background: var(--gold-base);
+  color: var(--black);
+  border-color: var(--gold-base);
+}
+
+[data-theme="dark"] .difficulty-hard {
+  background: var(--status-error);
+  color: var(--white);
+  border-color: var(--status-error);
 }
 
 .reviews-btn {
@@ -186,9 +245,52 @@
   background: var(--color-emphasis-hover);
 }
 
+.show-more-btn {
+  align-self: center;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1.5px solid var(--gold-base);
+  border-radius: 10px;
+  padding: 10px 28px;
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.show-more-btn:hover {
+  background: var(--gold-base);
+  color: var(--black);
+}
+
+[data-theme="dark"] .show-more-btn {
+  border-color: var(--blue-base);
+}
+
+[data-theme="dark"] .show-more-btn:hover {
+  background: var(--blue-base);
+  color: var(--white);
+}
+
 @media (max-width: 600px) {
   .course-search-content {
     padding: 24px 16px 40px;
+  }
+
+  .course-search-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .course-search-controls-left .control-dropdown {
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .control-dropdown-pagesize {
+    margin-left: 0;
+    width: 100%;
   }
 
   .class-card {

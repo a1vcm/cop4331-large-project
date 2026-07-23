@@ -1,0 +1,59 @@
+.bookmarks-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.bookmarks-top-spacer {
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.bookmarks-content {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bookmarks-heading {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.bookmarks-status {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bookmarks-list > * {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .bookmarks-content {
+    padding: 24px 16px 40px;
+  }
+}
