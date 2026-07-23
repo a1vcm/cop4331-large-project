@@ -370,7 +370,10 @@ class _ProfileDashboardScreenState extends State<ProfileDashboardScreen> {
       else
         for (final review in _reviews!)
           GestureDetector(
-            onTap: () => context.push('/courses/${review.courseId}'),
+            onTap: () {
+              StatefulNavigationShell.of(context).goBranch(1);
+              context.push('/courses/${review.courseId}');
+            },
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
