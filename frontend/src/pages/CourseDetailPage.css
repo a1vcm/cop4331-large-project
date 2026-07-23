@@ -232,11 +232,6 @@
   box-sizing: border-box;
 }
 
-[data-theme="dark"] .review-list > *,
-[data-theme="dark"] .review-list > * *:not(.star, .review-star, .tag, .review-tag) {
-  color: var(--black) !important;
-}
-
 .review-pagination {
   display: flex;
   align-items: center;
