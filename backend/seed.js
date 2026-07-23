@@ -10,8 +10,13 @@
 // Run with:  node seed.js
 
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const { connectDB } = require('./db');
 const Course = require('./collections/Course');
+const Review = require('./collections/Review');
+const User = require('./collections/User');
+const { REVIEW_TAGS } = require('./utils/reviewTags');
 
 const COURSES = [
   { course_code: 'CAP4053', title: 'AI for Game Programming', department: 'CAP', credits: 3 },
@@ -128,6 +133,162 @@ const COURSES = [
   { course_code: 'CHM2045C', title: 'Chemistry Fundamentals I', department: 'CHM', credits: 4 },
 ];
 
+// ---------------------------------------------------------------------------
+// Demo reviews — synthetic, clearly-fictional accounts only, never scraped
+// or attributed to real people. Only ever applied to courses that have zero
+// reviews, so this is safe to re-run: once a course has been touched it's
+// never touched again, and nothing here overwrites a real user's review.
+
+const SEED_REVIEWER_POOL = [
+  { username: 'midnightknight', email: 'seed.midnightknight@example.com' },
+  { username: 'starlit_pegasus', email: 'seed.starlitpegasus@example.com' },
+  { username: 'quillandquad', email: 'seed.quillandquad@example.com' },
+  { username: 'orlando_owl', email: 'seed.orlandoowl@example.com' },
+  { username: 'senior_knight24', email: 'seed.seniorknight24@example.com' },
+  { username: 'goldenpaladin', email: 'seed.goldenpaladin@example.com' },
+  { username: 'campuscoder', email: 'seed.campuscoder@example.com' },
+  { username: 'librarylurker', email: 'seed.librarylurker@example.com' },
+  { username: 'latenightlab', email: 'seed.latenightlab@example.com' },
+  { username: 'quizbowlqueen', email: 'seed.quizbowlqueen@example.com' },
+  { username: 'footballfanatic', email: 'seed.footballfanatic@example.com' },
+  { username: 'thesisthinker', email: 'seed.thesisthinker@example.com' },
+];
+
+const SEED_INSTRUCTORS = [
+  'Dr. Alaric Stone', 'Prof. Priya Anand', 'Dr. Marcus Whitfield', 'Prof. Elena Castillo',
+  'Dr. Samuel Voss', 'Prof. Naomi Reyes', 'Dr. Owen Baptiste', 'Prof. Mei Lin Chao',
+];
+
+const SEED_TERMS = ['Fall 2025', 'Spring 2026', 'Summer 2025', 'Fall 2024', 'Spring 2025'];
+const SEED_GRADES = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
+
+// Sentence-fragment pools, combined per review so no two reads identically.
+const SEED_OPENERS = [
+  'Took this course last term and overall it was worth it.',
+  'Honestly went in with low expectations and was pleasantly surprised.',
+  "This one's a staple for the major, so plan ahead.",
+  'Solid class if you keep up with the material week to week.',
+  'Wasn\'t my favorite, but I learned a lot by the end.',
+  'Would recommend to anyone who likes a structured workload.',
+];
+const SEED_MIDDLES = [
+  'Lectures moved at a reasonable pace and slides were posted ahead of time.',
+  'Assignments took longer than expected, so budget extra hours.',
+  'Office hours were genuinely useful — worth showing up to.',
+  'Exams closely followed the homework, no surprises there.',
+  'Group work was a big chunk of the grade, so pick your team wisely.',
+  'Grading felt fair as long as you followed the rubric closely.',
+];
+const SEED_CLOSERS = [
+  'Would take again if I had the choice.',
+  'Not the easiest course, but manageable if you stay organized.',
+  'Glad I got it out of the way early.',
+  'Definitely helped with the courses that came after it.',
+  "Wouldn't call it fun, but it was fair.",
+  'Solid class overall — no regrets taking it.',
+];
+
+function pickN(arr, n) {
+  const copy = [...arr];
+  const out = [];
+  for (let i = 0; i < n && copy.length > 0; i += 1) {
+    out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+  }
+  return out;
+}
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Half-star increments only, matching the Review schema's quality validator.
+function randomHalfStar(min = 2, max = 5) {
+  const steps = (max - min) * 2;
+  return min + Math.round(Math.random() * steps) / 2;
+}
+
+function randomWholeStar(min = 2, max = 5) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+async function ensureSeedReviewers() {
+  const passwordHash = await bcrypt.hash('SeedAccount!Not-A-Real-Login', 10);
+  const users = [];
+  for (const r of SEED_REVIEWER_POOL) {
+    const user = await User.findOneAndUpdate(
+      { email: r.email },
+      { $setOnInsert: { username: r.username, email: r.email, passwordHash, isVerified: true } },
+      { upsert: true, returnDocument: 'after' }
+    );
+    users.push(user);
+  }
+  return users;
+}
+
+async function recalcCourseStats(courseId) {
+  const stats = await Review.aggregate([
+    { $match: { courseId: new mongoose.Types.ObjectId(courseId) } },
+    {
+      $group: {
+        _id: '$courseId',
+        numRatings: { $sum: 1 },
+        avgRating: { $avg: '$quality' },
+        avgDifficulty: { $avg: '$difficulty' },
+      },
+    },
+  ]);
+  if (stats.length > 0) {
+    await Course.findByIdAndUpdate(courseId, {
+      numRatings: stats[0].numRatings,
+      avgRating: Math.round(stats[0].avgRating * 10) / 10,
+      avgDifficulty: Math.round(stats[0].avgDifficulty * 10) / 10,
+      lastReviewedAt: new Date(),
+    });
+  }
+}
+
+async function seedReviews() {
+  const reviewers = await ensureSeedReviewers();
+  const unreviewedCourses = [];
+  for (const course of await Course.find({})) {
+    // eslint-disable-next-line no-await-in-loop
+    const count = await Review.countDocuments({ courseId: course._id });
+    if (count === 0) unreviewedCourses.push(course);
+  }
+
+  console.log(`[seed] ${unreviewedCourses.length} course(s) have zero reviews — adding synthetic demo reviews...`);
+
+  let totalAdded = 0;
+  for (const course of unreviewedCourses) {
+    const n = 2 + Math.floor(Math.random() * 4); // 2-5 reviews
+    const reviewAuthors = pickN(reviewers, Math.min(n, reviewers.length));
+    for (const author of reviewAuthors) {
+      const comment = `${pick(SEED_OPENERS)} ${pick(SEED_MIDDLES)} ${pick(SEED_CLOSERS)}`;
+      // eslint-disable-next-line no-await-in-loop
+      await Review.create({
+        courseId: course._id,
+        userId: author._id,
+        instructor: pick(SEED_INSTRUCTORS),
+        term: pick(SEED_TERMS),
+        quality: randomHalfStar(2, 5),
+        difficulty: randomWholeStar(1, 5),
+        workload: randomWholeStar(1, 5),
+        gradingFairness: randomWholeStar(2, 5),
+        professorRating: randomWholeStar(2, 5),
+        attendance: randomWholeStar(1, 5),
+        grade: pick(SEED_GRADES),
+        comment,
+        tags: pickN(REVIEW_TAGS, Math.floor(Math.random() * 3)),
+      });
+      totalAdded += 1;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await recalcCourseStats(course._id);
+  }
+
+  console.log(`[seed] Added ${totalAdded} synthetic review(s) across ${unreviewedCourses.length} course(s).`);
+}
+
 async function seed() {
   await connectDB();
   console.log(`[seed] Upserting ${COURSES.length} courses...`);
@@ -146,6 +307,9 @@ async function seed() {
 
   console.log(`[seed] Done. ${created} created, ${updated} already existed.`);
   console.log(`[seed] Total courses in database: ${await Course.countDocuments()}`);
+
+  await seedReviews();
+
   process.exit(0);
 }
 

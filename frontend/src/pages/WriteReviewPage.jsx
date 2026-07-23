@@ -46,6 +46,7 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
   const [resourceUrl, setResourceUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({ term: false, comment: false });
 
   const termOptions = useMemo(() => buildTermOptions(existing?.term), [existing?.term]);
 
@@ -61,6 +62,21 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Term and comment aren't required by the database, but a review with
+    // neither is useless to other students — warn instead of silently
+    // accepting it.
+    const nextFieldErrors = {
+      term: !term,
+      comment: !comment.trim(),
+    };
+    if (nextFieldErrors.term || nextFieldErrors.comment) {
+      setFieldErrors(nextFieldErrors);
+      setError('Please fill out the required fields highlighted below.');
+      return;
+    }
+    setFieldErrors({ term: false, comment: false });
+
     setSaving(true);
     setError(null);
     const payload = {
@@ -117,7 +133,14 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
               />
             </div>
             <div className="course-info-side">
-              <select value={term} onChange={(e) => setTerm(e.target.value)}>
+              <select
+                value={term}
+                className={fieldErrors.term ? 'field-invalid' : ''}
+                onChange={(e) => {
+                  setTerm(e.target.value);
+                  if (e.target.value) setFieldErrors((prev) => ({ ...prev, term: false }));
+                }}
+              >
                 <option value="">Select term</option>
                 {termOptions.map((t) => (
                   <option key={t} value={t}>
@@ -125,6 +148,7 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
                   </option>
                 ))}
               </select>
+              {fieldErrors.term && <p className="write-review-field-error">Term is required.</p>}
               {onViewResources && (
                 <button
                   type="button"
@@ -245,17 +269,24 @@ function WriteReviewPage({ courseId, existing, onCancel, onSaved, onAccountClick
           </div>
 
           <div className="write-review-comment-field">
-            <span className="write-review-label">Write a Review</span>
+            <span className="write-review-label">
+              Write a Review<span className="required-asterisk">*</span>
+            </span>
             <textarea
               placeholder="Share your experience with this course…."
               rows={6}
               value={comment}
               maxLength={CHAR_LIMIT}
-              onChange={(e) => setComment(e.target.value)}
+              className={fieldErrors.comment ? 'field-invalid' : ''}
+              onChange={(e) => {
+                setComment(e.target.value);
+                if (e.target.value.trim()) setFieldErrors((prev) => ({ ...prev, comment: false }));
+              }}
             />
             <span className="write-review-word-count">
               {comment.length} / {CHAR_LIMIT}
             </span>
+            {fieldErrors.comment && <p className="write-review-field-error">A review comment is required.</p>}
           </div>
 
           {error && <p className="write-review-error">{error}</p>}

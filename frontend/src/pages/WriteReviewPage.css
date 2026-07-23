@@ -97,6 +97,21 @@
   cursor: pointer;
 }
 
+.required-asterisk {
+  color: var(--color-error);
+  margin-left: 2px;
+}
+
+.field-invalid {
+  border-color: var(--color-error) !important;
+}
+
+.write-review-field-error {
+  color: var(--color-error);
+  font-size: 12px;
+  margin: 2px 0 0;
+}
+
 .course-info-syllabus {
   display: flex;
   align-items: center;

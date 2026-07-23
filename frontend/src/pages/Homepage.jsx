@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import TopBar from './components/TopBar.jsx';
 import Footer from './components/Footer.jsx';
 import CourseSearchBar from './components/CourseSearchBar.jsx';
-import ucfLogo from '../assets/ucflogos.png';
-import ucfWordmark from '../assets/logo.png';
-import campusPhoto from '../assets/ucfcampus.png';
+import ucfLogo from '../assets/ucflogos.webp';
+import ucfWordmark from '../assets/knightrate_mark.webp';
+import campusPhoto from '../assets/ucfcampus.webp';
 import { getCourses } from '../api/courses.js';
 import './Homepage.css';
 
@@ -58,7 +58,7 @@ function Homepage({
             simply scrolls from here into the sections below. */}
         <section className="hero" style={{ backgroundImage: `url(${campusPhoto})` }}>
           <div className="hero-overlay">
-            <img src={ucfWordmark} alt="UCF" className="hero-wordmark" />
+            <img src={ucfWordmark} alt="KnightRate" className="hero-wordmark" width="567" height="608" />
             <h1 className="hero-title">KnightRate</h1>
             <p className="hero-tagline">
               Real ratings from real students, all in one place. Browse honest reviews on classes
@@ -87,7 +87,7 @@ function Homepage({
 
         <div className="homepage-content">
           <section className="intro" id="how-it-works">
-            <img src={ucfLogo} alt="UCF Logo" className="intro-logo" />
+            <img src={ucfLogo} alt="UCF Logo" className="intro-logo" width="250" height="250" />
             <div className="intro-text">
               <h2 className="intro-heading">Made for Knights, by Knights</h2>
               <p className="intro-line">

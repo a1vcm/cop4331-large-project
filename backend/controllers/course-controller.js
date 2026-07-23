@@ -20,7 +20,11 @@ async function getCourses(req, res) {
           ],
         }
       : {};
-    let query = Course.find(filter).limit(100);
+    // 500 comfortably covers the full course catalog (110 courses as of
+    // this seed) with headroom to grow — 100 silently dropped real courses
+    // off the end of the unfiltered/unsorted list once the catalog passed
+    // 100 entries.
+    let query = Course.find(filter).limit(500);
     if (sort === 'recent') {
       // Mongo sorts null after real dates in descending order, so
       // never-reviewed courses automatically fall to the end.

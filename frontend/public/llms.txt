@@ -1,0 +1,15 @@
+# KnightRate
+
+> KnightRate is a course-review platform for University of Central Florida students. Students search UCF courses, read and post ratings/reviews (difficulty, workload, grading fairness, professor), bookmark classes, and find course resources — all backed by real student accounts and moderated review data.
+
+## Key pages
+
+- [Home](/): search classes and see trending courses
+- [Course search](/): filter and sort the full UCF course catalog
+- [About](/): what KnightRate is and who built it
+- [FAQ](/): common questions about using the site
+
+## Notes
+
+- Course and review data is live and user-generated; it is not available as a static export.
+- Account creation requires a valid email for verification.

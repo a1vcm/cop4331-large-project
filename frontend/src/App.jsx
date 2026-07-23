@@ -1,17 +1,22 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+// Homepage is the landing view for every fresh visit, so it stays a static
+// import (it's needed for first paint anyway). Every other page is loaded
+// on demand — nobody pays for AuthPage/ProfilePage/etc. JS or CSS until
+// they actually navigate there.
 import Homepage from './pages/Homepage.jsx';
-import AuthPage from './pages/AuthPage.jsx';
-import AboutPage from './pages/AboutPage.jsx';
-import FaqPage from './pages/FaqPage.jsx';
-import CourseSearchPage from './pages/CourseSearchPage.jsx';
-import CourseDetailPage from './pages/CourseDetailPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import ResourcesPage from './pages/ResourcesPage.jsx';
-import WriteReviewPage from './pages/WriteReviewPage.jsx';
-import BookmarksPage from './pages/BookmarksPage.jsx';
 import Footer from './pages/components/Footer.jsx';
 import ScrollToTopButton from './pages/components/ScrollToTopButton.jsx';
 import { isLoggedIn } from './api/client.js';
+
+const AuthPage = lazy(() => import('./pages/AuthPage.jsx'));
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
+const FaqPage = lazy(() => import('./pages/FaqPage.jsx'));
+const CourseSearchPage = lazy(() => import('./pages/CourseSearchPage.jsx'));
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage.jsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const ResourcesPage = lazy(() => import('./pages/ResourcesPage.jsx'));
+const WriteReviewPage = lazy(() => import('./pages/WriteReviewPage.jsx'));
+const BookmarksPage = lazy(() => import('./pages/BookmarksPage.jsx'));
 
 function App() {
   const [view, setView] = useState('home'); // 'home' | 'auth' | 'about' | 'faq' | 'courses' | 'courseDetail' | 'profile' | 'resources' | 'writeReview' | 'bookmarks'
@@ -189,7 +194,10 @@ function App() {
 
   return (
     <>
-      {content}
+      {/* Only non-home views are lazy chunks; a null fallback avoids a
+          flash of loading UI for what's typically a near-instant fetch
+          on a warm connection. */}
+      <Suspense fallback={null}>{content}</Suspense>
       {showFooter && <Footer />}
       <ScrollToTopButton />
     </>
