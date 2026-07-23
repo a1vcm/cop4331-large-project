@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import '../services/auth_state.dart';
 import '../theme/app_theme.dart';
+import 'scroll_to_top_button.dart';
 
 /// A frosted, translucent surface approximating iOS's "Liquid Glass"
 /// material. Flutter has no access to Apple's native glass renderer (that's
@@ -37,50 +40,102 @@ class _GlassSurface extends StatelessWidget {
   }
 }
 
-/// Top bar: back button (or app/page title) + the light/dark theme toggle,
-/// extended up through the status bar / Dynamic Island so there's no color
-/// mismatch up there. Mirrors the web TopBar: fixed black in both skins,
-/// with ThemeToggle.jsx's moon/sun button on the trailing side.
+/// Top navigation bar: mirrors frontend/src/pages/components/TopBar.jsx —
+/// back button (optional) + "KnightRate" brand on the leading side, and a
+/// trailing icon row (theme toggle, Info→About, Help→FAQ, Bookmarks,
+/// Account) on the right. The web's Courses icon is intentionally dropped
+/// from this row: on mobile, Courses is already one tap away via the
+/// bottom tab bar (see AppBottomTabBar), so repeating it here would be
+/// redundant chrome the web doesn't need (it has no tab bar at all).
 class AppTopBar extends StatelessWidget {
   final VoidCallback? onBack;
   final bool showBack;
-  final String? title;
+  final bool transparent;
+  final bool showInfoIcon;
+  final bool showHelpIcon;
+  final bool showBookmarksIcon;
+  final bool showAccountIcon;
 
-  const AppTopBar({super.key, this.onBack, this.showBack = false, this.title});
+  const AppTopBar({
+    super.key,
+    this.onBack,
+    this.showBack = false,
+    this.transparent = false,
+    this.showInfoIcon = true,
+    this.showHelpIcon = true,
+    this.showBookmarksIcon = true,
+    this.showAccountIcon = true,
+  });
 
-  static const double contentHeight = 48;
+  static const double contentHeight = 64;
 
   @override
   Widget build(BuildContext context) {
     final topInset = MediaQuery.paddingOf(context).top;
-    return _GlassSurface(
-      tint: AppColors.topBar.withValues(alpha: 0.78),
-      child: Padding(
-        padding: EdgeInsets.only(top: topInset, left: 12, right: 12),
-        child: SizedBox(
-          height: contentHeight,
-          child: Row(
-            children: [
-              if (showBack)
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: AppColors.white, size: 20),
-                  onPressed: onBack,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              SizedBox(width: showBack ? 8 : 0),
-              Expanded(
-                child: Text(
-                  title ?? 'KnightRate',
-                  style: AppTextStyles.button,
-                  overflow: TextOverflow.ellipsis,
-                ),
+    final bar = Padding(
+      padding: EdgeInsets.only(top: topInset, left: 20, right: 12),
+      child: SizedBox(
+        height: contentHeight,
+        child: Row(
+          children: [
+            if (showBack)
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.white, size: 22),
+                onPressed: onBack,
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                padding: EdgeInsets.zero,
               ),
-              const _ThemeToggleButton(),
-            ],
-          ),
+            SizedBox(width: showBack ? 4 : 0),
+            Text(
+              'KnightRate',
+              style: AppTextStyles.button.copyWith(
+                color: ThemeColors.primary(context),
+                fontWeight: AppFontWeights.bold,
+                fontSize: 18,
+              ),
+            ),
+            const Spacer(),
+            const _ThemeToggleButton(),
+            if (showInfoIcon) _TopBarIcon(icon: Icons.info_outline, tooltip: 'Info', onTap: () => context.push('/about')),
+            if (showHelpIcon) _TopBarIcon(icon: Icons.help_outline, tooltip: 'Help', onTap: () => context.push('/faq')),
+            if (showBookmarksIcon)
+              _TopBarIcon(
+                icon: Icons.bookmark_border,
+                tooltip: 'Bookmarks',
+                onTap: () => context.push(AuthState.instance.isLoggedIn ? '/bookmarks' : '/login'),
+              ),
+            if (showAccountIcon)
+              _TopBarIcon(
+                icon: Icons.person_outline,
+                tooltip: 'Account',
+                onTap: () => context.push(AuthState.instance.isLoggedIn ? '/dashboard' : '/login'),
+              ),
+          ],
         ),
       ),
+    );
+
+    if (!transparent) {
+      return ColoredBox(color: AppColors.topBar, child: bar);
+    }
+    return _GlassSurface(tint: AppColors.topBar.withValues(alpha: 0.6), child: bar);
+  }
+}
+
+class _TopBarIcon extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _TopBarIcon({required this.icon, required this.tooltip, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: tooltip,
+      icon: Icon(icon, color: AppColors.white, size: 24),
+      onPressed: onTap,
+      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
     );
   }
 }
@@ -101,20 +156,22 @@ class _ThemeToggleButton extends StatelessWidget {
           icon: Icon(
             isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
             color: AppColors.white,
-            size: 20,
+            size: 24,
           ),
           onPressed: () => ThemeController.instance.toggle(),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
         );
       },
     );
   }
 }
 
-/// Bottom tab bar: Home / Search / Account, the standard 3-destination
-/// iOS UITabBar shape. Purely presentational — MainShell owns the actual
-/// branch-switching logic (see widgets/main_shell.dart).
+/// Bottom tab bar: Home / Courses / Account. Per Apple HIG, tab bars are
+/// for flat top-level navigation between a small number of peer sections
+/// that must stay reachable — that's exactly these three; everything else
+/// (About/FAQ/Bookmarks/course detail/etc.) is hierarchical drill-down and
+/// belongs in the navigation bar (see AppTopBar) or a pushed route instead.
+/// Purely presentational — MainShell owns the actual branch-switching logic.
 class AppBottomTabBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -141,7 +198,7 @@ class AppBottomTabBar extends StatelessWidget {
               _TabButton(
                 icon: Icons.search_outlined,
                 activeIcon: Icons.search,
-                label: 'Search',
+                label: 'Courses',
                 selected: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
@@ -196,37 +253,63 @@ class _TabButton extends StatelessWidget {
   }
 }
 
-/// Wraps a screen body with the standard top bar so screens only need to
-/// supply their middle content (and optionally a title/back action). The
-/// bottom tab bar is no longer part of this — it's owned by MainShell and
-/// automatically stays visible for every screen inside the tab shell
-/// (including pushed detail screens), and automatically absent for
-/// full-screen flows like auth that live outside the shell entirely.
+/// Wraps a screen body with the standard navigation bar so screens only
+/// need to supply their middle content. Any page-specific heading (e.g.
+/// "Your Bookmarks", a course code) lives inside `body` now, matching the
+/// web — TopBar.jsx never shows a page title, only the constant "KnightRate"
+/// brand next to the back button.
+///
+/// `floating: true` overlays the bar on top of `body` (for hero screens
+/// like Home/About where the bar is meant to sit transparently over a
+/// full-bleed image) instead of pushing `body` down in normal flow.
 class AppScaffold extends StatelessWidget {
   final Widget body;
   final bool showBack;
   final VoidCallback? onBack;
-  final String? title;
+  final bool transparent;
+  final bool floating;
+  final bool showInfoIcon;
+  final bool showHelpIcon;
+  final bool showBookmarksIcon;
+  final bool showAccountIcon;
 
   const AppScaffold({
     super.key,
     required this.body,
     this.showBack = false,
     this.onBack,
-    this.title,
+    this.transparent = false,
+    this.floating = false,
+    this.showInfoIcon = true,
+    this.showHelpIcon = true,
+    this.showBookmarksIcon = true,
+    this.showAccountIcon = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final topBar = AppTopBar(
+      showBack: showBack,
+      onBack: onBack,
+      transparent: transparent,
+      showInfoIcon: showInfoIcon,
+      showHelpIcon: showHelpIcon,
+      showBookmarksIcon: showBookmarksIcon,
+      showAccountIcon: showAccountIcon,
+    );
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: Column(
-          children: [
-            AppTopBar(showBack: showBack, onBack: onBack, title: title),
-            Expanded(child: body),
-          ],
-        ),
+        body: floating
+            ? Stack(
+                children: [
+                  Positioned.fill(child: ScrollToTopOverlay(child: body)),
+                  Positioned(top: 0, left: 0, right: 0, child: topBar),
+                ],
+              )
+            : Column(
+                children: [topBar, Expanded(child: ScrollToTopOverlay(child: body))],
+              ),
       ),
     );
   }

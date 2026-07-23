@@ -10,7 +10,7 @@ void main() {
     await tester.pumpWidget(const KnightRateApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Welcome to KnightRate!'), findsOneWidget);
+    expect(find.text('KNIGHTRATE'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
   });
 }
